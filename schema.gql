@@ -1,0 +1,74 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type ReturnStatus {
+  message: String!
+}
+
+type User {
+  _id: String!
+  email: String!
+  name: String
+  password: String
+  salt: String!
+  isAdmin: String!
+  avatar: String!
+  bio: String!
+  verifiedAt: DateTime!
+  token: String!
+  expiredAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Lead {
+  _id: String!
+  email: String!
+  name: String
+  message: String
+}
+
+type Query {
+  Users: [User!]!
+  getUserProfile(input: ListUserInput!): User!
+  Leads: [Lead!]!
+}
+
+input ListUserInput {
+  _id: String
+  name: String
+  email: String
+  password: String
+}
+
+type Mutation {
+  authUser(input: ListUserInput!): User!
+  register(input: CreateUserInput!): ReturnStatus!
+  updateUser(input: UpdateUserInput!): User!
+  deleteUser(id: String!): User!
+  deleteAll: Float!
+  addLead(input: CreateLeadInput!): ReturnStatus!
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+  confirmPassword: String!
+}
+
+input UpdateUserInput {
+  _id: String!
+  name: String
+  email: String
+}
+
+input CreateLeadInput {
+  name: String!
+  email: String!
+  message: String!
+}

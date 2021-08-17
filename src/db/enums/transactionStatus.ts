@@ -1,0 +1,17 @@
+export enum TransactionStatus {
+  New,
+  Draft,
+  Order,
+  Posted,
+  PostedWithLessStock,
+  Completed,
+  Closed,
+  Approved,
+  Archived,
+  Canceled,
+  OnProcess,
+  Shipped,
+  DeliveryConfirmed,
+  Received,
+  Refunded,
+}
