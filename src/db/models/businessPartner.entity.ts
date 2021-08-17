@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { DisplayFields } from '../common/displayFields';
+import { BusinessPartnerType } from '../enums/businessPartnerType';
 import { Address } from './address.entity';
 import { Contact } from './contact.entity';
 import { SalesPerson } from './salesPerson.entity';
@@ -25,11 +26,12 @@ export class BusinessPartner extends DisplayFields {
   creditLimit: number;
 
   @Column({
+    default: BusinessPartnerType.Customer,
+    enum: BusinessPartnerType,
     type: 'enum',
-    enum: ['Customer', 'Vendor'],
   })
-  @Field()
-  type: 'Customer' | 'Vendor';
+  @Field((type) => BusinessPartnerType)
+  public type: BusinessPartnerType;
 
   @Column({
     type: 'enum',
