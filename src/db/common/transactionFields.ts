@@ -4,8 +4,9 @@ import { TransactionStatus } from '../enums/transactionStatus';
 import { TransactionType } from '../enums/transactionType';
 import { BusinessPartner } from '../models/businessPartner.entity';
 import { Warehouse } from '../models/warehouse.entity';
+import { BasicFields } from './basicFields';
 
-export abstract class TransactionFields {
+export abstract class TransactionFields extends BasicFields {
   @Column({
     default: TransactionType.Purchase,
     enum: TransactionType,

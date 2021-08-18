@@ -28,7 +28,7 @@ export class UserService {
   }
 
   async authUser(listUserInput: ListUserInput): Promise<User> {
-    await validate(loginSchema, listUserInput);
+    //await validate(loginSchema, listUserInput);
 
     const { email, password } = listUserInput;
 
@@ -68,59 +68,67 @@ export class UserService {
     return user;
   }
 
-  async create(createUserDto: CreateUserInput): Promise<ReturnStatus> {
+  async create(createUserDto: CreateUserInput): Promise<User> {
     const { email, name, password } = createUserDto;
+    try {
+      //await validate(registerSchema, createUserDto);
+      const found = await this.usersRepository.findOne({ email });
 
-    await validate(registerSchema, createUserDto);
-    const found = await this.usersRepository.findOne({ email });
+      if (found) {
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            error: 'User already exists',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+        //throw new BadRequest('User already exists')
+      }
 
-    if (found) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: 'User already exists',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-      //throw new BadRequest('User already exists')
-    }
+      // let user = new User();
+      // user.email = email;
+      // user.name = name;
+      // user.password = password;
 
-    let usr = new User();
-    usr.email = email;
-    usr.name = name;
-    usr.password = password;
+      let user = await this.usersRepository.create({ email, name, password });
+      user = await this.preSave(user);
 
-    usr = await this.preSave(usr);
-    const user = await this.usersRepository.create(usr);
-
-    if (user) {
-      const link = this.verificationUrl(user);
-      await sendMail({
-        to: email,
-        subject: 'Verify your email address',
-        html: `
+      const response = await this.usersRepository.save(user);
+      //console.log(user);
+      if (response) {
+        const link = this.verificationUrl(user);
+        await sendMail({
+          to: email,
+          subject: 'Verify your email address',
+          html: `
                 <h1>Please use the following link to activate your account</h1>
                 <p>${link}</p>
                 <hr />
                 <p>This email may contain sensitive information</p>
                 <p>${APP_HOSTNAME}</p>
             `,
-      });
-
-      const status = new ReturnStatus();
-      status.message = `Email has been sent to ${email}. Follow the instruction to activate your account`;
-      return status;
-    } else {
+        });
+        return user;
+        // const status = new ReturnStatus();
+        // status.message = `Email has been sent to ${email}. Follow the instruction to activate your account`;
+        // return status;
+      } else {
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            error: 'Invalid user data',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    } catch (err) {
       throw new HttpException(
         {
-          status: HttpStatus.BAD_REQUEST,
-          error: 'Invalid user data',
+          error: err,
         },
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.FORBIDDEN,
       );
     }
-    //return user;
-    //return createdUser.save();
   }
 
   async update(updateUserDto: UpdateUserInput): Promise<UpdateResult> {

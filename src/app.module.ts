@@ -1,16 +1,15 @@
-import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 //import { EasyconfigModule } from 'nestjs-easyconfig';
 
 import { GraphQLModule } from '@nestjs/graphql';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ComponentsModule } from './components/components.module';
-import { MONGO_OPTIONS, MONGO_URI } from './config';
+import * as ormOptions from './config/orm';
 
-//ConfigModule.forRoot({isGlobal: true,  }),
 @Module({
   imports: [
+    TypeOrmModule.forRoot(ormOptions),
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',
       cors: {
@@ -23,7 +22,7 @@ import { MONGO_OPTIONS, MONGO_URI } from './config';
       },
       playground: true,
     }),
-    MongooseModule.forRoot(MONGO_URI, MONGO_OPTIONS),
+
     ComponentsModule,
   ],
 })

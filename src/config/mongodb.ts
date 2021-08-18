@@ -1,4 +1,3 @@
-import mongoose, { ConnectionOptions } from 'mongoose';
 const { env } = process;
 
 export const MONGO_URI = process.env.MONGO_URI;
@@ -11,22 +10,22 @@ export const {
   MONGO_DATABASE,
 } = process.env;
 
-export const MONGO_OPTIONS: ConnectionOptions = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-};
+// export const MONGO_OPTIONS: ConnectionOptions = {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+//   useCreateIndex: true,
+//   useFindAndModify: false,
+// };
 
-export default () => ({
-  MONGO_URI,
-  MONGO_OPTIONS,
-  // port: parseInt(process.env.PORT, 10) || 3000,
-  // database: {
-  //   host: process.env.DATABASE_HOST,
-  //   port: parseInt(process.env.DATABASE_PORT, 10) || 5432
-  // }
-});
+// export default () => ({
+//   MONGO_URI,
+//   MONGO_OPTIONS,
+//   // port: parseInt(process.env.PORT, 10) || 3000,
+//   // database: {
+//   //   host: process.env.DATABASE_HOST,
+//   //   port: parseInt(process.env.DATABASE_PORT, 10) || 5432
+//   // }
+// });
 // export const MONGO_URI = `mongodb://${MONGO_USERNAME}:${encodeURIComponent(<string>MONGO_PASSWORD)
 //   }@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DATABASE}`
 

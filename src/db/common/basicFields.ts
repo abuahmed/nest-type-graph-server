@@ -25,13 +25,13 @@ export abstract class BasicFields {
   @Field()
   isEnabled: boolean;
 
-  @Column()
+  @Column({ default: 1 })
   @Field()
-  createdByUserId!: number;
+  createdByUserId: number;
 
-  @Column()
+  @Column({ default: 1 })
   @Field()
-  modifiedByUserId!: number;
+  modifiedByUserId: number;
 
   @Field()
   @CreateDateColumn({ name: 'DateRecordCreated' })

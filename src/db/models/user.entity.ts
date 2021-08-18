@@ -1,9 +1,12 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { BasicFields } from '../common/basicFields';
 import { UserStatus } from '../enums/userStatus';
 import { Role } from './role.entity';
 
+registerEnumType(UserStatus, {
+  name: 'UserStatus',
+});
 @ObjectType()
 @Entity({ name: 'users' })
 export class User extends BasicFields {
@@ -19,19 +22,19 @@ export class User extends BasicFields {
   @Field()
   password: string;
 
-  @Column()
+  @Column({ nullable: true })
   @Field()
   salt: string;
 
-  @Column()
+  @Column({ nullable: true })
   @Field()
   avatar: string;
 
-  @Column()
+  @Column({ nullable: true })
   @Field()
   bio: string;
 
-  @Column()
+  @Column({ default: false })
   @Field()
   isAdmin: boolean;
 
@@ -40,18 +43,18 @@ export class User extends BasicFields {
     enum: UserStatus,
     type: 'enum',
   })
-  @Field(() => UserStatus)
-  status: UserStatus;
+  @Field((type) => UserStatus)
+  public status: UserStatus;
 
-  @Column()
+  @Column({ nullable: true })
   @Field()
   verifiedAt: Date;
 
-  @Column()
+  @Column({ nullable: true })
   @Field()
   token: string;
 
-  @Column()
+  @Column({ nullable: true })
   @Field()
   expiredAt: Date;
 

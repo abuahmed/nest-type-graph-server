@@ -1,9 +1,9 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { User } from '../../../db/models/user.entity';
 
 @InputType()
 export class ListUserInput {
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   id?: number;
 
   @Field(() => String, { nullable: true })
@@ -49,7 +49,7 @@ export class ReturnUser extends User {
   token: string;
 }
 
-@InputType()
+@ObjectType()
 export class ReturnStatus {
   @Field(() => String)
   message: string;

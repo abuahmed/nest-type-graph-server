@@ -16,10 +16,13 @@ export class TransactionLine extends BasicFields {
   @Column()
   @Field()
   lineNumber: number;
-  @Column()
+  @Column({ type: 'decimal' })
   @Field()
   unit: number;
-  @Column()
+  @Column({ type: 'decimal' })
   @Field()
   eachPrice: number;
+  @Column({ type: 'decimal' })
+  @Field()
+  linePrice: number;
 }

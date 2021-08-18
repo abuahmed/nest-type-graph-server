@@ -3,7 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { GetAuthenticatedUser } from '../get-authenticated-user.decorator';
-import { CreateUserInput, ListUserInput, UpdateUserInput, ReturnStatus } from './dto/user.dto';
+import { CreateUserInput, ListUserInput, UpdateUserInput } from './dto/user.dto';
 import { User } from '../../db/models/user.entity';
 import { UserService } from './user.service';
 
@@ -28,7 +28,7 @@ export class UserResolver {
   async authUser(@Args('input') input: ListUserInput, @GetAuthenticatedUser() user: User) {
     return this._userService.login(user);
   }
-  @Mutation(() => ReturnStatus)
+  @Mutation(() => User)
   async register(@Args('input') input: CreateUserInput) {
     return this._userService.create(input);
   }

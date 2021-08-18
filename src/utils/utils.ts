@@ -8,7 +8,7 @@ export const signVerificationUrl = (url: string) =>
     .update(String(url))
     .digest('hex');
 
-export const hasValidVerificationUrl = function <UserDocument>(
+export const hasValidVerificationUrl = function (
   _id: string,
   _token: string,
   _expires: string,

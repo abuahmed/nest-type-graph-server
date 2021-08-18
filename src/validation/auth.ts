@@ -1,6 +1,6 @@
 import { Joi } from './joi';
 
-const id = Joi.objectId().required();
+const id = Joi.required();
 
 const email = Joi.string().email().min(8).max(254).lowercase().trim().required();
 

@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 //import { UsersService } from '../users/users.service';
-import { JwtService } from '@nestjs/jwt';
-import { loginSchema, validate } from 'src/validation';
 //import { UserResolver } from '../components/user/user.resolver';
-import { UserDocument } from '../user/entities/user.schema';
 import { UserService } from '../user/user.service';
 
 @Injectable()
