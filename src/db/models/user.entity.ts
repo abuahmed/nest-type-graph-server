@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { BasicFields } from '../common/basicFields';
+import { UserStatus } from '../enums/userStatus';
 import { Role } from './role.entity';
 
 @ObjectType()
@@ -35,11 +36,12 @@ export class User extends BasicFields {
   isAdmin: boolean;
 
   @Column({
+    default: UserStatus.Waiting,
+    enum: UserStatus,
     type: 'enum',
-    enum: ['Waiting', 'Active', 'Disabled', 'Blocked'],
   })
-  @Field()
-  status: 'Waiting' | 'Active' | 'Disabled' | 'Blocked';
+  @Field(() => UserStatus)
+  status: UserStatus;
 
   @Column()
   @Field()

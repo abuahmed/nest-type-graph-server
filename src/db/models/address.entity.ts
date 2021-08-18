@@ -47,7 +47,6 @@ export class Address extends BasicFields {
   @Column()
   @Field()
   poBox: string;
-
   @Column()
   @Field()
   notes: string;

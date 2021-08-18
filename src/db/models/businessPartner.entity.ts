@@ -1,13 +1,15 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { DisplayFields } from '../common/displayFields';
+import { BusinessPartnerCategory } from '../enums/businessPartnerCategory';
 import { BusinessPartnerType } from '../enums/businessPartnerType';
 import { Address } from './address.entity';
 import { Contact } from './contact.entity';
 import { SalesPerson } from './salesPerson.entity';
+import { TransactionHeader } from './transactionHeader.entity';
 
 @ObjectType()
-@Entity({ name: 'BusinessPartners' })
+@Entity({ name: 'businessPartners' })
 export class BusinessPartner extends DisplayFields {
   @Column()
   @Field()
@@ -30,22 +32,26 @@ export class BusinessPartner extends DisplayFields {
     enum: BusinessPartnerType,
     type: 'enum',
   })
-  @Field((type) => BusinessPartnerType)
-  public type: BusinessPartnerType;
+  @Field(() => BusinessPartnerType)
+  type: BusinessPartnerType;
 
   @Column({
+    default: BusinessPartnerCategory.Individual,
+    enum: BusinessPartnerCategory,
     type: 'enum',
-    enum: ['Organization', 'Individual'],
   })
-  @Field()
-  category: 'Organization' | 'Individual';
+  @Field(() => BusinessPartnerCategory)
+  category: BusinessPartnerCategory;
 
-  @ManyToOne((type) => Address)
+  @ManyToOne(() => Address)
   address: Address;
 
-  @ManyToOne((type) => Contact)
+  @ManyToOne(() => Contact)
   contact: Contact;
 
-  @ManyToOne((type) => SalesPerson, (sp) => sp.businessPartners)
+  @ManyToOne(() => SalesPerson, (sp) => sp.businessPartners)
   salesPerson: SalesPerson;
+
+  @OneToMany(() => TransactionHeader, (tran) => tran.businessPartner)
+  transactions: TransactionHeader[];
 }

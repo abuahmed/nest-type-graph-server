@@ -1,25 +1,27 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { DisplayFields } from '../common/displayFields';
+import { ItemType } from '../enums/itemType';
 import { Category } from './category.entity';
 
 @ObjectType()
 @Entity({ name: 'items' })
 export class Item extends DisplayFields {
+  @Column({
+    default: ItemType.Purchased,
+    enum: ItemType,
+    type: 'enum',
+  })
+  @Field(() => ItemType)
+  type: ItemType;
+
   @Column()
   @Field()
   code: string;
 
-  @Column({
-    type: 'enum',
-    enum: ['Purchased', 'Manufactured', 'Service'],
-  })
-  @Field()
-  type: 'Purchased' | 'Manufactured' | 'Service';
-
-  @ManyToOne((type) => Category)
+  @ManyToOne(() => Category)
   category: Category;
 
-  @ManyToOne((type) => Category)
+  @ManyToOne(() => Category)
   unitOfMeasure: Category;
 }

@@ -15,9 +15,9 @@ export class SalesPerson extends BasicFields {
   @Field()
   salesLimit: number;
 
-  @ManyToOne((type) => Contact)
+  @ManyToOne(() => Contact)
   contact: Contact;
 
-  @OneToMany((type) => BusinessPartner, (bp) => bp.salesPerson)
+  @OneToMany(() => BusinessPartner, (bp) => bp.salesPerson)
   businessPartners: BusinessPartner;
 }

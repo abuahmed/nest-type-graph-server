@@ -8,10 +8,12 @@ import { Warehouse } from './warehouse.entity';
 @ObjectType()
 @Entity({ name: 'organizations' })
 export class Organization extends DisplayFields {
-  @ManyToOne((type) => Client, (client) => client.organizations)
+  @ManyToOne(() => Client, (client) => client.organizations)
   client: Client;
-  @OneToMany((type) => Warehouse, (warehouse) => warehouse.organization)
+
+  @OneToMany(() => Warehouse, (warehouse) => warehouse.organization)
   warehouses: Warehouse[];
-  @ManyToOne((type) => Address)
+
+  @ManyToOne(() => Address)
   address: Address;
 }

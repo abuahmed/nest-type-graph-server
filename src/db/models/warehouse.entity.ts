@@ -1,14 +1,19 @@
 import { ObjectType } from '@nestjs/graphql';
-import { Entity, ManyToOne } from 'typeorm';
+import { Entity, ManyToOne, OneToMany } from 'typeorm';
 import { DisplayFields } from '../common/displayFields';
 import { Address } from './address.entity';
 import { Organization } from './organization.entity';
+import { TransactionHeader } from './transactionHeader.entity';
 
 @ObjectType()
 @Entity({ name: 'warehouses' })
 export class Warehouse extends DisplayFields {
-  @ManyToOne((type) => Organization, (organization) => organization.warehouses)
+  @ManyToOne(() => Organization, (organization) => organization.warehouses)
   organization: Organization;
-  @ManyToOne((type) => Address)
+
+  @ManyToOne(() => Address)
   address: Address;
+
+  @OneToMany(() => TransactionHeader, (tran) => tran.warehouse)
+  transactions: TransactionHeader[];
 }
