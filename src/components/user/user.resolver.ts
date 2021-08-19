@@ -3,9 +3,17 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { GetAuthenticatedUser } from '../get-authenticated-user.decorator';
-import { CreateUserInput, ListUserInput, UpdateUserInput } from './dto/user.dto';
+import {
+  CreateUserInput,
+  DelResult,
+  DisplayInput,
+  ListUserInput,
+  UpdateUserInput,
+} from './dto/user.dto';
 import { User } from '../../db/models/user.entity';
 import { UserService } from './user.service';
+import { DeleteResult } from 'typeorm';
+import { Role } from 'src/db/models/role.entity';
 
 @Resolver()
 export class UserResolver {
@@ -37,9 +45,16 @@ export class UserResolver {
     return this._userService.update(input);
   }
 
-  @Mutation(() => User)
-  async deleteUser(@Args('id') id: string) {
+  @Mutation(() => DelResult)
+  async deleteUser(@Args('id') id: number) {
     return this._userService.delete(id);
+  }
+
+  @Mutation(() => [Role])
+  async addRoles(
+    @Args({ name: 'input', type: () => [DisplayInput] }) input: DisplayInput[],
+  ): Promise<Array<Role>> {
+    return this._userService.addRoles(input);
   }
 
   @Mutation(() => Number)

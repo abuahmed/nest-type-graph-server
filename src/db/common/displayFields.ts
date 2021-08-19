@@ -1,13 +1,14 @@
-import { Field } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { Column } from 'typeorm';
 import { BasicFields } from './basicFields';
 
+@ObjectType()
 export abstract class DisplayFields extends BasicFields {
   @Field()
-  @Column()
+  @Column({ unique: true })
   displayName: string;
 
   @Field()
-  @Column()
-  description: string;
+  @Column({ nullable: true })
+  description?: string;
 }

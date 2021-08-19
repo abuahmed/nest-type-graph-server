@@ -33,7 +33,7 @@ export class CreateUserInput {
 
 @InputType()
 export class UpdateUserInput {
-  @Field(() => String)
+  @Field(() => Number)
   id?: number;
 
   @Field(() => String, { nullable: true })
@@ -53,4 +53,19 @@ export class ReturnUser extends User {
 export class ReturnStatus {
   @Field(() => String)
   message: string;
+}
+
+@ObjectType()
+export class DelResult {
+  @Field(() => String)
+  affectedRows: number;
+}
+
+@InputType()
+export class DisplayInput {
+  @Field(() => String, { nullable: true })
+  displayName?: string;
+
+  @Field(() => String, { nullable: true })
+  description?: string;
 }

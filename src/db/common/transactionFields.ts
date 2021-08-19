@@ -1,11 +1,11 @@
-import { Field } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, ManyToOne } from 'typeorm';
 import { TransactionStatus } from '../enums/transactionStatus';
 import { TransactionType } from '../enums/transactionType';
 import { BusinessPartner } from '../models/businessPartner.entity';
 import { Warehouse } from '../models/warehouse.entity';
 import { BasicFields } from './basicFields';
-
+@ObjectType()
 export abstract class TransactionFields extends BasicFields {
   @Column({
     default: TransactionType.Purchase,

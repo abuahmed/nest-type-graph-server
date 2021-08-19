@@ -1,23 +1,5 @@
-// import mongoose from 'mongoose';
 import joi, { Root, ObjectSchema } from '@hapi/joi';
 import { BadRequest } from '../errors';
-
-// const objectId: ExtensionFactory = (joi) => ({
-//   type: 'objectId',
-//   base: joi.string(),
-//   messages: {
-//     objectId: '"{#label}" is not a valid ID',
-//   },
-//   validate(value, helpers) {
-//     if (!mongoose.Types.ObjectId.isValid(value)) {
-//       return { value, errors: helpers.error('objectId') };
-//     }
-//   },
-// });
-
-// interface ExtendedRoot extends Root {
-//   objectId(): StringSchema;
-// }
 
 export const Joi: Root = joi; //.extend(objectId);
 

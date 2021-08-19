@@ -2,7 +2,32 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Role {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  displayName: String!
+  description: String!
+  descriptionShort: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type User {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
   name: String!
   email: String!
   password: String!
@@ -23,10 +48,9 @@ enum UserStatus {
   Blocked
 }
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
+type DelResult {
+  affectedRows: String!
+}
 
 type Query {
   Users: [User!]!
@@ -44,7 +68,8 @@ type Mutation {
   authUser(input: ListUserInput!): User!
   register(input: CreateUserInput!): User!
   updateUser(input: UpdateUserInput!): User!
-  deleteUser(id: String!): User!
+  deleteUser(id: Float!): DelResult!
+  addRoles(input: [DisplayInput!]!): [Role!]!
   deleteAll: Float!
 }
 
@@ -56,7 +81,12 @@ input CreateUserInput {
 }
 
 input UpdateUserInput {
-  id: String!
+  id: Float!
   name: String
   email: String
+}
+
+input DisplayInput {
+  displayName: String
+  description: String
 }

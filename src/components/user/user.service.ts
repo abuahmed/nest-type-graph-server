@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { ReturnStatus } from './dto/user.dto';
+import { DelResult, DisplayInput, ReturnStatus } from './dto/user.dto';
 import { User } from '../../db/models/user.entity';
 import { CreateUserInput, ListUserInput, UpdateUserInput } from './dto/user.dto';
 import { validate, registerSchema, loginSchema } from '../../validation';
@@ -14,25 +14,28 @@ import { hash, compare, genSalt } from 'bcryptjs';
 import { createHash, timingSafeEqual } from 'crypto';
 import { EMAIL_VERIFICATION_TIMEOUT, CLIENT_ORIGIN, PASSWORD_RESET_TIMEOUT } from '../../config';
 import { hashedToken, signVerificationUrl } from '../../utils/utils';
+import { Role } from 'src/db/models/role.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private readonly usersRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
     private readonly jwtService: JwtService,
   ) {}
 
   async findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+    return this.userRepository.find();
   }
 
   async authUser(listUserInput: ListUserInput): Promise<User> {
-    //await validate(loginSchema, listUserInput);
+    await validate(loginSchema, listUserInput);
 
     const { email, password } = listUserInput;
 
-    const user = await this.usersRepository.findOne({ email });
+    const user = await this.userRepository.findOne({ email });
 
     if (!user || !(await this.matchesPassword(password, user))) {
       throw new HttpException(
@@ -44,18 +47,11 @@ export class UserService {
       );
     }
     return user;
-    // const userData = new ReturnUser();
-    // userData._id = user._id;
-    // userData.name = user.name;
-    // userData.email = user.email;
-    // userData.isAdmin = user.isAdmin;
-    // userData.token = generateToken(user._id);
-    // return userData;
   }
 
   async getUserProfile(listUserInput: ListUserInput): Promise<User> {
     const { id } = listUserInput;
-    const user = await this.usersRepository.findOne({ id });
+    const user = await this.userRepository.findOne({ id });
     if (!user) {
       throw new HttpException(
         {
@@ -71,8 +67,8 @@ export class UserService {
   async create(createUserDto: CreateUserInput): Promise<User> {
     const { email, name, password } = createUserDto;
     try {
-      //await validate(registerSchema, createUserDto);
-      const found = await this.usersRepository.findOne({ email });
+      await validate(registerSchema, createUserDto);
+      const found = await this.userRepository.findOne({ email });
 
       if (found) {
         throw new HttpException(
@@ -82,18 +78,12 @@ export class UserService {
           },
           HttpStatus.BAD_REQUEST,
         );
-        //throw new BadRequest('User already exists')
       }
 
-      // let user = new User();
-      // user.email = email;
-      // user.name = name;
-      // user.password = password;
-
-      let user = await this.usersRepository.create({ email, name, password });
+      let user = this.userRepository.create({ email, name, password });
       user = await this.preSave(user);
 
-      const response = await this.usersRepository.save(user);
+      const response = await this.userRepository.save(user);
       //console.log(user);
       if (response) {
         const link = this.verificationUrl(user);
@@ -109,9 +99,6 @@ export class UserService {
             `,
         });
         return user;
-        // const status = new ReturnStatus();
-        // status.message = `Email has been sent to ${email}. Follow the instruction to activate your account`;
-        // return status;
       } else {
         throw new HttpException(
           {
@@ -124,25 +111,54 @@ export class UserService {
     } catch (err) {
       throw new HttpException(
         {
+          status: HttpStatus.FORBIDDEN,
           error: err,
+          message: err.message,
         },
         HttpStatus.FORBIDDEN,
       );
     }
   }
 
-  async update(updateUserDto: UpdateUserInput): Promise<UpdateResult> {
-    return this.usersRepository.update(updateUserDto.id, updateUserDto);
+  async update(updateUserDto: UpdateUserInput): Promise<User> {
+    await this.userRepository.update(updateUserDto.id, {
+      name: updateUserDto.name,
+      email: updateUserDto.email,
+    });
+
+    const user = await this.userRepository.findOne({ id: updateUserDto.id });
+    return user;
   }
 
-  async delete(id: string): Promise<DeleteResult> {
-    return this.usersRepository.delete(id);
+  async delete(id: number): Promise<DelResult> {
+    const del = await this.userRepository.delete(id);
+    const res = new DelResult();
+    res.affectedRows = del.affected;
+    return res;
   }
 
   async deleteAll(): Promise<void> {
-    // const deletedCount = await this.usersRepository.count;
-    return await this.usersRepository.clear();
-    //return deletedCount;
+    return await this.userRepository.clear();
+  }
+
+  async addRoles(roles: DisplayInput[]): Promise<Role[]> {
+    try {
+      const rls = [];
+      roles.forEach((rl) => {
+        rls.push(this.roleRepository.create({ displayName: rl.displayName }));
+      });
+      const role = await this.roleRepository.save(rls);
+      return role;
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
   }
 
   async login(user: User) {
