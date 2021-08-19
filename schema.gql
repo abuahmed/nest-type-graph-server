@@ -39,6 +39,7 @@ type User {
   verifiedAt: DateTime!
   token: String!
   expiredAt: DateTime!
+  roles: [Role!]!
 }
 
 enum UserStatus {
@@ -52,13 +53,26 @@ type DelResult {
   affectedRows: String!
 }
 
+type Warehouse {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  displayName: String!
+  description: String!
+}
+
 type Query {
   Users: [User!]!
   getUserProfile(input: ListUserInput!): User!
+  Warehouses: [Warehouse!]!
 }
 
 input ListUserInput {
-  id: String
+  id: Float
   name: String
   email: String
   password: String
@@ -70,7 +84,9 @@ type Mutation {
   updateUser(input: UpdateUserInput!): User!
   deleteUser(id: Float!): DelResult!
   addRoles(input: [DisplayInput!]!): [Role!]!
+  addUserRoles(input: [ListUserInput!]!): User!
   deleteAll: Float!
+  create(input: DisplayInput!): Warehouse!
 }
 
 input CreateUserInput {

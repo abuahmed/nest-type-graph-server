@@ -60,5 +60,6 @@ export class User extends BasicFields {
 
   @ManyToMany(() => Role)
   @JoinTable()
+  @Field(() => [Role])
   roles: Role[];
 }

@@ -6,6 +6,8 @@ const email = Joi.string().email().min(8).max(254).lowercase().trim().required()
 
 const name = Joi.string().min(3).max(128).trim().required();
 
+const displayName = Joi.string().min(3).max(128).trim().required();
+
 const password = Joi.string().min(6).max(20).required();
 // const password = Joi.string().min(8)
 //     .regex(/^(?=.*?[\p{Lu}])(?=.*?[\p{Ll}])(?=.*?\d).*$/u)
@@ -35,6 +37,10 @@ export const verifyEmailSchema = Joi.object({
 
 export const resendEmailSchema = Joi.object({
   id,
+});
+
+export const displaySchema = Joi.object({
+  displayName,
 });
 
 export const forgotPasswordSchema = Joi.object({

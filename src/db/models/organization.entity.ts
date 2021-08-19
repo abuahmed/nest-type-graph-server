@@ -8,7 +8,7 @@ import { Warehouse } from './warehouse.entity';
 @ObjectType()
 @Entity({ name: 'organizations' })
 export class Organization extends DisplayFields {
-  @ManyToOne(() => Client, (client) => client.organizations)
+  @ManyToOne(() => Client, (client) => client.organizations, { cascade: true })
   client: Client;
 
   @OneToMany(() => Warehouse, (warehouse) => warehouse.organization)
