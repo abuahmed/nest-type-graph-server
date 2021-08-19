@@ -27,7 +27,7 @@ export class UserService {
   ) {}
 
   async findAll(): Promise<User[]> {
-    return this.userRepository.find();
+    return this.userRepository.find({ relations: ['roles'] });
   }
 
   async authUser(listUserInput: ListUserInput): Promise<User> {
@@ -161,6 +161,31 @@ export class UserService {
     }
   }
 
+  async addUserRoles(roles: ListUserInput[]): Promise<User> {
+    try {
+      let user = await this.userRepository.findOne({ id: roles[0].id });
+
+      const rls = [];
+      for (let i = 1; i < roles.length; i++) {
+        const rl = await this.roleRepository.findOne({ id: roles[i].id });
+        rls.push(rl);
+      }
+
+      user.roles = rls;
+      console.log(user);
+      user = await this.userRepository.save(user);
+      return user;
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
   async login(user: User) {
     const payload = { id: user.id };
     return {

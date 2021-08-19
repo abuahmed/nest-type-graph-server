@@ -12,7 +12,6 @@ import {
 } from './dto/user.dto';
 import { User } from '../../db/models/user.entity';
 import { UserService } from './user.service';
-import { DeleteResult } from 'typeorm';
 import { Role } from 'src/db/models/role.entity';
 
 @Resolver()
@@ -21,7 +20,7 @@ export class UserResolver {
 
   //Query
   @Query(() => [User])
-  async Users() {
+  async Users(): Promise<Array<User>> {
     return this._userService.findAll();
   }
 
@@ -55,6 +54,13 @@ export class UserResolver {
     @Args({ name: 'input', type: () => [DisplayInput] }) input: DisplayInput[],
   ): Promise<Array<Role>> {
     return this._userService.addRoles(input);
+  }
+
+  @Mutation(() => User)
+  async addUserRoles(
+    @Args({ name: 'input', type: () => [ListUserInput] }) input: ListUserInput[],
+  ): Promise<User> {
+    return this._userService.addUserRoles(input);
   }
 
   @Mutation(() => Number)

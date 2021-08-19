@@ -3,7 +3,7 @@ import { User } from '../../../db/models/user.entity';
 
 @InputType()
 export class ListUserInput {
-  @Field(() => String, { nullable: true })
+  @Field(() => Number, { nullable: true })
   id?: number;
 
   @Field(() => String, { nullable: true })
