@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Address } from 'src/db/models/address.entity';
 import { Client } from 'src/db/models/client.entity';
 import { Organization } from 'src/db/models/organization.entity';
 import { Warehouse } from 'src/db/models/warehouse.entity';
@@ -10,6 +11,8 @@ import { DisplayInput } from '../user/dto/user.dto';
 @Injectable()
 export class WarehouseService {
   constructor(
+    @InjectRepository(Address)
+    private readonly addressRepository: Repository<Address>,
     @InjectRepository(Client)
     private readonly clientRepository: Repository<Client>,
     @InjectRepository(Organization)
@@ -32,21 +35,28 @@ export class WarehouseService {
         throw new HttpException(
           {
             status: HttpStatus.BAD_REQUEST,
-            error: 'User already exists',
+            error: 'Warehouse already exists',
           },
           HttpStatus.BAD_REQUEST,
         );
       }
 
       const client = this.clientRepository.create({ displayName });
+      client.address = this.addressRepository.create({ country: 'Ethiopia', city: 'Addis Ababa' });
       const organization = this.organizationRepository.create({ displayName });
       organization.client = client;
+      organization.address = this.addressRepository.create({
+        country: 'Ethiopia',
+        city: 'Addis Ababa',
+      });
 
       const warehouse = this.warehouseRepository.create({ displayName });
       warehouse.organization = organization;
-
+      warehouse.address = this.addressRepository.create({
+        country: 'Ethiopia',
+        city: 'Addis Ababa',
+      });
       const response = await this.warehouseRepository.save(warehouse);
-      //console.log(user);
       return response;
     } catch (err) {
       throw new HttpException(

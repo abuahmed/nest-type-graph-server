@@ -8,10 +8,13 @@ import { TransactionHeader } from './transactionHeader.entity';
 @ObjectType()
 @Entity({ name: 'warehouses' })
 export class Warehouse extends DisplayFields {
-  @ManyToOne(() => Organization, (organization) => organization.warehouses, { cascade: true })
+  @ManyToOne(() => Organization, (organization) => organization.warehouses, {
+    cascade: true,
+    nullable: false,
+  })
   organization: Organization;
 
-  @ManyToOne(() => Address, { cascade: true })
+  @ManyToOne(() => Address, { cascade: true, nullable: false })
   address: Address;
 
   @OneToMany(() => TransactionHeader, (tran) => tran.warehouse, { cascade: true })

@@ -10,6 +10,6 @@ export class Contact extends BasicFields {
   @Field()
   fullName: string;
 
-  @ManyToOne(() => Address)
+  @ManyToOne(() => Address, { cascade: true, nullable: false })
   address: Address;
 }

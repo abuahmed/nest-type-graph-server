@@ -18,6 +18,6 @@ export class Client extends DisplayFields {
 
   @OneToMany(() => Organization, (org) => org.client)
   organizations: Organization[];
-  @ManyToOne(() => Address)
+  @ManyToOne(() => Address, { cascade: true, nullable: false })
   address: Address;
 }

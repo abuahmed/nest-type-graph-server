@@ -7,15 +7,15 @@ import { Contact } from './contact.entity';
 @ObjectType()
 @Entity({ name: 'salesPersons' })
 export class SalesPerson extends BasicFields {
-  @Column()
+  @Column({ nullable: true })
   @Field()
   code: string;
 
-  @Column()
+  @Column({ default: 0 })
   @Field()
   salesLimit: number;
 
-  @ManyToOne(() => Contact)
+  @ManyToOne(() => Contact, { cascade: true, nullable: false })
   contact: Contact;
 
   @OneToMany(() => BusinessPartner, (bp) => bp.salesPerson)

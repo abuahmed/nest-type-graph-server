@@ -11,43 +11,43 @@ export class Address extends BasicFields {
   @Column()
   @Field()
   city: string;
-  @Column()
+  @Column({ nullable: true })
   @Field()
   subCity: string;
-  @Column()
+  @Column({ nullable: true })
   @Field()
   streetAddress: string;
-  @Column()
+  @Column({ nullable: true })
   @Field()
   woreda: string;
-  @Column()
+  @Column({ nullable: true })
   @Field()
   kebele: string;
-  @Column()
+  @Column({ nullable: true })
   @Field()
   houseNumber: string;
-  @Column()
+  @Column({ nullable: true })
   @Field()
   telephone: string;
-  @Column()
+  @Column({ nullable: true })
   @Field()
   alternateTelephone: string;
-  @Column()
+  @Column({ nullable: true })
   @Field()
   email: string;
-  @Column()
+  @Column({ nullable: true })
   @Field()
   alternateEmail: string;
-  @Column()
+  @Column({ nullable: true })
   @Field()
   webAddress: string;
-  @Column()
+  @Column({ nullable: true })
   @Field()
   fax: string;
-  @Column()
+  @Column({ nullable: true })
   @Field()
   poBox: string;
-  @Column()
+  @Column({ nullable: true })
   @Field()
   notes: string;
 }

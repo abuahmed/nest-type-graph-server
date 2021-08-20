@@ -11,19 +11,19 @@ import { TransactionHeader } from './transactionHeader.entity';
 @ObjectType()
 @Entity({ name: 'businessPartners' })
 export class BusinessPartner extends DisplayFields {
-  @Column()
+  @Column({ nullable: true })
   @Field()
   tinNumber: string;
 
-  @Column()
+  @Column({ nullable: true })
   @Field()
   vatNumber: string;
 
-  @Column()
+  @Column({ nullable: true })
   @Field()
   code: string;
 
-  @Column()
+  @Column({ default: 0 })
   @Field()
   creditLimit: number;
 
@@ -43,10 +43,10 @@ export class BusinessPartner extends DisplayFields {
   @Field(() => BusinessPartnerCategory)
   category: BusinessPartnerCategory;
 
-  @ManyToOne(() => Address)
+  @ManyToOne(() => Address, { cascade: true, nullable: false })
   address: Address;
 
-  @ManyToOne(() => Contact)
+  @ManyToOne(() => Contact, { cascade: true, nullable: false })
   contact: Contact;
 
   @ManyToOne(() => SalesPerson, (sp) => sp.businessPartners)
