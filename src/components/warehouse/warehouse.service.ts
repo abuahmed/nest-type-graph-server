@@ -1,7 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CategoryType } from 'src/db/enums/categoryType';
 import { Address } from 'src/db/models/address.entity';
+import { Category } from 'src/db/models/category.entity';
 import { Client } from 'src/db/models/client.entity';
+import { Inventory } from 'src/db/models/inventory.entity';
+import { Item } from 'src/db/models/item.entity';
 import { Organization } from 'src/db/models/organization.entity';
 import { Warehouse } from 'src/db/models/warehouse.entity';
 import { displaySchema, validate } from 'src/validation';
@@ -19,16 +23,22 @@ export class WarehouseService {
     private readonly organizationRepository: Repository<Organization>,
     @InjectRepository(Warehouse)
     private readonly warehouseRepository: Repository<Warehouse>,
+    @InjectRepository(Item)
+    private readonly itemRepository: Repository<Item>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Inventory)
+    private readonly inventoryRepository: Repository<Inventory>,
   ) {}
 
   async findAll(): Promise<Warehouse[]> {
     return this.warehouseRepository.find();
   }
 
-  async create(createWarehouseDto: DisplayInput): Promise<Warehouse> {
-    const { displayName } = createWarehouseDto;
+  async create(createItemDto: DisplayInput): Promise<Warehouse> {
+    const { displayName } = createItemDto;
     try {
-      await validate(displaySchema, createWarehouseDto);
+      await validate(displaySchema, createItemDto);
       const found = await this.warehouseRepository.findOne({ displayName });
 
       if (found) {
@@ -57,6 +67,53 @@ export class WarehouseService {
         city: 'Addis Ababa',
       });
       const response = await this.warehouseRepository.save(warehouse);
+      return response;
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  async createItem(createItemDto: Item): Promise<Item> {
+    let { category, unitOfMeasure } = createItemDto;
+    try {
+      await validate(displaySchema, createItemDto);
+      const found = await this.itemRepository.findOne({ displayName: createItemDto.displayName });
+
+      if (found) {
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            error: 'Item already exists',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (!category) {
+        category = await this.categoryRepository.findOne({
+          type: CategoryType.ItemCategory,
+          displayName: 'Default',
+        });
+      }
+      if (!unitOfMeasure) {
+        unitOfMeasure = await this.categoryRepository.findOne({
+          type: CategoryType.UnitOfMeasure,
+          displayName: 'Pcs',
+        });
+      }
+
+      const item = this.itemRepository.create({ displayName: createItemDto.displayName });
+      item.category = category;
+      item.unitOfMeasure = unitOfMeasure;
+      const response = await this.itemRepository.save(item);
+
       return response;
     } catch (err) {
       throw new HttpException(

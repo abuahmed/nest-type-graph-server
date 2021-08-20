@@ -16,18 +16,27 @@ export class ListWarehouseInput {
 }
 
 @InputType()
-export class CreateWarehouseInput {
+export class ItemInput {
   @Field()
-  name: string;
+  displayName: string;
 
   @Field()
-  email: string;
+  category: string;
 
   @Field()
-  password: string;
+  uom: string;
+}
+
+@InputType()
+export class CategoryInput {
+  @Field()
+  displayName: string;
 
   @Field()
-  confirmPassword: string;
+  category: string;
+
+  @Field()
+  uom: string;
 }
 
 @InputType()
