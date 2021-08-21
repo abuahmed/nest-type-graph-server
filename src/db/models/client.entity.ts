@@ -1,10 +1,12 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { DisplayFields } from '../common/displayFields';
 import { ClientType } from '../enums/clientType';
 import { Address } from './address.entity';
 import { Organization } from './organization.entity';
-
+registerEnumType(ClientType, {
+  name: 'ClientType',
+});
 @ObjectType()
 @Entity({ name: 'clients' })
 export class Client extends DisplayFields {

@@ -60,12 +60,3 @@ export class DelResult {
   @Field(() => String)
   affectedRows: number;
 }
-
-@InputType()
-export class DisplayInput {
-  @Field(() => String, { nullable: true })
-  displayName?: string;
-
-  @Field(() => String, { nullable: true })
-  description?: string;
-}

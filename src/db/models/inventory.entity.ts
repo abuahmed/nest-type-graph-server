@@ -7,13 +7,13 @@ import { Warehouse } from './warehouse.entity';
 @ObjectType()
 @Entity({ name: 'inventories' })
 export class Inventory extends BasicFields {
-  @ManyToOne(() => Warehouse)
+  @ManyToOne(() => Warehouse, { nullable: false })
   warehouse: Warehouse;
 
-  @ManyToOne(() => Item)
+  @ManyToOne(() => Item, { nullable: false })
   item: Item;
 
-  @Column()
+  @Column({ type: 'decimal' })
   @Field()
   qtyOnHand: number;
 }

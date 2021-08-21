@@ -4,9 +4,9 @@ import { Address } from 'src/db/models/address.entity';
 import { BusinessPartner } from 'src/db/models/businessPartner.entity';
 import { displaySchema, validate } from 'src/validation';
 import { Repository } from 'typeorm';
-import { DisplayInput } from '../user/dto/user.dto';
 import { Contact } from 'src/db/models/contact.entity';
 import { SalesPerson } from 'src/db/models/salesPerson.entity';
+import { DisplayInput } from '../dto/display.input';
 
 @Injectable()
 export class BusinessPartnerService {

@@ -1,9 +1,11 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { DisplayFields } from '../common/displayFields';
 import { ItemType } from '../enums/itemType';
 import { Category } from './category.entity';
-
+registerEnumType(ItemType, {
+  name: 'ItemType',
+});
 @ObjectType()
 @Entity({ name: 'items' })
 export class Item extends DisplayFields {
@@ -15,13 +17,15 @@ export class Item extends DisplayFields {
   @Field(() => ItemType)
   type: ItemType;
 
-  @Column()
+  @Column({ unique: true, nullable: true })
   @Field()
-  code: string;
+  code?: string;
 
-  @ManyToOne(() => Category)
-  category: Category;
+  @ManyToOne(() => Category, { cascade: true, nullable: false })
+  @Field(() => Category)
+  itemCategory: Category;
 
-  @ManyToOne(() => Category)
+  @ManyToOne(() => Category, { cascade: true, nullable: false })
+  @Field(() => Category)
   unitOfMeasure: Category;
 }

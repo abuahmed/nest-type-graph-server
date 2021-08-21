@@ -5,6 +5,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ComponentsModule } from './components/components.module';
+import { ItemModule } from './components/item/item.module';
 import * as ormOptions from './config/orm';
 
 @Module({

@@ -28,18 +28,6 @@ export class ItemInput {
 }
 
 @InputType()
-export class CategoryInput {
-  @Field()
-  displayName: string;
-
-  @Field()
-  category: string;
-
-  @Field()
-  uom: string;
-}
-
-@InputType()
 export class UpdateWarehouseInput {
   @Field(() => Number)
   id?: number;

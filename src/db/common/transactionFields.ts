@@ -1,10 +1,17 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Column, ManyToOne } from 'typeorm';
 import { TransactionStatus } from '../enums/transactionStatus';
 import { TransactionType } from '../enums/transactionType';
 import { BusinessPartner } from '../models/businessPartner.entity';
 import { Warehouse } from '../models/warehouse.entity';
 import { BasicFields } from './basicFields';
+registerEnumType(TransactionType, {
+  name: 'TransactionType',
+});
+
+registerEnumType(TransactionStatus, {
+  name: 'TransactionStatus',
+});
 @ObjectType()
 export abstract class TransactionFields extends BasicFields {
   @Column({

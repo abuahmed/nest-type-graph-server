@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { DelResult, DisplayInput, ReturnStatus } from './dto/user.dto';
+import { DelResult, ReturnStatus } from './dto/user.dto';
 import { User } from '../../db/models/user.entity';
 import { CreateUserInput, ListUserInput, UpdateUserInput } from './dto/user.dto';
 import { validate, registerSchema, loginSchema } from '../../validation';
@@ -15,6 +15,7 @@ import { createHash, timingSafeEqual } from 'crypto';
 import { EMAIL_VERIFICATION_TIMEOUT, CLIENT_ORIGIN, PASSWORD_RESET_TIMEOUT } from '../../config';
 import { hashedToken, signVerificationUrl } from '../../utils/utils';
 import { Role } from 'src/db/models/role.entity';
+import { DisplayInput } from '../dto/display.input';
 
 @Injectable()
 export class UserService {

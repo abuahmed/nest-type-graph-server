@@ -3,16 +3,11 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { GetAuthenticatedUser } from '../get-authenticated-user.decorator';
-import {
-  CreateUserInput,
-  DelResult,
-  DisplayInput,
-  ListUserInput,
-  UpdateUserInput,
-} from './dto/user.dto';
+import { CreateUserInput, DelResult, ListUserInput, UpdateUserInput } from './dto/user.dto';
 import { User } from '../../db/models/user.entity';
 import { UserService } from './user.service';
 import { Role } from 'src/db/models/role.entity';
+import { DisplayInput } from '../dto/display.input';
 
 @Resolver()
 export class UserResolver {

@@ -53,6 +53,193 @@ type DelResult {
   affectedRows: String!
 }
 
+type Address {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  country: String!
+  city: String!
+  subCity: String!
+  streetAddress: String!
+  woreda: String!
+  kebele: String!
+  houseNumber: String!
+  telephone: String!
+  alternateTelephone: String!
+  email: String!
+  alternateEmail: String!
+  webAddress: String!
+  fax: String!
+  poBox: String!
+  notes: String!
+}
+
+type Category {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  displayName: String!
+  description: String!
+  type: CategoryType!
+  parentCategory: Category
+  childCategories: [Category!]!
+}
+
+enum CategoryType {
+  ItemCategory
+  UnitOfMeasure
+  Bank
+}
+
+type Item {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  displayName: String!
+  description: String!
+  type: ItemType!
+  code: String
+  itemCategory: Category!
+  unitOfMeasure: Category!
+}
+
+enum ItemType {
+  Purchased
+  Manufactured
+  Service
+}
+
+type TransactionLine {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  lineNumber: Float!
+  unit: Float!
+  eachPrice: Float!
+  linePrice: Float!
+  header: TransactionHeader!
+  item: Item!
+}
+
+type Contact {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  fullName: String!
+  address: Address!
+}
+
+type SalesPerson {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  code: String!
+  salesLimit: Float!
+  contact: Contact!
+  businessPartners: BusinessPartner!
+}
+
+type BusinessPartner {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  displayName: String!
+  description: String!
+  tinNumber: String!
+  vatNumber: String!
+  code: String!
+  creditLimit: Float!
+  type: BusinessPartnerType!
+  category: BusinessPartnerCategory!
+  address: Address!
+  contact: Contact!
+  salesPerson: SalesPerson!
+  transactions: [TransactionHeader!]!
+}
+
+enum BusinessPartnerType {
+  Customer
+  Vendor
+}
+
+enum BusinessPartnerCategory {
+  Organization
+  Individual
+}
+
+type TransactionHeader {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  type: TransactionType!
+  number: Float!
+  date: DateTime!
+  status: TransactionStatus!
+  comment: String!
+  lines: [TransactionLine!]!
+}
+
+enum TransactionType {
+  All
+  Sale
+  Purchase
+  Profit
+  Pi
+  GoodsIn
+  GoodsOut
+  StockTransfer
+}
+
+enum TransactionStatus {
+  New
+  Draft
+  Order
+  Posted
+  PostedWithLessStock
+  Completed
+  Closed
+  Approved
+  Archived
+  Canceled
+  OnProcess
+  Shipped
+  DeliveryConfirmed
+  Received
+  Refunded
+}
+
 type Warehouse {
   id: Float!
   uuid: String!
@@ -63,12 +250,54 @@ type Warehouse {
   dateLastModified: DateTime!
   displayName: String!
   description: String!
+  organization: Organization!
+  address: Address!
+  transactions: [TransactionHeader!]!
+}
+
+type Organization {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  displayName: String!
+  description: String!
+  client: Client!
+  warehouses: [Warehouse!]!
+  address: Address!
+}
+
+type Client {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  displayName: String!
+  description: String!
+  type: ClientType!
+  organizations: [Organization!]!
+  address: Address!
+}
+
+enum ClientType {
+  SingleOrgSingleStore
+  SingleOrgMultiStore
+  MultiOrgSingleStore
+  MultiOrgMultiStore
 }
 
 type Query {
   Users: [User!]!
   getUserProfile(input: ListUserInput!): User!
   Warehouses: [Warehouse!]!
+  BusinessPartners: [BusinessPartner!]!
+  item(id: Int!): Item!
 }
 
 input ListUserInput {
@@ -87,6 +316,10 @@ type Mutation {
   addUserRoles(input: [ListUserInput!]!): User!
   deleteAll: Float!
   create(input: DisplayInput!): Warehouse!
+  createBusinessPartner(input: DisplayInput!): BusinessPartner!
+  createItem(input: CreateItemInput!): Item!
+  updateItem(updateItemInput: UpdateItemInput!): Item!
+  removeItem(id: Int!): Item!
 }
 
 input CreateUserInput {
@@ -103,6 +336,61 @@ input UpdateUserInput {
 }
 
 input DisplayInput {
+  id: Float
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  createdByUserId: Float
+  modifiedByUserId: Float
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  displayName: String!
+  description: String
+}
+
+input CreateItemInput {
+  id: Float
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  createdByUserId: Float
+  modifiedByUserId: Float
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
   displayName: String
   description: String
+  code: String
+  itemCategory: CategoryInput!
+  unitOfMeasure: CategoryInput!
+}
+
+input CategoryInput {
+  id: Float
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  createdByUserId: Float
+  modifiedByUserId: Float
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  displayName: String
+  description: String
+  type: CategoryType = ItemCategory
+  parentCategory: CategoryInput
+}
+
+input UpdateItemInput {
+  id: Float
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  createdByUserId: Float
+  modifiedByUserId: Float
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  displayName: String
+  description: String
+  code: String
+  itemCategory: CategoryInput
+  unitOfMeasure: CategoryInput
 }

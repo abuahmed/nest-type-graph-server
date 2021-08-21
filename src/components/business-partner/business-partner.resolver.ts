@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { BusinessPartner } from 'src/db/models/businessPartner.entity';
-import { DisplayInput } from '../user/dto/user.dto';
+import { DisplayInput } from '../dto/display.input';
 import { BusinessPartnerService } from './business-partner.service';
 
 @Resolver()

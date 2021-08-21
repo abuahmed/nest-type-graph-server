@@ -1,5 +1,5 @@
-import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { AfterInsert, BeforeInsert, Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { DisplayFields } from '../common/displayFields';
 import { BusinessPartnerCategory } from '../enums/businessPartnerCategory';
 import { BusinessPartnerType } from '../enums/businessPartnerType';
@@ -8,6 +8,13 @@ import { Contact } from './contact.entity';
 import { SalesPerson } from './salesPerson.entity';
 import { TransactionHeader } from './transactionHeader.entity';
 
+registerEnumType(BusinessPartnerType, {
+  name: 'BusinessPartnerType',
+});
+
+registerEnumType(BusinessPartnerCategory, {
+  name: 'BusinessPartnerCategory',
+});
 @ObjectType()
 @Entity({ name: 'businessPartners' })
 export class BusinessPartner extends DisplayFields {
@@ -54,4 +61,9 @@ export class BusinessPartner extends DisplayFields {
 
   @OneToMany(() => TransactionHeader, (tran) => tran.businessPartner)
   transactions: TransactionHeader[];
+
+  // @AfterInsert()
+  // createCode() {
+  //   this.code = 'Cu' + this.id.toString();
+  // }
 }

@@ -43,8 +43,8 @@ export class User extends BasicFields {
     enum: UserStatus,
     type: 'enum',
   })
-  @Field((type) => UserStatus)
-  public status: UserStatus;
+  @Field(() => UserStatus)
+  status: UserStatus;
 
   @Column({ nullable: true })
   @Field()
