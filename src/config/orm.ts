@@ -16,7 +16,7 @@ const options: TypeOrmModuleOptions = {
   entities: [path.resolve(__dirname, '..', 'db', 'models', '*')],
   migrations: [path.resolve(__dirname, '..', 'db', 'migrations', '*')],
   cache: {
-    duration: 300000, // 5 minutes
+    duration: 300000, // 5 minutes cache enabled
   },
 };
 
