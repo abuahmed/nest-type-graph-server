@@ -18,7 +18,7 @@ export class ItemService {
   ) {}
 
   async createUpdate(createItemInput: CreateItemInput): Promise<Item> {
-    let { itemCategory, unitOfMeasure } = createItemInput;
+    const { itemCategory, unitOfMeasure } = createItemInput;
     try {
       await validate(displaySchema, { displayName: createItemInput.displayName });
 
@@ -26,16 +26,17 @@ export class ItemService {
         ? await this.itemRepository.preload(createItemInput)
         : this.itemRepository.create(createItemInput);
 
-      if (!itemCategory)
-        itemCategory = await this.categoryRepository.findOne({
-          type: CategoryType.ItemCategory,
-          displayName: 'Default',
-        });
-      if (!unitOfMeasure)
-        unitOfMeasure = await this.categoryRepository.findOne({
-          type: CategoryType.UnitOfMeasure,
-          displayName: 'Pcs',
-        });
+      ////Always true
+      // if (!itemCategory)
+      //   itemCategory = await this.categoryRepository.findOne({
+      //     type: CategoryType.ItemCategory,
+      //     displayName: 'Default',
+      //   });
+      // if (!unitOfMeasure)
+      //   unitOfMeasure = await this.categoryRepository.findOne({
+      //     type: CategoryType.UnitOfMeasure,
+      //     displayName: 'Pcs',
+      //   });
 
       const cat = itemCategory.id
         ? await this.categoryRepository.preload(itemCategory)
@@ -47,7 +48,6 @@ export class ItemService {
 
       item.itemCategory = cat;
       item.unitOfMeasure = uom;
-      //console.log(item);
 
       const response = await this.itemRepository.save(item);
 
@@ -64,17 +64,57 @@ export class ItemService {
     }
   }
 
-  findAll() {
-    return `This action returns all item`;
+  async findAll(createItemInput: CreateItemInput): Promise<Item[]> {
+    //console.log(createItemInput);
+
+    //const itemsQB = await this.itemRepository.createQueryBuilder('item').relation(;
+    // .where('item.id = :id', { id: 1 })
+    // .getOne();
+
+    return await this.itemRepository.find({
+      where: createItemInput,
+      relations: ['itemCategory', 'unitOfMeasure'],
+      cache: true,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} item`;
+  async findOne(id: number): Promise<Item> {
+    return await this.itemRepository.findOne(
+      { id },
+      { relations: ['itemCategory', 'unitOfMeasure'] },
+    );
   }
+  /**
+ *   Query: {
+    searchListings: async (
+      _,
+      { input: { name, guests, beds }, limit, offset }
+    ) => {
+      let listingQB = getConnection()
+        .getRepository(Listing)
+        .createQueryBuilder("l");
+      if (guests) {
+        listingQB = listingQB.andWhere("l.guests = :guests", { guests });
+      }
+      if (beds) {
+        listingQB = listingQB.andWhere("l.beds = :beds", { beds });
+      }
+      if (name) {
+        listingQB = listingQB.andWhere("l.name ilike :name", {
+          name: `%${name}%`
+        });
+      }
 
-  update(id: number, updateItemInput: UpdateItemInput) {
-    return `This action updates a #${id} item`;
+      return listingQB
+        .take(limit)
+        .skip(offset)
+        .getMany();
+    }
   }
+*/
+  // update(id: number, updateItemInput: UpdateItemInput) {
+  //   return `This action updates a #${id} item`;
+  // }
 
   remove(id: number) {
     return `This action removes a #${id} item`;

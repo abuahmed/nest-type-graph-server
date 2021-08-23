@@ -13,9 +13,9 @@ export class ItemResolver {
     return this.itemService.createUpdate(createItemInput);
   }
 
-  @Query(() => [Item], { name: 'item' })
-  findAll() {
-    return this.itemService.findAll();
+  @Query(() => [Item])
+  Items(@Args('input') createItemInput: CreateItemInput): Promise<Array<Item>> {
+    return this.itemService.findAll(createItemInput);
   }
 
   @Query(() => Item, { name: 'item' })
@@ -23,10 +23,10 @@ export class ItemResolver {
     return this.itemService.findOne(id);
   }
 
-  @Mutation(() => Item)
-  updateItem(@Args('updateItemInput') updateItemInput: UpdateItemInput) {
-    return this.itemService.update(updateItemInput.id, updateItemInput);
-  }
+  // @Mutation(() => Item)
+  // updateItem(@Args('updateItemInput') updateItemInput: UpdateItemInput) {
+  //   return this.itemService.update(updateItemInput.id, updateItemInput);
+  // }
 
   @Mutation(() => Item)
   removeItem(@Args('id', { type: () => Int }) id: number) {

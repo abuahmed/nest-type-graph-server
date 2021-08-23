@@ -297,6 +297,7 @@ type Query {
   getUserProfile(input: ListUserInput!): User!
   Warehouses: [Warehouse!]!
   BusinessPartners: [BusinessPartner!]!
+  Items(input: CreateItemInput!): [Item!]!
   item(id: Int!): Item!
 }
 
@@ -305,6 +306,37 @@ input ListUserInput {
   name: String
   email: String
   password: String
+}
+
+input CreateItemInput {
+  id: Float
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  createdByUserId: Float
+  modifiedByUserId: Float
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  displayName: String
+  description: String
+  code: String
+  itemCategory: CategoryInput
+  unitOfMeasure: CategoryInput
+}
+
+input CategoryInput {
+  id: Float
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  createdByUserId: Float
+  modifiedByUserId: Float
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  displayName: String
+  description: String
+  type: CategoryType = ItemCategory
+  parentCategory: CategoryInput
 }
 
 type Mutation {
@@ -318,7 +350,6 @@ type Mutation {
   create(input: DisplayInput!): Warehouse!
   createBusinessPartner(input: DisplayInput!): BusinessPartner!
   createItem(input: CreateItemInput!): Item!
-  updateItem(updateItemInput: UpdateItemInput!): Item!
   removeItem(id: Int!): Item!
 }
 
@@ -346,51 +377,4 @@ input DisplayInput {
   dateLastModified: DateTime
   displayName: String!
   description: String
-}
-
-input CreateItemInput {
-  id: Float
-  version: Float
-  uuid: String
-  isEnabled: Boolean
-  createdByUserId: Float
-  modifiedByUserId: Float
-  dateRecordCreated: DateTime
-  dateLastModified: DateTime
-  displayName: String
-  description: String
-  code: String
-  itemCategory: CategoryInput!
-  unitOfMeasure: CategoryInput!
-}
-
-input CategoryInput {
-  id: Float
-  version: Float
-  uuid: String
-  isEnabled: Boolean
-  createdByUserId: Float
-  modifiedByUserId: Float
-  dateRecordCreated: DateTime
-  dateLastModified: DateTime
-  displayName: String
-  description: String
-  type: CategoryType = ItemCategory
-  parentCategory: CategoryInput
-}
-
-input UpdateItemInput {
-  id: Float
-  version: Float
-  uuid: String
-  isEnabled: Boolean
-  createdByUserId: Float
-  modifiedByUserId: Float
-  dateRecordCreated: DateTime
-  dateLastModified: DateTime
-  displayName: String
-  description: String
-  code: String
-  itemCategory: CategoryInput
-  unitOfMeasure: CategoryInput
 }
