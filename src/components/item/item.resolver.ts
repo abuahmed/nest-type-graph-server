@@ -10,7 +10,7 @@ export class ItemResolver {
 
   @Mutation(() => Item)
   createItem(@Args('input') createItemInput: CreateItemInput) {
-    return this.itemService.create(createItemInput);
+    return this.itemService.createUpdate(createItemInput);
   }
 
   @Query(() => [Item], { name: 'item' })

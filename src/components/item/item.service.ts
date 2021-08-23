@@ -17,49 +17,38 @@ export class ItemService {
     private readonly categoryRepository: Repository<Category>,
   ) {}
 
-  async create(createItemInput: CreateItemInput): Promise<Item> {
-    const { itemCategory, unitOfMeasure } = createItemInput;
+  async createUpdate(createItemInput: CreateItemInput): Promise<Item> {
+    let { itemCategory, unitOfMeasure } = createItemInput;
     try {
-      //await validate(displaySchema, createItemInput);
-      const found = await this.itemRepository.findOne({ displayName: createItemInput.displayName });
+      await validate(displaySchema, { displayName: createItemInput.displayName });
 
-      if (found) {
-        throw new HttpException(
-          {
-            status: HttpStatus.BAD_REQUEST,
-            error: 'Item already exists',
-          },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+      const item = createItemInput.id
+        ? await this.itemRepository.preload(createItemInput)
+        : this.itemRepository.create(createItemInput);
 
-      const item = this.itemRepository.create({ displayName: createItemInput.displayName });
-      if (!itemCategory.id) {
-        const cat = itemCategory
-          ? this.categoryRepository.create(itemCategory)
-          : await this.categoryRepository.findOne({
-              type: CategoryType.ItemCategory,
-              displayName: 'Default',
-            });
-        item.itemCategory = cat;
-      } else {
-        item.itemCategory = await this.categoryRepository.findOne({
-          id: itemCategory.id,
+      if (!itemCategory)
+        itemCategory = await this.categoryRepository.findOne({
+          type: CategoryType.ItemCategory,
+          displayName: 'Default',
         });
-      }
-      if (!unitOfMeasure.id) {
-        const uom = unitOfMeasure
-          ? this.categoryRepository.create(unitOfMeasure)
-          : await this.categoryRepository.findOne({
-              type: CategoryType.UnitOfMeasure,
-              displayName: 'Pcs',
-            });
-        item.unitOfMeasure = uom;
-      } else {
-        item.unitOfMeasure = await this.categoryRepository.findOne({
-          id: unitOfMeasure.id,
+      if (!unitOfMeasure)
+        unitOfMeasure = await this.categoryRepository.findOne({
+          type: CategoryType.UnitOfMeasure,
+          displayName: 'Pcs',
         });
-      }
+
+      const cat = itemCategory.id
+        ? await this.categoryRepository.preload(itemCategory)
+        : this.categoryRepository.create(itemCategory);
+
+      const uom = unitOfMeasure.id
+        ? await this.categoryRepository.preload(unitOfMeasure)
+        : this.categoryRepository.create(unitOfMeasure);
+
+      item.itemCategory = cat;
+      item.unitOfMeasure = uom;
+      //console.log(item);
+
       const response = await this.itemRepository.save(item);
 
       return response;
