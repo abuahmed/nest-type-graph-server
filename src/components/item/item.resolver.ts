@@ -3,6 +3,8 @@ import { ItemService } from './item.service';
 import { CreateItemInput } from './dto/create-item.input';
 import { UpdateItemInput } from './dto/update-item.input';
 import { Item } from 'src/db/models/item.entity';
+import { ItemArgs } from './dto/item.args';
+import { DelResult } from '../user/dto/user.dto';
 
 @Resolver(() => Item)
 export class ItemResolver {
@@ -14,8 +16,8 @@ export class ItemResolver {
   }
 
   @Query(() => [Item])
-  Items(@Args('input') createItemInput: CreateItemInput): Promise<Array<Item>> {
-    return this.itemService.findAll(createItemInput);
+  items(@Args() itemArgs: ItemArgs): Promise<Array<Item>> {
+    return this.itemService.findAll(itemArgs);
   }
 
   @Query(() => Item, { name: 'item' })
@@ -28,7 +30,7 @@ export class ItemResolver {
   //   return this.itemService.update(updateItemInput.id, updateItemInput);
   // }
 
-  @Mutation(() => Item)
+  @Mutation(() => DelResult)
   removeItem(@Args('id', { type: () => Int }) id: number) {
     return this.itemService.remove(id);
   }

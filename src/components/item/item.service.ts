@@ -5,8 +5,9 @@ import { Category } from 'src/db/models/category.entity';
 import { Item } from 'src/db/models/item.entity';
 import { displaySchema, validate } from 'src/validation';
 import { Repository } from 'typeorm';
+import { DelResult } from '../user/dto/user.dto';
 import { CreateItemInput } from './dto/create-item.input';
-import { UpdateItemInput } from './dto/update-item.input';
+import { ItemArgs } from './dto/item.args';
 
 @Injectable()
 export class ItemService {
@@ -64,18 +65,18 @@ export class ItemService {
     }
   }
 
-  async findAll(createItemInput: CreateItemInput): Promise<Item[]> {
-    //console.log(createItemInput);
+  async findAll(itemArgs: ItemArgs): Promise<Item[]> {
+    //console.log(itemArgs);
+    const { skip, take, itemCategoryId, unitOfMeasureId } = itemArgs;
 
-    //const itemsQB = await this.itemRepository.createQueryBuilder('item').relation(;
-    // .where('item.id = :id', { id: 1 })
-    // .getOne();
-
-    return await this.itemRepository.find({
-      where: createItemInput,
-      relations: ['itemCategory', 'unitOfMeasure'],
-      cache: true,
-    });
+    let itemsQB = this.itemRepository.createQueryBuilder('i');
+    if (itemCategoryId) {
+      itemsQB = itemsQB.andWhere('i.itemCategoryID = :itemCategoryId', { itemCategoryId });
+    }
+    if (unitOfMeasureId) {
+      itemsQB = itemsQB.andWhere('i.unitOfMeasureId = :unitOfMeasureId', { unitOfMeasureId });
+    }
+    return await itemsQB.take(take).skip(skip).cache(true).getMany();
   }
 
   async findOne(id: number): Promise<Item> {
@@ -84,39 +85,15 @@ export class ItemService {
       { relations: ['itemCategory', 'unitOfMeasure'] },
     );
   }
-  /**
- *   Query: {
-    searchListings: async (
-      _,
-      { input: { name, guests, beds }, limit, offset }
-    ) => {
-      let listingQB = getConnection()
-        .getRepository(Listing)
-        .createQueryBuilder("l");
-      if (guests) {
-        listingQB = listingQB.andWhere("l.guests = :guests", { guests });
-      }
-      if (beds) {
-        listingQB = listingQB.andWhere("l.beds = :beds", { beds });
-      }
-      if (name) {
-        listingQB = listingQB.andWhere("l.name ilike :name", {
-          name: `%${name}%`
-        });
-      }
 
-      return listingQB
-        .take(limit)
-        .skip(offset)
-        .getMany();
-    }
-  }
-*/
   // update(id: number, updateItemInput: UpdateItemInput) {
   //   return `This action updates a #${id} item`;
   // }
 
-  remove(id: number) {
-    return `This action removes a #${id} item`;
+  async remove(id: number): Promise<DelResult> {
+    const del = await this.itemRepository.delete(id);
+    const res = new DelResult();
+    res.affectedRows = del.affected;
+    return res;
   }
 }
