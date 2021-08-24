@@ -78,65 +78,6 @@ type Address {
   notes: String!
 }
 
-type Category {
-  id: Float!
-  uuid: String!
-  isEnabled: Boolean!
-  createdByUserId: Float!
-  modifiedByUserId: Float!
-  dateRecordCreated: DateTime!
-  dateLastModified: DateTime!
-  displayName: String!
-  description: String!
-  type: CategoryType!
-  parentCategory: Category
-  childCategories: [Category!]!
-}
-
-enum CategoryType {
-  ItemCategory
-  UnitOfMeasure
-  Bank
-}
-
-type Item {
-  id: Float!
-  uuid: String!
-  isEnabled: Boolean!
-  createdByUserId: Float!
-  modifiedByUserId: Float!
-  dateRecordCreated: DateTime!
-  dateLastModified: DateTime!
-  displayName: String!
-  description: String!
-  type: ItemType!
-  code: String
-  itemCategory: Category!
-  unitOfMeasure: Category!
-}
-
-enum ItemType {
-  Purchased
-  Manufactured
-  Service
-}
-
-type TransactionLine {
-  id: Float!
-  uuid: String!
-  isEnabled: Boolean!
-  createdByUserId: Float!
-  modifiedByUserId: Float!
-  dateRecordCreated: DateTime!
-  dateLastModified: DateTime!
-  lineNumber: Float!
-  unit: Float!
-  eachPrice: Float!
-  linePrice: Float!
-  header: TransactionHeader!
-  item: Item!
-}
-
 type Contact {
   id: Float!
   uuid: String!
@@ -195,6 +136,72 @@ enum BusinessPartnerCategory {
   Individual
 }
 
+type Category {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  displayName: String!
+  description: String!
+  type: CategoryType!
+  parentCategory: Category
+  childCategories: [Category!]!
+}
+
+enum CategoryType {
+  ItemCategory
+  UnitOfMeasure
+  Bank
+}
+
+type Item {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  displayName: String!
+  description: String!
+  type: ItemType!
+  code: String
+  pictureUrl: String
+  itemCategoryId: Int
+  itemCategory: Category!
+  unitOfMeasureId: Int
+  unitOfMeasure: Category!
+  purchasePrice: Float
+  sellingPrice: Float
+  safeQty: Float
+}
+
+enum ItemType {
+  Purchased
+  Manufactured
+  Service
+}
+
+type TransactionLine {
+  id: Float!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Float!
+  modifiedByUserId: Float!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  headerId: Int
+  itemId: Int
+  qty: Float!
+  eachPrice: Float!
+  diff: Float!
+  header: TransactionHeader!
+  item: Item!
+}
+
 type TransactionHeader {
   id: Float!
   uuid: String!
@@ -204,11 +211,12 @@ type TransactionHeader {
   dateRecordCreated: DateTime!
   dateLastModified: DateTime!
   type: TransactionType!
-  number: Float!
-  date: DateTime!
   status: TransactionStatus!
+  number: String
+  transactionDate: DateTime!
+  warehouseId: Int
+  businessPartnerId: Int
   comment: String!
-  lines: [TransactionLine!]!
 }
 
 enum TransactionType {
@@ -297,8 +305,9 @@ type Query {
   getUserProfile(input: ListUserInput!): User!
   Warehouses: [Warehouse!]!
   BusinessPartners: [BusinessPartner!]!
-  Items(input: CreateItemInput!): [Item!]!
+  items(skip: Int = 0, take: Int = 25, itemCategoryId: Int, subCategoryId: Int, unitOfMeasureId: Int): [Item!]!
   item(id: Int!): Item!
+  transaction(id: Int!): TransactionHeader!
 }
 
 input ListUserInput {
@@ -306,6 +315,50 @@ input ListUserInput {
   name: String
   email: String
   password: String
+}
+
+type Mutation {
+  authUser(input: ListUserInput!): User!
+  register(input: CreateUserInput!): User!
+  updateUser(input: UpdateUserInput!): User!
+  deleteUser(id: Float!): DelResult!
+  addRoles(input: [DisplayInput!]!): [Role!]!
+  addUserRoles(input: [ListUserInput!]!): User!
+  deleteAll: Float!
+  create(input: DisplayInput!): Warehouse!
+  createBusinessPartner(input: DisplayInput!): BusinessPartner!
+  createItem(input: CreateItemInput!): Item!
+  removeItem(id: Int!): DelResult!
+  createTransaction(input: CreateTransactionInput!): TransactionHeader!
+  addTransactionLine(input: TransactionLineInput!): TransactionLine!
+  updateTransaction(updateTransactionInput: UpdateTransactionInput!): TransactionHeader!
+  removeTransaction(id: Int!): TransactionHeader!
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+  confirmPassword: String!
+}
+
+input UpdateUserInput {
+  id: Float!
+  name: String
+  email: String
+}
+
+input DisplayInput {
+  id: Float
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  createdByUserId: Float
+  modifiedByUserId: Float
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  displayName: String!
+  description: String
 }
 
 input CreateItemInput {
@@ -339,34 +392,7 @@ input CategoryInput {
   parentCategory: CategoryInput
 }
 
-type Mutation {
-  authUser(input: ListUserInput!): User!
-  register(input: CreateUserInput!): User!
-  updateUser(input: UpdateUserInput!): User!
-  deleteUser(id: Float!): DelResult!
-  addRoles(input: [DisplayInput!]!): [Role!]!
-  addUserRoles(input: [ListUserInput!]!): User!
-  deleteAll: Float!
-  create(input: DisplayInput!): Warehouse!
-  createBusinessPartner(input: DisplayInput!): BusinessPartner!
-  createItem(input: CreateItemInput!): Item!
-  removeItem(id: Int!): Item!
-}
-
-input CreateUserInput {
-  name: String!
-  email: String!
-  password: String!
-  confirmPassword: String!
-}
-
-input UpdateUserInput {
-  id: Float!
-  name: String
-  email: String
-}
-
-input DisplayInput {
+input CreateTransactionInput {
   id: Float
   version: Float
   uuid: String
@@ -375,6 +401,60 @@ input DisplayInput {
   modifiedByUserId: Float
   dateRecordCreated: DateTime
   dateLastModified: DateTime
-  displayName: String!
-  description: String
+  type: Float
+  number: String
+  transactionDate: DateTime
+  warehouseId: Float
+  businessPartnerId: Float
+  lines: [TransactionLineInput!]
+}
+
+input TransactionLineInput {
+  id: Float
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  createdByUserId: Float
+  modifiedByUserId: Float
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  headerId: Float
+  header: TransactionInput
+  itemId: Float!
+  qty: Float!
+  eachPrice: Float!
+}
+
+input TransactionInput {
+  id: Float
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  createdByUserId: Float
+  modifiedByUserId: Float
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  type: Float!
+  number: String
+  transactionDate: DateTime
+  warehouseId: Float
+  businessPartnerId: Float
+  lines: [TransactionLineInput!]
+}
+
+input UpdateTransactionInput {
+  id: Int!
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  createdByUserId: Float
+  modifiedByUserId: Float
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  type: Float
+  number: String
+  transactionDate: DateTime
+  warehouseId: Float
+  businessPartnerId: Float
+  lines: [TransactionLineInput!]
 }

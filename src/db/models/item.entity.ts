@@ -1,4 +1,4 @@
-import { Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { DisplayFields } from '../common/displayFields';
 import { ItemType } from '../enums/itemType';
@@ -21,11 +21,35 @@ export class Item extends DisplayFields {
   @Field()
   code?: string;
 
+  @Column({ nullable: true })
+  @Field()
+  pictureUrl?: string;
+
+  @Column({ nullable: true })
+  @Field(() => Int, { nullable: true })
+  itemCategoryId: number;
+
   @ManyToOne(() => Category, { cascade: true, nullable: false })
   @Field(() => Category)
   itemCategory: Category;
 
+  @Column({ nullable: true })
+  @Field(() => Int, { nullable: true })
+  unitOfMeasureId: number;
+
   @ManyToOne(() => Category, { cascade: true, nullable: false })
   @Field(() => Category)
   unitOfMeasure: Category;
+
+  @Column({ type: 'decimal', nullable: true })
+  @Field(() => Float, { nullable: true })
+  purchasePrice?: number;
+
+  @Column({ type: 'decimal', nullable: true })
+  @Field(() => Float, { nullable: true })
+  sellingPrice?: number;
+
+  @Column({ type: 'decimal', nullable: true })
+  @Field(() => Float, { nullable: true })
+  safeQty?: number;
 }
