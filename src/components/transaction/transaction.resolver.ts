@@ -5,7 +5,7 @@ import { UpdateTransactionInput } from './dto/update-transaction.input';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
 import { TransactionLineInput } from '../dto/transaction.input';
-import { TransactionArgs } from '../item/dto/transaction.args';
+import { TransactionArgs } from './dto/transaction.args';
 
 @Resolver(() => TransactionHeader)
 export class TransactionResolver {
@@ -21,7 +21,7 @@ export class TransactionResolver {
     return this.transactionService.createLine(tranLine);
   }
 
-  @Query(() => [TransactionHeader], { name: 'transaction' })
+  @Query(() => [TransactionHeader])
   transactions(@Args() transactionArgs: TransactionArgs): Promise<Array<TransactionHeader>> {
     return this.transactionService.findAll(transactionArgs);
   }

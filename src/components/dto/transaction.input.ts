@@ -1,5 +1,4 @@
 import { InputType, PartialType } from '@nestjs/graphql';
-import { TransactionType } from 'src/db/enums/transactionType';
 import { BasicInput } from './basic.input';
 
 @InputType()

@@ -51,6 +51,7 @@ export abstract class TransactionFields extends BasicFields {
   @ManyToOne(() => BusinessPartner, (ware) => ware.transactions)
   businessPartner!: BusinessPartner;
 
+  @Field(() => [TransactionLine])
   @OneToMany(() => TransactionLine, (line) => line.header)
   lines: TransactionLine[];
 }

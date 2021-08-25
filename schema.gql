@@ -216,6 +216,7 @@ type TransactionHeader {
   transactionDate: DateTime!
   warehouseId: Int
   businessPartnerId: Int
+  lines: [TransactionLine!]!
   comment: String!
 }
 
@@ -307,6 +308,7 @@ type Query {
   BusinessPartners: [BusinessPartner!]!
   items(skip: Int = 0, take: Int = 25, itemCategoryId: Int, subCategoryId: Int, unitOfMeasureId: Int): [Item!]!
   item(id: Int!): Item!
+  transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, type: String!, durationBegin: DateTime, durationEnd: DateTime): [TransactionHeader!]!
   transaction(id: Int!): TransactionHeader!
 }
 
