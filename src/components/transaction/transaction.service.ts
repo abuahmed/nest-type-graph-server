@@ -4,6 +4,7 @@ import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
 import { Repository } from 'typeorm';
 import { TransactionLineInput } from '../dto/transaction.input';
+import { TransactionArgs } from '../item/dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
 import { UpdateTransactionInput } from './dto/update-transaction.input';
 
@@ -62,12 +63,21 @@ export class TransactionService {
     }
   }
 
-  findAll() {
-    return `This action returns all transaction`;
+  async findAll(transactionArgs: TransactionArgs): Promise<TransactionHeader[]> {
+    const { skip, take } = transactionArgs;
+
+    const transactionsQB = this.transactionHeaderRepository.createQueryBuilder('t');
+    // if (transactionCategoryId) {
+    //   transactionsQB = transactionsQB.andWhere('i.transactionCategoryID = :transactionCategoryId', { transactionCategoryId });
+    // }
+    // if (unitOfMeasureId) {
+    //   transactionsQB = transactionsQB.andWhere('i.unitOfMeasureId = :unitOfMeasureId', { unitOfMeasureId });
+    // }
+    return await transactionsQB.take(take).skip(skip).cache(true).getMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
+  async findOne(id: number) {
+    return await this.transactionHeaderRepository.findOne({ id }, { relations: ['lines'] });
   }
 
   update(id: number, updateTransactionInput: UpdateTransactionInput) {
