@@ -3,11 +3,20 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { GetAuthenticatedUser } from '../get-authenticated-user.decorator';
-import { CreateUserInput, DelResult, ListUserInput, UpdateUserInput } from './dto/user.dto';
+import {
+  CreateUserInput,
+  DelResult,
+  FacebookInput,
+  GoogleInput,
+  ListUserInput,
+  UpdateUserInput,
+} from './dto/user.dto';
 import { User } from '../../db/models/user.entity';
 import { UserService } from './user.service';
 import { Role } from 'src/db/models/role.entity';
 import { DisplayInput } from '../dto/display.input';
+import { GoogleAuthGuard } from '../auth/guards/google-auth.guard';
+import { FacebookAuthGuard } from '../auth/guards/facebook-auth.guard';
 
 @Resolver()
 export class UserResolver {
@@ -28,6 +37,16 @@ export class UserResolver {
   @Mutation(() => User)
   @UseGuards(LocalAuthGuard)
   async authUser(@Args('input') input: ListUserInput, @GetAuthenticatedUser() user: User) {
+    return this._userService.login(user);
+  }
+  @Mutation(() => User)
+  @UseGuards(GoogleAuthGuard)
+  async googleLogin(@Args('input') input: GoogleInput, @GetAuthenticatedUser() user: User) {
+    return this._userService.login(user);
+  }
+  @Mutation(() => User)
+  @UseGuards(FacebookAuthGuard)
+  async facebookLogin(@Args('input') input: FacebookInput, @GetAuthenticatedUser() user: User) {
     return this._userService.login(user);
   }
   @Mutation(() => User)

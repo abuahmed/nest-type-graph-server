@@ -1,7 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { DelResult, ReturnStatus } from './dto/user.dto';
+import { LoginTicket, OAuth2Client, TokenPayload } from 'google-auth-library';
+import axios from 'axios';
+import { DelResult, FacebookInput, GoogleInput, ReturnStatus } from './dto/user.dto';
 import { User } from '../../db/models/user.entity';
 import { CreateUserInput, ListUserInput, UpdateUserInput } from './dto/user.dto';
 import { validate, registerSchema, loginSchema } from '../../validation';
@@ -16,6 +18,8 @@ import { EMAIL_VERIFICATION_TIMEOUT, CLIENT_ORIGIN, PASSWORD_RESET_TIMEOUT } fro
 import { hashedToken, signVerificationUrl } from '../../utils/utils';
 import { Role } from 'src/db/models/role.entity';
 import { DisplayInput } from '../dto/display.input';
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 @Injectable()
 export class UserService {
@@ -121,6 +125,95 @@ export class UserService {
     }
   }
 
+  googleLogin = async (googleInput: GoogleInput) => {
+    try {
+      const { idToken } = googleInput;
+
+      const result: LoginTicket = await client.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      // console.log('GOOGLE LOGIN RESPONSE',response)
+      const payload = result.getPayload();
+      const email_verified = payload?.email_verified;
+      const name = payload?.name;
+      const email = payload?.email;
+      const avatar = payload?.picture;
+      //const { email_verified,name, email } = payload
+
+      if (email_verified) {
+        let user = await this.userRepository.findOne({ email });
+
+        if (!user) {
+          const password = (email as string) + process.env.JWT_SECRET;
+          user = this.userRepository.create({ email, name, password, avatar });
+          user = await this.preSave(user);
+
+          await this.userRepository.save(user);
+        }
+        if (user) {
+          // const token = generateToken(user._id)
+          // const { _id, email, name } = user;
+          return user;
+        }
+      } else {
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            error: 'Email not Verified',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  };
+
+  facebookLogin = async (facebookInput: FacebookInput) => {
+    try {
+      //console.log('FACEBOOK LOGIN REQ BODY', req.body);
+      const { userID, accessToken } = facebookInput;
+
+      const url = `https://graph.facebook.com/v10.0/${userID}/?fields=id,name,email,picture&access_token=${accessToken}`;
+
+      const response = await axios.get(url);
+      const { email, name, picture } = response.data;
+
+      const avatar = picture?.data?.url;
+
+      let user = await this.userRepository.findOne({ email });
+
+      if (!user) {
+        const password = (email as string) + process.env.JWT_SECRET;
+        user = this.userRepository.create({ email, name, password, avatar });
+        user = await this.preSave(user);
+
+        await this.userRepository.save(user);
+      }
+      if (user) {
+        return user;
+      }
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  };
+
   async update(updateUserDto: UpdateUserInput): Promise<User> {
     await this.userRepository.update(updateUserDto.id, {
       name: updateUserDto.name,
@@ -187,15 +280,19 @@ export class UserService {
       );
     }
   }
-  async login(user: User) {
+  async login(user: User): Promise<User> {
     const payload = { id: user.id };
-    return {
-      _id: user.id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      token: this.jwtService.sign(payload),
-    };
+    const usr = await this.userRepository.preload(user);
+    usr.token = this.jwtService.sign(payload);
+    return usr;
+    // return {
+    //   id: user.id,
+    //   name: user.name,
+    //   email: user.email,
+    //   isAdmin: user.isAdmin,
+    //   avatar: user.avatar,
+    //   token: this.jwtService.sign(payload),
+    // };
   }
 
   preSave = async (user: User) => {

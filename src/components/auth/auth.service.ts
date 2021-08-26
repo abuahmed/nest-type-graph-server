@@ -9,34 +9,11 @@ export class AuthService {
 
   async validateUser(username: string, pass: string): Promise<any> {
     return await this.userService.authUser({ email: username, password: pass });
-    // // const user = await this.usersService.findOne(username);
-    // // if (user && user.password === pass) {
-    // //   const { password, ...result } = user;
-    // //   return result;
-    // // }
-    // return null;
-
-    // const listUserInput = { email: username, password: pass };
-    // await validate(loginSchema, listUserInput);
-
-    // const { email, password } = listUserInput;
-
-    // const user = await this.UserModel.findOne({ email });
-
-    // if (!user || !(await user.matchesPassword(password))) {
-    //   return null;
-    // }
-    // return user;
   }
-
-  // async login(user: UserDocument) {
-  //   const payload = { id: user._id };
-  //   return {
-  //     _id: user._id,
-  //     name: user.name,
-  //     email: user.email,
-  //     isAdmin: user.isAdmin,
-  //     token: this.jwtService.sign(payload),
-  //   };
-  // }
+  async google(idToken: string): Promise<any> {
+    return await this.userService.googleLogin({ idToken });
+  }
+  async facebook(userID: string, accessToken: string): Promise<any> {
+    return await this.userService.facebookLogin({ userID, accessToken });
+  }
 }

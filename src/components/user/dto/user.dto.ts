@@ -60,3 +60,18 @@ export class DelResult {
   @Field(() => String)
   affectedRows: number;
 }
+
+@InputType()
+export class GoogleInput {
+  @Field()
+  idToken: string;
+}
+
+@InputType()
+export class FacebookInput {
+  @Field()
+  userID: string;
+
+  @Field()
+  accessToken: string;
+}

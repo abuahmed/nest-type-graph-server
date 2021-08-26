@@ -321,6 +321,8 @@ input ListUserInput {
 
 type Mutation {
   authUser(input: ListUserInput!): User!
+  googleLogin(input: GoogleInput!): User!
+  facebookLogin(input: FacebookInput!): User!
   register(input: CreateUserInput!): User!
   updateUser(input: UpdateUserInput!): User!
   deleteUser(id: Float!): DelResult!
@@ -335,6 +337,15 @@ type Mutation {
   addTransactionLine(input: TransactionLineInput!): TransactionLine!
   updateTransaction(updateTransactionInput: UpdateTransactionInput!): TransactionHeader!
   removeTransaction(id: Int!): TransactionHeader!
+}
+
+input GoogleInput {
+  idToken: String!
+}
+
+input FacebookInput {
+  userID: String!
+  accessToken: String!
 }
 
 input CreateUserInput {
