@@ -25,60 +25,60 @@ export class UserResolver {
   //Query
   @Query(() => [User])
   async Users(): Promise<Array<User>> {
-    return this._userService.findAll();
+    return await this._userService.findAll();
   }
 
   @Query(() => User)
   @UseGuards(JwtAuthGuard)
   async getUserProfile(@Args('input') input: ListUserInput) {
-    return this._userService.getUserProfile(input);
+    return await this._userService.getUserProfile(input);
   }
   //Mutations
   @Mutation(() => User)
   @UseGuards(LocalAuthGuard)
   async authUser(@Args('input') input: ListUserInput, @GetAuthenticatedUser() user: User) {
-    return this._userService.login(user);
+    return await this._userService.login(user);
   }
   @Mutation(() => User)
   @UseGuards(GoogleAuthGuard)
   async googleLogin(@Args('input') input: GoogleInput, @GetAuthenticatedUser() user: User) {
-    return this._userService.login(user);
+    return await this._userService.login(user);
   }
   @Mutation(() => User)
   @UseGuards(FacebookAuthGuard)
   async facebookLogin(@Args('input') input: FacebookInput, @GetAuthenticatedUser() user: User) {
-    return this._userService.login(user);
+    return await this._userService.login(user);
   }
   @Mutation(() => User)
   async register(@Args('input') input: CreateUserInput) {
-    return this._userService.create(input);
+    return await this._userService.create(input);
   }
   @Mutation(() => User)
   async updateUser(@Args('input') input: UpdateUserInput) {
-    return this._userService.update(input);
+    return await this._userService.update(input);
   }
 
   @Mutation(() => DelResult)
   async deleteUser(@Args('id') id: number) {
-    return this._userService.delete(id);
+    return await this._userService.delete(id);
   }
 
   @Mutation(() => [Role])
   async addRoles(
     @Args({ name: 'input', type: () => [DisplayInput] }) input: DisplayInput[],
   ): Promise<Array<Role>> {
-    return this._userService.addRoles(input);
+    return await this._userService.addRoles(input);
   }
 
   @Mutation(() => User)
   async addUserRoles(
     @Args({ name: 'input', type: () => [ListUserInput] }) input: ListUserInput[],
   ): Promise<User> {
-    return this._userService.addUserRoles(input);
+    return await this._userService.addUserRoles(input);
   }
 
   @Mutation(() => Number)
   async deleteAll() {
-    return this._userService.deleteAll();
+    return await this._userService.deleteAll();
   }
 }
