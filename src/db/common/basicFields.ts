@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import {
   Column,
   CreateDateColumn,
@@ -10,7 +10,7 @@ import {
 @ObjectType()
 export abstract class BasicFields {
   @PrimaryGeneratedColumn()
-  @Field()
+  @Field(() => Int)
   id: number;
 
   @VersionColumn()
@@ -26,11 +26,11 @@ export abstract class BasicFields {
   isEnabled: boolean;
 
   @Column({ default: 1 })
-  @Field()
+  @Field(() => Int)
   createdByUserId: number;
 
   @Column({ default: 1 })
-  @Field()
+  @Field(() => Int)
   modifiedByUserId: number;
 
   @Field()

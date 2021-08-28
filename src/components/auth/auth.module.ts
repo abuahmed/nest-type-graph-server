@@ -5,8 +5,8 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JWT_SECRET } from 'src/config';
-import { UserService } from '../user/user.service';
 import { UserModule } from '../user/user.module';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 @Module({
   imports: [
     PassportModule,
@@ -16,7 +16,7 @@ import { UserModule } from '../user/user.module';
     }),
     UserModule,
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, LocalAuthGuard, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

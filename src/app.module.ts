@@ -13,7 +13,7 @@ import * as ormOptions from './config/orm';
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot(ormOptions),
     GraphQLModule.forRoot({
-      autoSchemaFile: true,
+      autoSchemaFile: 'schema.gql',
       playground: true,
       debug: true,
     }),

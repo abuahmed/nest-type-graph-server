@@ -36,7 +36,7 @@ export class UserService {
   }
 
   async authUser(listUserInput: ListUserInput): Promise<User> {
-    await validate(loginSchema, listUserInput);
+    //await validate(loginSchema, listUserInput);
 
     const { email, password } = listUserInput;
 
