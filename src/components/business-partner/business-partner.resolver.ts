@@ -1,9 +1,12 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { BusinessPartner } from 'src/db/models/businessPartner.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { DisplayInput } from '../dto/display.input';
 import { BusinessPartnerService } from './business-partner.service';
 
 @Resolver()
+@UseGuards(JwtAuthGuard)
 export class BusinessPartnerResolver {
   constructor(private readonly _businessPartnerService: BusinessPartnerService) {}
 

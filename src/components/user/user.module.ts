@@ -9,6 +9,7 @@ import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
 import { JWT_SECRET } from 'src/config';
 import { Role } from 'src/db/models/role.entity';
+import { AuthService } from '../auth/auth.service';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { Role } from 'src/db/models/role.entity';
       signOptions: { expiresIn: '30d', algorithm: 'HS256' },
     }),
   ],
-  providers: [UserResolver, UserService, JwtStrategy],
+  providers: [UserResolver, UserService, AuthService, JwtStrategy],
   exports: [UserService],
 })
 export class UserModule {}

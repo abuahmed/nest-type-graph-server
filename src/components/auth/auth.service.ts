@@ -18,4 +18,8 @@ export class AuthService {
   async facebook(userID: string, accessToken: string): Promise<any> {
     return await this.userService.facebookLogin({ userID, accessToken });
   }
+
+  public async validateUserById(userId: number) {
+    return this.userService.findUserById(userId);
+  }
 }

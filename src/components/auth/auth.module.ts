@@ -3,10 +3,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { LocalStrategy } from './strategies/local.strategy';
 import { JWT_SECRET } from 'src/config';
 import { UserModule } from '../user/user.module';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 @Module({
   imports: [
     PassportModule,
@@ -16,7 +14,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
     }),
     UserModule,
   ],
-  providers: [AuthService, LocalStrategy, LocalAuthGuard, JwtStrategy],
+  providers: [AuthService, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

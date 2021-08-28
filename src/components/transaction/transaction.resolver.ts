@@ -6,8 +6,11 @@ import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
 import { TransactionLineInput } from '../dto/transaction.input';
 import { TransactionArgs } from './dto/transaction.args';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UseGuards } from '@nestjs/common';
 
 @Resolver(() => TransactionHeader)
+@UseGuards(JwtAuthGuard)
 export class TransactionResolver {
   constructor(private readonly transactionService: TransactionService) {}
 

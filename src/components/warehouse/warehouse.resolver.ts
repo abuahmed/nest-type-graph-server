@@ -1,9 +1,12 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Warehouse } from 'src/db/models/warehouse.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { DisplayInput } from '../dto/display.input';
 import { WarehouseService } from './warehouse.service';
 
 @Resolver()
+@UseGuards(JwtAuthGuard)
 export class WarehouseResolver {
   constructor(private readonly _warehouseService: WarehouseService) {}
 

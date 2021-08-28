@@ -18,6 +18,7 @@ import { EMAIL_VERIFICATION_TIMEOUT, CLIENT_ORIGIN, PASSWORD_RESET_TIMEOUT } fro
 import { hashedToken, signVerificationUrl } from '../../utils/utils';
 import { Role } from 'src/db/models/role.entity';
 import { DisplayInput } from '../dto/display.input';
+import { JwtDto } from '../auth/dto/jwt.dto';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -36,7 +37,7 @@ export class UserService {
   }
 
   async authUser(listUserInput: ListUserInput): Promise<User> {
-    //await validate(loginSchema, listUserInput);
+    await validate(loginSchema, listUserInput);
 
     const { email, password } = listUserInput;
 
@@ -51,7 +52,8 @@ export class UserService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    return user;
+    return await this.login(user);
+    //return user;
   }
 
   async getUserProfile(listUserInput: ListUserInput): Promise<User> {
@@ -155,7 +157,7 @@ export class UserService {
         if (user) {
           // const token = generateToken(user._id)
           // const { _id, email, name } = user;
-          return user;
+          return await this.login(user);
         }
       } else {
         throw new HttpException(
@@ -200,7 +202,7 @@ export class UserService {
         await this.userRepository.save(user);
       }
       if (user) {
-        return user;
+        return await this.login(user);
       }
     } catch (err) {
       throw new HttpException(
@@ -213,6 +215,14 @@ export class UserService {
       );
     }
   };
+
+  async findUserById(userId: number) {
+    return this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+    });
+  }
 
   async update(updateUserDto: UpdateUserInput): Promise<User> {
     await this.userRepository.update(updateUserDto.id, {
@@ -281,7 +291,9 @@ export class UserService {
     }
   }
   async login(user: User): Promise<User> {
-    const payload = { id: user.id };
+    //const payload = { userId: user.id };
+    const payload: JwtDto = { userId: user.id };
+
     const usr = await this.userRepository.preload(user);
     usr.token = this.jwtService.sign(payload);
     return usr;

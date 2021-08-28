@@ -1,12 +1,14 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { ItemService } from './item.service';
 import { CreateItemInput } from './dto/create-item.input';
-import { UpdateItemInput } from './dto/update-item.input';
 import { Item } from 'src/db/models/item.entity';
 import { ItemArgs } from './dto/item.args';
 import { DelResult } from '../user/dto/user.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UseGuards } from '@nestjs/common';
 
 @Resolver(() => Item)
+@UseGuards(JwtAuthGuard)
 export class ItemResolver {
   constructor(private readonly itemService: ItemService) {}
 
