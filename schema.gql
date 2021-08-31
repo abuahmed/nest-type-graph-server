@@ -31,12 +31,12 @@ type User {
   name: String!
   email: String!
   password: String!
-  salt: String!
-  avatar: String!
-  bio: String!
+  salt: String
+  avatar: String
+  bio: String
   isAdmin: Boolean!
   status: UserStatus!
-  verifiedAt: DateTime!
+  verifiedAt: DateTime
   token: String!
   expiredAt: DateTime!
   roles: [Role!]!

@@ -26,7 +26,7 @@ export class UserResolver {
   }
 
   @Query(() => User)
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async getUserProfile(@Args('input') input: ListUserInput) {
     return await this._userService.getUserProfile(input);
   }

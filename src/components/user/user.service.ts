@@ -127,7 +127,7 @@ export class UserService {
     }
   }
 
-  googleLogin = async (googleInput: GoogleInput) => {
+  googleLogin = async (googleInput: GoogleInput): Promise<User> => {
     try {
       const { idToken } = googleInput;
 
@@ -135,8 +135,8 @@ export class UserService {
         idToken,
         audience: process.env.GOOGLE_CLIENT_ID,
       });
-
-      // console.log('GOOGLE LOGIN RESPONSE',response)
+      //console.log(idToken);
+      //console.log('GOOGLE LOGIN RESPONSE', result);
       const payload = result.getPayload();
       const email_verified = payload?.email_verified;
       const name = payload?.name;
@@ -148,7 +148,8 @@ export class UserService {
         let user = await this.userRepository.findOne({ email });
 
         if (!user) {
-          const password = (email as string) + process.env.JWT_SECRET;
+          //const password = "(email as string) + process.env.JWT_SECRET";
+          const password = '123456';
           user = this.userRepository.create({ email, name, password, avatar });
           user = await this.preSave(user);
 
@@ -180,7 +181,7 @@ export class UserService {
     }
   };
 
-  facebookLogin = async (facebookInput: FacebookInput) => {
+  facebookLogin = async (facebookInput: FacebookInput): Promise<User> => {
     try {
       //console.log('FACEBOOK LOGIN REQ BODY', req.body);
       const { userID, accessToken } = facebookInput;
@@ -296,7 +297,8 @@ export class UserService {
 
     const usr = await this.userRepository.preload(user);
     usr.token = this.jwtService.sign(payload);
-    return usr;
+    console.log(usr);
+    return { ...usr };
     // return {
     //   id: user.id,
     //   name: user.name,

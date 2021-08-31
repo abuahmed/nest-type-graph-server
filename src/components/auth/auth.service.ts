@@ -9,13 +9,12 @@ export class AuthService {
   constructor(private readonly userService: UserService) {}
 
   async validateUser(username: string, pass: string): Promise<User> {
-    console.log(username);
     return await this.userService.authUser({ email: username, password: pass });
   }
-  async google(idToken: string): Promise<any> {
+  async google(idToken: string): Promise<User> {
     return await this.userService.googleLogin({ idToken });
   }
-  async facebook(userID: string, accessToken: string): Promise<any> {
+  async facebook(userID: string, accessToken: string): Promise<User> {
     return await this.userService.facebookLogin({ userID, accessToken });
   }
 

@@ -23,15 +23,15 @@ export class User extends BasicFields {
   password: string;
 
   @Column({ nullable: true })
-  @Field()
+  @Field({ nullable: true })
   salt: string;
 
   @Column({ nullable: true })
-  @Field()
+  @Field({ nullable: true })
   avatar: string;
 
   @Column({ nullable: true })
-  @Field()
+  @Field({ nullable: true })
   bio: string;
 
   @Column({ default: false })
@@ -47,7 +47,7 @@ export class User extends BasicFields {
   status: UserStatus;
 
   @Column({ nullable: true })
-  @Field()
+  @Field({ nullable: true })
   verifiedAt: Date;
 
   @Column({ nullable: true })
