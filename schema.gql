@@ -303,6 +303,7 @@ enum ClientType {
 
 type Query {
   Users: [User!]!
+  User(input: ListUserInput!): User!
   getUserProfile(input: ListUserInput!): User!
   Warehouses: [Warehouse!]!
   BusinessPartners: [BusinessPartner!]!
