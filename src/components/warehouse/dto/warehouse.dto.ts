@@ -1,8 +1,8 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, Int } from '@nestjs/graphql';
 
 @InputType()
 export class ListWarehouseInput {
-  @Field(() => Number, { nullable: true })
+  @Field(() => Int, { nullable: true })
   id?: number;
 
   @Field(() => String, { nullable: true })
@@ -29,7 +29,7 @@ export class ItemInput {
 
 @InputType()
 export class UpdateWarehouseInput {
-  @Field(() => Number)
+  @Field(() => Int)
   id?: number;
 
   @Field(() => String, { nullable: true })

@@ -303,8 +303,9 @@ enum ClientType {
 
 type Query {
   Users: [User!]!
-  User(input: ListUserInput!): User!
+  GetUser(input: ListUserInput!): User!
   getUserProfile(input: ListUserInput!): User!
+  GetRoles: [Role!]!
   Warehouses: [Warehouse!]!
   BusinessPartners: [BusinessPartner!]!
   items(skip: Int = 0, take: Int = 25, itemCategoryId: Int, subCategoryId: Int, unitOfMeasureId: Int): [Item!]!
@@ -314,7 +315,7 @@ type Query {
 }
 
 input ListUserInput {
-  id: Float
+  id: Int
   name: String
   email: String
   password: String
@@ -327,7 +328,7 @@ type Mutation {
   register(input: CreateUserInput!): User!
   updateUser(input: UpdateUserInput!): User!
   deleteUser(id: Float!): DelResult!
-  addRoles(input: [DisplayInput!]!): [Role!]!
+  addRoles: [Role!]!
   addUserRoles(input: [ListUserInput!]!): User!
   deleteAll: Float!
   create(input: DisplayInput!): Warehouse!
@@ -357,18 +358,18 @@ input CreateUserInput {
 }
 
 input UpdateUserInput {
-  id: Float!
+  id: Int!
   name: String
   email: String
 }
 
 input DisplayInput {
-  id: Float
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
   version: Float
   uuid: String
   isEnabled: Boolean
-  createdByUserId: Float
-  modifiedByUserId: Float
   dateRecordCreated: DateTime
   dateLastModified: DateTime
   displayName: String!
@@ -376,12 +377,12 @@ input DisplayInput {
 }
 
 input CreateItemInput {
-  id: Float
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
   version: Float
   uuid: String
   isEnabled: Boolean
-  createdByUserId: Float
-  modifiedByUserId: Float
   dateRecordCreated: DateTime
   dateLastModified: DateTime
   displayName: String
@@ -392,12 +393,12 @@ input CreateItemInput {
 }
 
 input CategoryInput {
-  id: Float
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
   version: Float
   uuid: String
   isEnabled: Boolean
-  createdByUserId: Float
-  modifiedByUserId: Float
   dateRecordCreated: DateTime
   dateLastModified: DateTime
   displayName: String
@@ -407,29 +408,29 @@ input CategoryInput {
 }
 
 input CreateTransactionInput {
-  id: Float
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
   version: Float
   uuid: String
   isEnabled: Boolean
-  createdByUserId: Float
-  modifiedByUserId: Float
   dateRecordCreated: DateTime
   dateLastModified: DateTime
+  warehouseId: Int
+  businessPartnerId: Int
   type: Float
   number: String
   transactionDate: DateTime
-  warehouseId: Float
-  businessPartnerId: Float
   lines: [TransactionLineInput!]
 }
 
 input TransactionLineInput {
-  id: Float
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
   version: Float
   uuid: String
   isEnabled: Boolean
-  createdByUserId: Float
-  modifiedByUserId: Float
   dateRecordCreated: DateTime
   dateLastModified: DateTime
   headerId: Float
@@ -440,35 +441,35 @@ input TransactionLineInput {
 }
 
 input TransactionInput {
-  id: Float
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
   version: Float
   uuid: String
   isEnabled: Boolean
-  createdByUserId: Float
-  modifiedByUserId: Float
   dateRecordCreated: DateTime
   dateLastModified: DateTime
+  warehouseId: Int
+  businessPartnerId: Int
   type: Float!
   number: String
   transactionDate: DateTime
-  warehouseId: Float
-  businessPartnerId: Float
   lines: [TransactionLineInput!]
 }
 
 input UpdateTransactionInput {
   id: Int!
+  createdByUserId: Int
+  modifiedByUserId: Int
   version: Float
   uuid: String
   isEnabled: Boolean
-  createdByUserId: Float
-  modifiedByUserId: Float
   dateRecordCreated: DateTime
   dateLastModified: DateTime
+  warehouseId: Int
+  businessPartnerId: Int
   type: Float
   number: String
   transactionDate: DateTime
-  warehouseId: Float
-  businessPartnerId: Float
   lines: [TransactionLineInput!]
 }

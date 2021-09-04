@@ -1,9 +1,9 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 import { User } from '../../../db/models/user.entity';
 
 @InputType()
 export class ListUserInput {
-  @Field(() => Number, { nullable: true })
+  @Field(() => Int, { nullable: true })
   id?: number;
 
   @Field(() => String, { nullable: true })
@@ -33,7 +33,7 @@ export class CreateUserInput {
 
 @InputType()
 export class UpdateUserInput {
-  @Field(() => Number)
+  @Field(() => Int)
   id?: number;
 
   @Field(() => String, { nullable: true })

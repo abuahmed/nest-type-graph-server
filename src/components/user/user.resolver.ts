@@ -26,8 +26,10 @@ export class UserResolver {
   }
 
   @Query(() => User)
-  //@UseGuards(JwtAuthGuard)
-  async User(@Args('input') input: ListUserInput): Promise<User> {
+  @UseGuards(JwtAuthGuard)
+  async GetUser(@Args('input') input: ListUserInput): Promise<User> {
+    console.log('userId', input.id);
+
     return await this._userService.findUserById(input.id);
   }
 
@@ -68,11 +70,16 @@ export class UserResolver {
     return await this._userService.delete(id);
   }
 
+  //@Args({ name: 'input', type: () => [DisplayInput] }) input: DisplayInput[],
   @Mutation(() => [Role])
-  async addRoles(
-    @Args({ name: 'input', type: () => [DisplayInput] }) input: DisplayInput[],
-  ): Promise<Array<Role>> {
-    return await this._userService.addRoles(input);
+  async addRoles(): Promise<Array<Role>> {
+    return await this._userService.addRoles();
+  }
+
+  @Query(() => [Role])
+  @UseGuards(JwtAuthGuard)
+  async GetRoles(): Promise<Array<Role>> {
+    return await this._userService.findAllRoles();
   }
 
   @Mutation(() => User)

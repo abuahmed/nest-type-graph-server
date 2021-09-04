@@ -19,7 +19,7 @@ import { hashedToken, signVerificationUrl } from '../../utils/utils';
 import { Role } from 'src/db/models/role.entity';
 import { DisplayInput } from '../dto/display.input';
 import { JwtDto } from '../auth/dto/jwt.dto';
-
+import roles from 'src/data/roles';
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 @Injectable()
@@ -218,7 +218,7 @@ export class UserService {
   };
 
   async findUserById(userId: number) {
-    console.log(userId);
+    console.log('userId', userId);
     return this.userRepository.findOne({
       where: {
         id: userId,
@@ -248,11 +248,11 @@ export class UserService {
     return await this.userRepository.clear();
   }
 
-  async addRoles(roles: DisplayInput[]): Promise<Role[]> {
+  async addRoles(): Promise<Role[]> {
     try {
       const rls = [];
       roles.forEach((rl) => {
-        rls.push(this.roleRepository.create({ displayName: rl.displayName }));
+        rls.push(this.roleRepository.create({ displayName: rl }));
       });
       const role = await this.roleRepository.save(rls);
       return role;
@@ -266,6 +266,10 @@ export class UserService {
         HttpStatus.FORBIDDEN,
       );
     }
+  }
+
+  async findAllRoles(): Promise<Role[]> {
+    return await this.roleRepository.find();
   }
 
   async addUserRoles(roles: ListUserInput[]): Promise<User> {
