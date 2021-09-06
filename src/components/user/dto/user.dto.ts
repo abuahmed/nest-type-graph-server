@@ -1,4 +1,5 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { ListTypeNode } from 'graphql';
 import { User } from '../../../db/models/user.entity';
 
 @InputType()
@@ -47,6 +48,12 @@ export class UpdateUserInput {
 export class ReturnUser extends User {
   @Field(() => String)
   token: string;
+}
+
+@InputType()
+export class IdList {
+  @Field(() => [Int])
+  ids: [number];
 }
 
 @ObjectType()

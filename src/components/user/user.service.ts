@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { LoginTicket, OAuth2Client, TokenPayload } from 'google-auth-library';
 import axios from 'axios';
-import { DelResult, FacebookInput, GoogleInput, ReturnStatus } from './dto/user.dto';
+import { DelResult, FacebookInput, GoogleInput, IdList, ReturnStatus } from './dto/user.dto';
 import { User } from '../../db/models/user.entity';
 import { CreateUserInput, ListUserInput, UpdateUserInput } from './dto/user.dto';
 import { validate, registerSchema, loginSchema } from '../../validation';
@@ -218,7 +218,7 @@ export class UserService {
   };
 
   async findUserById(userId: number) {
-    console.log('userId', userId);
+    //console.log('userId', userId);
     return this.userRepository.findOne({
       where: {
         id: userId,
@@ -272,18 +272,17 @@ export class UserService {
     return await this.roleRepository.find();
   }
 
-  async addUserRoles(roles: ListUserInput[]): Promise<User> {
+  async addUserRoles(roles: [number]): Promise<User> {
+    console.log(roles);
     try {
-      let user = await this.userRepository.findOne({ id: roles[0].id });
-
+      let user = await this.userRepository.findOne({ id: roles[0] });
       const rls = [];
       for (let i = 1; i < roles.length; i++) {
-        const rl = await this.roleRepository.findOne({ id: roles[i].id });
+        const rl = await this.roleRepository.findOne({ id: roles[i] });
         rls.push(rl);
       }
 
       user.roles = rls;
-      console.log(user);
       user = await this.userRepository.save(user);
       return user;
     } catch (err) {

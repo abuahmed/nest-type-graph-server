@@ -329,7 +329,7 @@ type Mutation {
   updateUser(input: UpdateUserInput!): User!
   deleteUser(id: Float!): DelResult!
   addRoles: [Role!]!
-  addUserRoles(input: [ListUserInput!]!): User!
+  addUserRoles(input: IdList!): User!
   deleteAll: Float!
   create(input: DisplayInput!): Warehouse!
   createBusinessPartner(input: DisplayInput!): BusinessPartner!
@@ -361,6 +361,10 @@ input UpdateUserInput {
   id: Int!
   name: String
   email: String
+}
+
+input IdList {
+  ids: [Int!]!
 }
 
 input DisplayInput {

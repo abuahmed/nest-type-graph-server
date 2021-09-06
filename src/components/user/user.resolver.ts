@@ -6,6 +6,7 @@ import {
   DelResult,
   FacebookInput,
   GoogleInput,
+  IdList,
   ListUserInput,
   UpdateUserInput,
 } from './dto/user.dto';
@@ -83,10 +84,9 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
-  async addUserRoles(
-    @Args({ name: 'input', type: () => [ListUserInput] }) input: ListUserInput[],
-  ): Promise<User> {
-    return await this._userService.addUserRoles(input);
+  async addUserRoles(@Args({ name: 'input', type: () => IdList }) input: IdList): Promise<User> {
+    console.log(input);
+    return await this._userService.addUserRoles(input.ids);
   }
 
   @Mutation(() => Number)
