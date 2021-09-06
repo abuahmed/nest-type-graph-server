@@ -273,7 +273,6 @@ export class UserService {
   }
 
   async addUserRoles(roles: [number]): Promise<User> {
-    console.log(roles);
     try {
       let user = await this.userRepository.findOne({ id: roles[0] });
       const rls = [];
@@ -300,9 +299,14 @@ export class UserService {
     //const payload = { userId: user.id };
     const payload: JwtDto = { userId: user.id };
 
-    const usr = await this.userRepository.preload(user);
+    const usr = await this.userRepository.findOne({
+      where: {
+        id: user.id,
+      },
+      relations: ['roles'],
+    });
     usr.token = this.jwtService.sign(payload);
-    console.log(usr);
+    //console.log(usr);
     return { ...usr };
     // return {
     //   id: user.id,

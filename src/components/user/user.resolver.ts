@@ -29,8 +29,6 @@ export class UserResolver {
   @Query(() => User)
   @UseGuards(JwtAuthGuard)
   async GetUser(@Args('input') input: ListUserInput): Promise<User> {
-    console.log('userId', input.id);
-
     return await this._userService.findUserById(input.id);
   }
 
@@ -85,7 +83,6 @@ export class UserResolver {
 
   @Mutation(() => User)
   async addUserRoles(@Args({ name: 'input', type: () => IdList }) input: IdList): Promise<User> {
-    console.log(input);
     return await this._userService.addUserRoles(input.ids);
   }
 
