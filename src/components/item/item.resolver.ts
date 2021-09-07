@@ -6,6 +6,7 @@ import { ItemArgs } from './dto/item.args';
 import { DelResult } from '../user/dto/user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
+import { Category } from 'src/db/models/category.entity';
 
 @Resolver(() => Item)
 @UseGuards(JwtAuthGuard)
@@ -22,8 +23,18 @@ export class ItemResolver {
     return this.itemService.findAll(itemArgs);
   }
 
-  @Query(() => Item, { name: 'item' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  @Query(() => [Category])
+  getItemCategories(): Promise<Array<Category>> {
+    return this.itemService.getItemCategories();
+  }
+
+  @Query(() => [Category])
+  getItemUoms(): Promise<Array<Category>> {
+    return this.itemService.getItemUoms();
+  }
+
+  @Query(() => Item)
+  getItem(@Args('id', { type: () => Int }) id: number) {
     return this.itemService.findOne(id);
   }
 

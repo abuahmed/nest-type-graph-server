@@ -11,7 +11,7 @@ type Role {
   dateRecordCreated: DateTime!
   dateLastModified: DateTime!
   displayName: String!
-  description: String!
+  description: String
   descriptionShort: String!
 }
 
@@ -113,7 +113,7 @@ type BusinessPartner {
   dateRecordCreated: DateTime!
   dateLastModified: DateTime!
   displayName: String!
-  description: String!
+  description: String
   tinNumber: String!
   vatNumber: String!
   code: String!
@@ -145,7 +145,7 @@ type Category {
   dateRecordCreated: DateTime!
   dateLastModified: DateTime!
   displayName: String!
-  description: String!
+  description: String
   type: CategoryType!
   parentCategory: Category
   childCategories: [Category!]!
@@ -166,7 +166,7 @@ type Item {
   dateRecordCreated: DateTime!
   dateLastModified: DateTime!
   displayName: String!
-  description: String!
+  description: String
   type: ItemType!
   code: String
   pictureUrl: String
@@ -258,7 +258,7 @@ type Warehouse {
   dateRecordCreated: DateTime!
   dateLastModified: DateTime!
   displayName: String!
-  description: String!
+  description: String
   organization: Organization!
   address: Address!
   transactions: [TransactionHeader!]!
@@ -273,7 +273,7 @@ type Organization {
   dateRecordCreated: DateTime!
   dateLastModified: DateTime!
   displayName: String!
-  description: String!
+  description: String
   client: Client!
   warehouses: [Warehouse!]!
   address: Address!
@@ -288,7 +288,7 @@ type Client {
   dateRecordCreated: DateTime!
   dateLastModified: DateTime!
   displayName: String!
-  description: String!
+  description: String
   type: ClientType!
   organizations: [Organization!]!
   address: Address!
@@ -309,7 +309,9 @@ type Query {
   Warehouses: [Warehouse!]!
   BusinessPartners: [BusinessPartner!]!
   items(skip: Int = 0, take: Int = 25, itemCategoryId: Int, subCategoryId: Int, unitOfMeasureId: Int): [Item!]!
-  item(id: Int!): Item!
+  getItemCategories: [Category!]!
+  getItemUoms: [Category!]!
+  getItem(id: Int!): Item!
   transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, type: String!, durationBegin: DateTime, durationEnd: DateTime): [TransactionHeader!]!
   transaction(id: Int!): TransactionHeader!
 }

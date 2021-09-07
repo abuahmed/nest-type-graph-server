@@ -69,7 +69,10 @@ export class ItemService {
     //console.log(itemArgs);
     const { skip, take, itemCategoryId, unitOfMeasureId } = itemArgs;
 
-    let itemsQB = this.itemRepository.createQueryBuilder('i');
+    let itemsQB = this.itemRepository
+      .createQueryBuilder('i')
+      .innerJoinAndSelect('i.itemCategory', 'ItemCategory')
+      .innerJoinAndSelect('i.unitOfMeasure', 'UOM');
     if (itemCategoryId) {
       itemsQB = itemsQB.andWhere('i.itemCategoryID = :itemCategoryId', { itemCategoryId });
     }
@@ -77,6 +80,14 @@ export class ItemService {
       itemsQB = itemsQB.andWhere('i.unitOfMeasureId = :unitOfMeasureId', { unitOfMeasureId });
     }
     return await itemsQB.take(take).skip(skip).cache(true).getMany();
+  }
+
+  async getItemCategories(): Promise<Array<Category>> {
+    return await this.categoryRepository.find({ type: CategoryType.ItemCategory });
+  }
+
+  async getItemUoms(): Promise<Array<Category>> {
+    return await this.categoryRepository.find({ type: CategoryType.UnitOfMeasure });
   }
 
   async findOne(id: number): Promise<Item> {
