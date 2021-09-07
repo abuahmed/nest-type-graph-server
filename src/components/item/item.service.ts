@@ -19,8 +19,9 @@ export class ItemService {
   ) {}
 
   async createUpdate(createItemInput: CreateItemInput): Promise<Item> {
-    const { itemCategory, unitOfMeasure } = createItemInput;
+    let { itemCategory, unitOfMeasure } = createItemInput;
     try {
+      console.log(createItemInput);
       await validate(displaySchema, { displayName: createItemInput.displayName });
 
       const item = createItemInput.id
@@ -28,16 +29,14 @@ export class ItemService {
         : this.itemRepository.create(createItemInput);
 
       ////Always true
-      // if (!itemCategory)
-      //   itemCategory = await this.categoryRepository.findOne({
-      //     type: CategoryType.ItemCategory,
-      //     displayName: 'Default',
-      //   });
-      // if (!unitOfMeasure)
-      //   unitOfMeasure = await this.categoryRepository.findOne({
-      //     type: CategoryType.UnitOfMeasure,
-      //     displayName: 'Pcs',
-      //   });
+      if (!itemCategory)
+        itemCategory = await this.categoryRepository.findOne({
+          displayName: 'Default',
+        });
+      if (!unitOfMeasure)
+        unitOfMeasure = await this.categoryRepository.findOne({
+          displayName: 'Pcs',
+        });
 
       const cat = itemCategory.id
         ? await this.categoryRepository.preload(itemCategory)
@@ -54,6 +53,7 @@ export class ItemService {
 
       return response;
     } catch (err) {
+      console.log(err);
       throw new HttpException(
         {
           status: HttpStatus.FORBIDDEN,
