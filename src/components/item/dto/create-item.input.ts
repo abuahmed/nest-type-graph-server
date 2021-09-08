@@ -7,4 +7,7 @@ export class CreateItemInput extends PartialType(DisplayInput) {
   code?: string;
   itemCategory?: CategoryInput;
   unitOfMeasure?: CategoryInput;
+  purchasePrice?: number;
+  sellingPrice?: number;
+  safeQty?: number;
 }

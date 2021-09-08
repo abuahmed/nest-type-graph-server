@@ -79,7 +79,7 @@ export class ItemService {
     if (unitOfMeasureId) {
       itemsQB = itemsQB.andWhere('i.unitOfMeasureId = :unitOfMeasureId', { unitOfMeasureId });
     }
-    return await itemsQB.take(take).skip(skip).cache(true).getMany();
+    return await itemsQB.take(take).skip(skip).getMany();
   }
 
   async getItemCategories(): Promise<Array<Category>> {

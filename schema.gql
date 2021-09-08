@@ -396,6 +396,9 @@ input CreateItemInput {
   code: String
   itemCategory: CategoryInput
   unitOfMeasure: CategoryInput
+  purchasePrice: Float
+  sellingPrice: Float
+  safeQty: Float
 }
 
 input CategoryInput {

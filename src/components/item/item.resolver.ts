@@ -14,8 +14,9 @@ export class ItemResolver {
   constructor(private readonly itemService: ItemService) {}
 
   @Mutation(() => Item)
-  createItem(@Args('input') createItemInput: CreateItemInput) {
-    return this.itemService.createUpdate(createItemInput);
+  createItem(@Args('input') input: CreateItemInput) {
+    console.log(input);
+    return this.itemService.createUpdate(input);
   }
 
   @Query(() => [Item])
