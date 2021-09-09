@@ -15,7 +15,6 @@ export class ItemResolver {
 
   @Mutation(() => Item)
   createItem(@Args('input') input: CreateItemInput) {
-    console.log(input);
     return this.itemService.createUpdate(input);
   }
 

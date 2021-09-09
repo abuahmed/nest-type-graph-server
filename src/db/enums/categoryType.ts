@@ -1,5 +1,5 @@
 export enum CategoryType {
-  ItemCategory,
-  UnitOfMeasure,
-  Bank,
+  ItemCategory = 'ItemCategory',
+  UnitOfMeasure = 'UnitOfMeasure',
+  Bank = 'Bank',
 }

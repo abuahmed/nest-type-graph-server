@@ -19,25 +19,25 @@ export class ItemService {
   ) {}
 
   async createUpdate(createItemInput: CreateItemInput): Promise<Item> {
-    let { itemCategory, unitOfMeasure } = createItemInput;
+    const { itemCategory, unitOfMeasure } = createItemInput;
     try {
-      console.log(createItemInput);
+      //console.log(createItemInput);
       await validate(displaySchema, { displayName: createItemInput.displayName });
 
       const item = createItemInput.id
         ? await this.itemRepository.preload(createItemInput)
         : this.itemRepository.create(createItemInput);
 
-      ////Always true
-      if (!itemCategory)
-        itemCategory = await this.categoryRepository.findOne({
-          displayName: 'Default',
-        });
-      if (!unitOfMeasure)
-        unitOfMeasure = await this.categoryRepository.findOne({
-          displayName: 'Pcs',
-        });
-
+      // if (!itemCategory)
+      //   itemCategory = await this.categoryRepository.findOne({
+      //     displayName: 'Default',
+      //   });
+      // if (!unitOfMeasure)
+      //   unitOfMeasure = await this.categoryRepository.findOne({
+      //     displayName: 'Pcs',
+      //   });
+      itemCategory.type = CategoryType.ItemCategory;
+      unitOfMeasure.type = CategoryType.UnitOfMeasure;
       const cat = itemCategory.id
         ? await this.categoryRepository.preload(itemCategory)
         : this.categoryRepository.create(itemCategory);
@@ -53,7 +53,7 @@ export class ItemService {
 
       return response;
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       throw new HttpException(
         {
           status: HttpStatus.FORBIDDEN,
