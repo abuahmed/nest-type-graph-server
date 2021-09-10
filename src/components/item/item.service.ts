@@ -5,6 +5,8 @@ import { Category } from 'src/db/models/category.entity';
 import { Item } from 'src/db/models/item.entity';
 import { displaySchema, validate } from 'src/validation';
 import { Repository } from 'typeorm';
+import { CategoryInput } from '../dto/category.input';
+import { DisplayInput } from '../dto/display.input';
 import { DelResult } from '../user/dto/user.dto';
 import { CreateItemInput } from './dto/create-item.input';
 import { ItemArgs } from './dto/item.args';
@@ -19,23 +21,23 @@ export class ItemService {
   ) {}
 
   async createUpdate(createItemInput: CreateItemInput): Promise<Item> {
-    const { itemCategory, unitOfMeasure } = createItemInput;
+    let { itemCategory, unitOfMeasure } = createItemInput;
     try {
-      //console.log(createItemInput);
       await validate(displaySchema, { displayName: createItemInput.displayName });
 
       const item = createItemInput.id
         ? await this.itemRepository.preload(createItemInput)
         : this.itemRepository.create(createItemInput);
 
-      // if (!itemCategory)
-      //   itemCategory = await this.categoryRepository.findOne({
-      //     displayName: 'Default',
-      //   });
-      // if (!unitOfMeasure)
-      //   unitOfMeasure = await this.categoryRepository.findOne({
-      //     displayName: 'Pcs',
-      //   });
+      if (!itemCategory.id)
+        itemCategory = await this.categoryRepository.findOne({
+          displayName: 'Default',
+        });
+      if (!unitOfMeasure.id)
+        unitOfMeasure = await this.categoryRepository.findOne({
+          displayName: 'Pcs',
+        });
+
       itemCategory.type = CategoryType.ItemCategory;
       unitOfMeasure.type = CategoryType.UnitOfMeasure;
       const cat = itemCategory.id
@@ -65,6 +67,30 @@ export class ItemService {
     }
   }
 
+  async createItemCategory(input: CategoryInput): Promise<Category> {
+    try {
+      console.log(input);
+      await validate(displaySchema, { displayName: input.displayName });
+
+      const item = input.id
+        ? await this.categoryRepository.preload(input)
+        : this.categoryRepository.create(input);
+
+      const response = await this.categoryRepository.save(item);
+
+      return response;
+    } catch (err) {
+      //console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
   async findAll(itemArgs: ItemArgs): Promise<Item[]> {
     //console.log(itemArgs);
     const { skip, take, itemCategoryId, unitOfMeasureId } = itemArgs;
@@ -102,7 +128,19 @@ export class ItemService {
   // }
 
   async remove(id: number): Promise<DelResult> {
-    const del = await this.itemRepository.delete(id);
+    const del = await this.categoryRepository.delete(id);
+    const res = new DelResult();
+    res.affectedRows = del.affected;
+    return res;
+  }
+  async removeItemCategory(id: number): Promise<DelResult> {
+    const del = await this.categoryRepository.delete(id);
+    const res = new DelResult();
+    res.affectedRows = del.affected;
+    return res;
+  }
+  async removeItemUom(id: number): Promise<DelResult> {
+    const del = await this.categoryRepository.delete(id);
     const res = new DelResult();
     res.affectedRows = del.affected;
     return res;

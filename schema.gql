@@ -336,7 +336,10 @@ type Mutation {
   create(input: DisplayInput!): Warehouse!
   createBusinessPartner(input: DisplayInput!): BusinessPartner!
   createItem(input: CreateItemInput!): Item!
+  createItemCategory(input: CategoryInput!): Category!
   removeItem(id: Int!): DelResult!
+  removeItemCategory(id: Int!): DelResult!
+  removeItemUom(id: Int!): DelResult!
   createTransaction(input: CreateTransactionInput!): TransactionHeader!
   addTransactionLine(input: TransactionLineInput!): TransactionLine!
   updateTransaction(updateTransactionInput: UpdateTransactionInput!): TransactionHeader!
@@ -378,7 +381,7 @@ input DisplayInput {
   isEnabled: Boolean
   dateRecordCreated: DateTime
   dateLastModified: DateTime
-  displayName: String!
+  displayName: String
   description: String
 }
 

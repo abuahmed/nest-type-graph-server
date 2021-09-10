@@ -7,6 +7,8 @@ import { DelResult } from '../user/dto/user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { Category } from 'src/db/models/category.entity';
+import { DisplayInput } from '../dto/display.input';
+import { CategoryInput } from '../dto/category.input';
 
 @Resolver(() => Item)
 @UseGuards(JwtAuthGuard)
@@ -17,6 +19,16 @@ export class ItemResolver {
   createItem(@Args('input') input: CreateItemInput) {
     return this.itemService.createUpdate(input);
   }
+
+  @Mutation(() => Category)
+  createItemCategory(@Args('input') input: CategoryInput) {
+    return this.itemService.createItemCategory(input);
+  }
+
+  // @Mutation(() => Category)
+  // createItemUom(@Args('input') input: CreateItemInput) {
+  //   return this.itemService.createItemUom(input);
+  // }
 
   @Query(() => [Item])
   items(@Args() itemArgs: ItemArgs): Promise<Array<Item>> {
@@ -46,5 +58,13 @@ export class ItemResolver {
   @Mutation(() => DelResult)
   removeItem(@Args('id', { type: () => Int }) id: number) {
     return this.itemService.remove(id);
+  }
+  @Mutation(() => DelResult)
+  removeItemCategory(@Args('id', { type: () => Int }) id: number) {
+    return this.itemService.removeItemCategory(id);
+  }
+  @Mutation(() => DelResult)
+  removeItemUom(@Args('id', { type: () => Int }) id: number) {
+    return this.itemService.removeItemUom(id);
   }
 }
