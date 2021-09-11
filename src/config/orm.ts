@@ -12,7 +12,7 @@ const options: TypeOrmModuleOptions = {
   password: MYSQL_PASSWORD,
   database: 'pinnzzxc_estock',
   synchronize: true,
-  logging: true,
+  logging: false,
   entities: [path.resolve(__dirname, '..', 'db', 'models', '*')],
   migrations: [path.resolve(__dirname, '..', 'db', 'migrations', '*')],
 };

@@ -20,19 +20,14 @@ export class ItemResolver {
     return this.itemService.createUpdate(input);
   }
 
-  @Mutation(() => Category)
-  createItemCategory(@Args('input') input: CategoryInput) {
-    return this.itemService.createItemCategory(input);
-  }
-
-  // @Mutation(() => Category)
-  // createItemUom(@Args('input') input: CreateItemInput) {
-  //   return this.itemService.createItemUom(input);
-  // }
-
   @Query(() => [Item])
   items(@Args() itemArgs: ItemArgs): Promise<Array<Item>> {
     return this.itemService.findAll(itemArgs);
+  }
+
+  @Query(() => Item)
+  getItem(@Args('id', { type: () => Int }) id: number) {
+    return this.itemService.findOne(id);
   }
 
   @Query(() => [Category])
@@ -45,15 +40,10 @@ export class ItemResolver {
     return this.itemService.getItemUoms();
   }
 
-  @Query(() => Item)
-  getItem(@Args('id', { type: () => Int }) id: number) {
-    return this.itemService.findOne(id);
+  @Mutation(() => Category)
+  createItemCategory(@Args('input') input: CategoryInput) {
+    return this.itemService.createItemCategory(input);
   }
-
-  // @Mutation(() => Item)
-  // updateItem(@Args('updateItemInput') updateItemInput: UpdateItemInput) {
-  //   return this.itemService.update(updateItemInput.id, updateItemInput);
-  // }
 
   @Mutation(() => DelResult)
   removeItem(@Args('id', { type: () => Int }) id: number) {
@@ -62,9 +52,5 @@ export class ItemResolver {
   @Mutation(() => DelResult)
   removeItemCategory(@Args('id', { type: () => Int }) id: number) {
     return this.itemService.removeItemCategory(id);
-  }
-  @Mutation(() => DelResult)
-  removeItemUom(@Args('id', { type: () => Int }) id: number) {
-    return this.itemService.removeItemUom(id);
   }
 }
