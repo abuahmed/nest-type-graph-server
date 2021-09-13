@@ -3,6 +3,7 @@ import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { BasicFields } from '../common/basicFields';
 import { UserStatus } from '../enums/userStatus';
 import { Role } from './role.entity';
+import { Warehouse } from './warehouse.entity';
 
 registerEnumType(UserStatus, {
   name: 'UserStatus',
@@ -62,4 +63,9 @@ export class User extends BasicFields {
   @JoinTable()
   @Field(() => [Role])
   roles: Role[];
+
+  @ManyToMany(() => Warehouse)
+  @JoinTable()
+  @Field(() => [Warehouse])
+  warehouses?: Warehouse[];
 }

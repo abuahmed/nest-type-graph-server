@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { LoginTicket, OAuth2Client, TokenPayload } from 'google-auth-library';
+import { Repository } from 'typeorm';
+import { LoginTicket, OAuth2Client } from 'google-auth-library';
 import axios from 'axios';
-import { DelResult, FacebookInput, GoogleInput, IdList, ReturnStatus } from './dto/user.dto';
+import { DelResult, FacebookInput, GoogleInput } from './dto/user.dto';
 import { User } from '../../db/models/user.entity';
 import { CreateUserInput, ListUserInput, UpdateUserInput } from './dto/user.dto';
 import { validate, registerSchema, loginSchema } from '../../validation';
@@ -17,9 +17,9 @@ import { createHash, timingSafeEqual } from 'crypto';
 import { EMAIL_VERIFICATION_TIMEOUT, CLIENT_ORIGIN, PASSWORD_RESET_TIMEOUT } from '../../config';
 import { hashedToken, signVerificationUrl } from '../../utils/utils';
 import { Role } from 'src/db/models/role.entity';
-import { DisplayInput } from '../dto/display.input';
 import { JwtDto } from '../auth/dto/jwt.dto';
 import roles from 'src/data/roles';
+import { Warehouse } from 'src/db/models/warehouse.entity';
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 @Injectable()
@@ -29,11 +29,13 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
+    @InjectRepository(Warehouse)
+    private readonly warehouseRepository: Repository<Warehouse>,
     private readonly jwtService: JwtService,
   ) {}
 
   async findAll(): Promise<User[]> {
-    return this.userRepository.find({ relations: ['roles'] });
+    return this.userRepository.find({ relations: ['roles', 'warehouses'] });
   }
 
   async authUser(listUserInput: ListUserInput): Promise<User> {
@@ -271,7 +273,29 @@ export class UserService {
   async findAllRoles(): Promise<Role[]> {
     return await this.roleRepository.find();
   }
+  async addUserWarehouses(warehouses: [number]): Promise<User> {
+    try {
+      let user = await this.userRepository.findOne({ id: warehouses[0] });
+      const rls = [];
+      for (let i = 1; i < warehouses.length; i++) {
+        const rl = await this.warehouseRepository.findOne({ id: warehouses[i] });
+        rls.push(rl);
+      }
 
+      user.warehouses = rls;
+      user = await this.userRepository.save(user);
+      return user;
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
   async addUserRoles(roles: [number]): Promise<User> {
     try {
       let user = await this.userRepository.findOne({ id: roles[0] });
@@ -303,7 +327,7 @@ export class UserService {
       where: {
         id: user.id,
       },
-      relations: ['roles'],
+      relations: ['roles', 'warehouses'],
     });
     usr.token = this.jwtService.sign(payload);
     //console.log(usr);

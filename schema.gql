@@ -20,39 +20,6 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type User {
-  id: Int!
-  uuid: String!
-  isEnabled: Boolean!
-  createdByUserId: Int!
-  modifiedByUserId: Int!
-  dateRecordCreated: DateTime!
-  dateLastModified: DateTime!
-  name: String!
-  email: String!
-  password: String!
-  salt: String
-  avatar: String
-  bio: String
-  isAdmin: Boolean!
-  status: UserStatus!
-  verifiedAt: DateTime
-  token: String!
-  expiredAt: DateTime!
-  roles: [Role!]!
-}
-
-enum UserStatus {
-  Waiting
-  Active
-  Disabled
-  Blocked
-}
-
-type DelResult {
-  affectedRows: String!
-}
-
 type Address {
   id: Int!
   uuid: String!
@@ -76,6 +43,43 @@ type Address {
   fax: String!
   poBox: String!
   notes: String!
+}
+
+type Client {
+  id: Int!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Int!
+  modifiedByUserId: Int!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  displayName: String!
+  description: String
+  type: ClientType!
+  organizations: [Organization!]!
+  address: Address!
+}
+
+enum ClientType {
+  SingleOrgSingleStore
+  SingleOrgMultiStore
+  MultiOrgSingleStore
+  MultiOrgMultiStore
+}
+
+type Organization {
+  id: Int!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Int!
+  modifiedByUserId: Int!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  displayName: String!
+  description: String
+  client: Client!
+  warehouses: [Warehouse!]!
+  address: Address!
 }
 
 type Contact {
@@ -264,7 +268,7 @@ type Warehouse {
   transactions: [TransactionHeader!]!
 }
 
-type Organization {
+type User {
   id: Int!
   uuid: String!
   isEnabled: Boolean!
@@ -272,33 +276,30 @@ type Organization {
   modifiedByUserId: Int!
   dateRecordCreated: DateTime!
   dateLastModified: DateTime!
-  displayName: String!
-  description: String
-  client: Client!
-  warehouses: [Warehouse!]!
-  address: Address!
+  name: String!
+  email: String!
+  password: String!
+  salt: String
+  avatar: String
+  bio: String
+  isAdmin: Boolean!
+  status: UserStatus!
+  verifiedAt: DateTime
+  token: String!
+  expiredAt: DateTime!
+  roles: [Role!]!
+  warehouses: [Warehouse!]
 }
 
-type Client {
-  id: Int!
-  uuid: String!
-  isEnabled: Boolean!
-  createdByUserId: Int!
-  modifiedByUserId: Int!
-  dateRecordCreated: DateTime!
-  dateLastModified: DateTime!
-  displayName: String!
-  description: String
-  type: ClientType!
-  organizations: [Organization!]!
-  address: Address!
+enum UserStatus {
+  Waiting
+  Active
+  Disabled
+  Blocked
 }
 
-enum ClientType {
-  SingleOrgSingleStore
-  SingleOrgMultiStore
-  MultiOrgSingleStore
-  MultiOrgMultiStore
+type DelResult {
+  affectedRows: String!
 }
 
 type Query {
@@ -332,6 +333,7 @@ type Mutation {
   deleteUser(id: Float!): DelResult!
   addRoles: [Role!]!
   addUserRoles(input: IdList!): User!
+  addUserWarehouses(input: IdList!): User!
   deleteAll: Float!
   create(input: DisplayInput!): Warehouse!
   createBusinessPartner(input: DisplayInput!): BusinessPartner!

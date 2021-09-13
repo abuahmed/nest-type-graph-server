@@ -10,11 +10,12 @@ import { UserService } from './user.service';
 import { JWT_SECRET } from 'src/config';
 import { Role } from 'src/db/models/role.entity';
 import { AuthService } from '../auth/auth.service';
+import { Warehouse } from 'src/db/models/warehouse.entity';
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([User, Role]),
+    TypeOrmModule.forFeature([User, Role, Warehouse]),
     JwtModule.register({
       secret: JWT_SECRET,
       signOptions: { expiresIn: '30d', algorithm: 'HS256' },

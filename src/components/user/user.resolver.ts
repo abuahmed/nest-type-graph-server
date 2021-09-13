@@ -86,6 +86,13 @@ export class UserResolver {
     return await this._userService.addUserRoles(input.ids);
   }
 
+  @Mutation(() => User)
+  async addUserWarehouses(
+    @Args({ name: 'input', type: () => IdList }) input: IdList,
+  ): Promise<User> {
+    return await this._userService.addUserWarehouses(input.ids);
+  }
+
   @Mutation(() => Number)
   @UseGuards(JwtAuthGuard)
   async deleteAll() {
