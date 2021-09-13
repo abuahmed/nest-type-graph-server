@@ -39,19 +39,28 @@ export class TransactionService {
       );
     }
   }
-  async createLine(tranLine: TransactionLineInput) {
+  async createLine(tranLine: TransactionLineInput): Promise<TransactionHeader> {
     const { header } = tranLine;
     try {
       const line = tranLine.id
         ? await this.lineRepo.preload(tranLine)
         : this.lineRepo.create(tranLine);
 
-      if (header) {
-        line.header = this.headerRepo.create(header);
-      }
+      const transaction = header.id
+        ? await this.headerRepo.preload(header)
+        : this.headerRepo.create(header);
+
+      transaction.totalAmount = transaction.totalAmount
+        ? transaction.totalAmount + line.eachPrice
+        : line.eachPrice;
+      transaction.totalQty = transaction.totalQty ? transaction.totalQty + line.qty : line.qty;
+      transaction.numberOfItems = transaction.numberOfItems ? transaction.numberOfItems + 1 : 1;
+
+      line.header = transaction;
+
       const response = await this.lineRepo.save(line);
 
-      return response;
+      return response.header;
     } catch (err) {
       throw new HttpException(
         {
@@ -74,9 +83,13 @@ export class TransactionService {
       skip,
       take,
     } = transactionArgs;
-    let transactionsQB = this.headerRepo.createQueryBuilder('t').where('t.type = :type', {
-      type: type,
-    });
+    let transactionsQB = this.headerRepo
+      .createQueryBuilder('t')
+      .innerJoinAndSelect('t.warehouse', 'Warehouse')
+      .innerJoinAndSelect('t.businessPartner', 'BusinessPartner')
+      .where('t.type = :type', {
+        type: type,
+      });
 
     if (warehouseId) {
       transactionsQB = transactionsQB.andWhere('t.warehouseId = :warehouseId', {

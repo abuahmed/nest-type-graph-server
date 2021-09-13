@@ -19,7 +19,7 @@ export class TransactionResolver {
     return this.transactionService.create(tranHeader);
   }
 
-  @Mutation(() => TransactionLine)
+  @Mutation(() => TransactionHeader)
   addTransactionLine(@Args('input') tranLine: TransactionLineInput) {
     return this.transactionService.createLine(tranLine);
   }

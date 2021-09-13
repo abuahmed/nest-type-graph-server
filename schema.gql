@@ -217,9 +217,14 @@ type TransactionHeader {
   type: TransactionType!
   status: TransactionStatus!
   number: String
+  numberOfItems: Int!
+  totalAmount: Float!
+  totalQty: Float!
   transactionDate: DateTime!
   warehouseId: Int!
+  warehouse: Warehouse
   businessPartnerId: Int
+  businessPartner: BusinessPartner
   lines: [TransactionLine!]!
   comment: String!
 }
@@ -342,7 +347,7 @@ type Mutation {
   removeItem(id: Int!): DelResult!
   removeItemCategory(id: Int!): DelResult!
   createTransaction(input: CreateTransactionInput!): TransactionHeader!
-  addTransactionLine(input: TransactionLineInput!): TransactionLine!
+  addTransactionLine(input: TransactionLineInput!): TransactionHeader!
   updateTransaction(updateTransactionInput: UpdateTransactionInput!): TransactionHeader!
   removeTransaction(id: Int!): TransactionHeader!
 }
@@ -430,10 +435,15 @@ input CreateTransactionInput {
   dateRecordCreated: DateTime
   dateLastModified: DateTime
   warehouseId: Int
+  warehouse: DisplayInput
   businessPartnerId: Int
+  businessPartner: DisplayInput
   type: TransactionType
   number: String
   transactionDate: DateTime
+  totalAmount: Float
+  totalQty: Float
+  numberOfItems: Float
   lines: [TransactionLineInput!]
 }
 
@@ -446,8 +456,7 @@ input TransactionLineInput {
   isEnabled: Boolean
   dateRecordCreated: DateTime
   dateLastModified: DateTime
-  headerId: Float
-  header: TransactionInput
+  header: TransactionInput!
   itemId: Float!
   qty: Float!
   eachPrice: Float!
@@ -463,10 +472,15 @@ input TransactionInput {
   dateRecordCreated: DateTime
   dateLastModified: DateTime
   warehouseId: Int
+  warehouse: DisplayInput
   businessPartnerId: Int
+  businessPartner: DisplayInput
   type: TransactionType!
   number: String
   transactionDate: DateTime
+  totalAmount: Float
+  totalQty: Float
+  numberOfItems: Float
   lines: [TransactionLineInput!]
 }
 
@@ -480,9 +494,14 @@ input UpdateTransactionInput {
   dateRecordCreated: DateTime
   dateLastModified: DateTime
   warehouseId: Int
+  warehouse: DisplayInput
   businessPartnerId: Int
+  businessPartner: DisplayInput
   type: TransactionType
   number: String
   transactionDate: DateTime
+  totalAmount: Float
+  totalQty: Float
+  numberOfItems: Float
   lines: [TransactionLineInput!]
 }

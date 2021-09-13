@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { BeforeUpdate, Column, ManyToOne, OneToMany } from 'typeorm';
 import { TransactionStatus } from '../enums/transactionStatus';
 import { TransactionType } from '../enums/transactionType';
@@ -35,6 +35,18 @@ export abstract class TransactionFields extends BasicFields {
   @Field(() => String, { nullable: true })
   number?: string;
 
+  @Column({ default: 0 })
+  @Field(() => Int, { defaultValue: 0 })
+  numberOfItems: number;
+
+  @Column({ default: 0 })
+  @Field(() => Float, { defaultValue: 0 })
+  totalAmount: number;
+
+  @Column({ default: 0 })
+  @Field(() => Float, { defaultValue: 0 })
+  totalQty: number;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @Field()
   transactionDate: Date;
@@ -42,13 +54,17 @@ export abstract class TransactionFields extends BasicFields {
   @Column({ nullable: false })
   @Field(() => Int, { nullable: false })
   warehouseId: number;
+
   @ManyToOne(() => Warehouse, (ware) => ware.transactions)
+  @Field(() => Warehouse, { nullable: true })
   warehouse: Warehouse;
 
   @Column({ nullable: true })
   @Field(() => Int, { nullable: true })
   businessPartnerId?: number;
+
   @ManyToOne(() => BusinessPartner, (ware) => ware.transactions)
+  @Field(() => BusinessPartner, { nullable: true })
   businessPartner!: BusinessPartner; //Will be null for PI
 
   @Field(() => [TransactionLine])
