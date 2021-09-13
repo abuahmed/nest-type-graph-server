@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Column, ManyToOne, OneToMany } from 'typeorm';
+import { BeforeUpdate, Column, ManyToOne, OneToMany } from 'typeorm';
 import { TransactionStatus } from '../enums/transactionStatus';
 import { TransactionType } from '../enums/transactionType';
 import { BusinessPartner } from '../models/businessPartner.entity';
@@ -39,19 +39,30 @@ export abstract class TransactionFields extends BasicFields {
   @Field()
   transactionDate: Date;
 
-  @Column({ nullable: true })
-  @Field(() => Int, { nullable: true })
+  @Column({ nullable: false })
+  @Field(() => Int, { nullable: false })
   warehouseId: number;
   @ManyToOne(() => Warehouse, (ware) => ware.transactions)
   warehouse: Warehouse;
 
   @Column({ nullable: true })
   @Field(() => Int, { nullable: true })
-  businessPartnerId: number;
+  businessPartnerId?: number;
   @ManyToOne(() => BusinessPartner, (ware) => ware.transactions)
-  businessPartner!: BusinessPartner;
+  businessPartner!: BusinessPartner; //Will be null for PI
 
   @Field(() => [TransactionLine])
   @OneToMany(() => TransactionLine, (line) => line.header)
   lines: TransactionLine[];
+
+  @BeforeUpdate()
+  updateNumber() {
+    const idLength = this.id.toString().length;
+    const numLength = 6 - idLength;
+    let prefix = this.type.substring(0, 2).toUpperCase();
+    for (let i = 0; i < numLength; i++) {
+      prefix = prefix + '0';
+    }
+    this.number = prefix + this.id;
+  }
 }

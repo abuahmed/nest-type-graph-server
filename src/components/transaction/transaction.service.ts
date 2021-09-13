@@ -18,12 +18,12 @@ export class TransactionService {
     private readonly lineRepo: Repository<TransactionLine>,
   ) {}
 
-  async create(tranHeader: CreateTransactionInput) {
+  async create(header: CreateTransactionInput) {
     //const { lines } = transactionInput;
     try {
-      const transaction = tranHeader.id
-        ? await this.headerRepo.preload(tranHeader)
-        : this.headerRepo.create(tranHeader);
+      const transaction = header.id
+        ? await this.headerRepo.preload(header)
+        : this.headerRepo.create(header);
 
       const response = await this.headerRepo.save(transaction);
 

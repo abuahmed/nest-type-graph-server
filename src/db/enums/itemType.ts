@@ -1,5 +1,5 @@
 export enum ItemType {
-  Purchased,
-  Manufactured,
-  Service,
+  Purchased = 'Purchased',
+  Manufactured = 'Manufactured',
+  Service = 'Service',
 }

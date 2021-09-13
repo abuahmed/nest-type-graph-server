@@ -1,4 +1,4 @@
 export enum BusinessPartnerCategory {
-  Organization,
-  Individual,
+  Organization = 'Organization',
+  Individual = 'Individual',
 }

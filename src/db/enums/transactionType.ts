@@ -1,10 +1,10 @@
 export enum TransactionType {
-  All,
-  Sale,
-  Purchase,
-  Profit,
-  Pi,
-  GoodsIn,
-  GoodsOut,
-  StockTransfer,
+  All = 'All',
+  Sale = 'Sale',
+  Purchase = 'Purchase',
+  PI = 'PI',
+  Transfer = 'Transfer',
+  Profit = 'Profit',
+  GoodsIn = 'GoodsIn',
+  GoodsOut = 'GoodsOut',
 }

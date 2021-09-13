@@ -1,6 +1,6 @@
 export enum UserStatus {
-  Waiting,
-  Active,
-  Disabled,
-  Blocked,
+  Waiting = 'Waiting',
+  Active = 'Active',
+  Disabled = 'Disabled',
+  Blocked = 'Blocked',
 }

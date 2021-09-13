@@ -1,9 +1,10 @@
 import { Field, InputType, Int, PartialType } from '@nestjs/graphql';
+import { TransactionType } from 'src/db/enums/transactionType';
 import { BasicInput } from './basic.input';
 
 @InputType()
 export class TransactionInput extends PartialType(BasicInput) {
-  type: number;
+  type: TransactionType;
   number?: string;
   transactionDate?: Date;
   @Field(() => Int)

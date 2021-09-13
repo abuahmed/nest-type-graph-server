@@ -1,6 +1,6 @@
 export enum ClientType {
-  SingleOrgSingleStore,
-  SingleOrgMultiStore,
-  MultiOrgSingleStore,
-  MultiOrgMultiStore,
+  SingleOrgSingleStore = 'SingleOrgSingleStore',
+  SingleOrgMultiStore = 'SingleOrgMultiStore',
+  MultiOrgSingleStore = 'MultiOrgSingleStore',
+  MultiOrgMultiStore = 'MultiOrgMultiStore',
 }

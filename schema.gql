@@ -218,7 +218,7 @@ type TransactionHeader {
   status: TransactionStatus!
   number: String
   transactionDate: DateTime!
-  warehouseId: Int
+  warehouseId: Int!
   businessPartnerId: Int
   lines: [TransactionLine!]!
   comment: String!
@@ -228,11 +228,11 @@ enum TransactionType {
   All
   Sale
   Purchase
+  PI
+  Transfer
   Profit
-  Pi
   GoodsIn
   GoodsOut
-  StockTransfer
 }
 
 enum TransactionStatus {
@@ -431,7 +431,7 @@ input CreateTransactionInput {
   dateLastModified: DateTime
   warehouseId: Int
   businessPartnerId: Int
-  type: Float
+  type: TransactionType
   number: String
   transactionDate: DateTime
   lines: [TransactionLineInput!]
@@ -464,7 +464,7 @@ input TransactionInput {
   dateLastModified: DateTime
   warehouseId: Int
   businessPartnerId: Int
-  type: Float!
+  type: TransactionType!
   number: String
   transactionDate: DateTime
   lines: [TransactionLineInput!]
@@ -481,7 +481,7 @@ input UpdateTransactionInput {
   dateLastModified: DateTime
   warehouseId: Int
   businessPartnerId: Int
-  type: Float
+  type: TransactionType
   number: String
   transactionDate: DateTime
   lines: [TransactionLineInput!]
