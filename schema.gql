@@ -318,7 +318,8 @@ type Query {
   getItem(id: Int!): Item!
   getItemCategories: [Category!]!
   getItemUoms: [Category!]!
-  transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, type: String!, durationBegin: DateTime, durationEnd: DateTime): [TransactionHeader!]!
+  transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, type: TransactionType!, durationBegin: DateTime, durationEnd: DateTime): [TransactionHeader!]!
+  lines(skip: Int = 0, take: Int = 25, headerId: Int): [TransactionLine!]!
   transaction(id: Int!): TransactionHeader!
 }
 

@@ -4,10 +4,11 @@ import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
 import { Repository } from 'typeorm';
 import { TransactionLineInput } from '../dto/transaction.input';
-import { TransactionArgs } from './dto/transaction.args';
+import { LineArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
 import { UpdateTransactionInput } from './dto/update-transaction.input';
 import { startOfDay, endOfDay } from 'date-fns';
+import { PaginationArgs } from '../dto/pagination.args';
 
 @Injectable()
 export class TransactionService {
@@ -111,6 +112,18 @@ export class TransactionService {
       );
     }
     return await transactionsQB.take(take).skip(skip).getMany();
+  }
+
+  async findLines(lineArgs: LineArgs): Promise<TransactionLine[]> {
+    const { headerId, skip, take } = lineArgs;
+    const linesQB = this.lineRepo
+      .createQueryBuilder('l')
+      .innerJoinAndSelect('l.item', 'Item')
+      .where('l.headerId = :headerId', {
+        headerId: headerId,
+      });
+
+    return await linesQB.take(take).skip(skip).getMany();
   }
 
   async findOne(id: number) {

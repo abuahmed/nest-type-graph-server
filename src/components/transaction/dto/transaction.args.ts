@@ -1,9 +1,10 @@
 import { ArgsType, Field, Int, PartialType } from '@nestjs/graphql';
 import { PaginationArgs } from 'src/components/dto/pagination.args';
+import { TransactionType } from 'src/db/enums/transactionType';
 
 @ArgsType()
 export class TransactionArgs extends PartialType(PaginationArgs) {
-  type: string;
+  type: TransactionType;
   durationBegin?: Date;
   durationEnd?: Date;
   @Field(() => Int, { nullable: true })
@@ -12,4 +13,10 @@ export class TransactionArgs extends PartialType(PaginationArgs) {
   businessPartnerId?: number;
   @Field(() => Boolean, { defaultValue: false })
   includeLines: boolean;
+}
+
+@ArgsType()
+export class LineArgs extends PartialType(PaginationArgs) {
+  @Field(() => Int, { nullable: true })
+  headerId?: number;
 }
