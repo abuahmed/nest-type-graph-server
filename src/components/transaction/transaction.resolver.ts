@@ -8,6 +8,7 @@ import { TransactionLineInput } from '../dto/transaction.input';
 import { LineArgs, TransactionArgs } from './dto/transaction.args';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
+import { DelResult } from '../user/dto/user.dto';
 
 @Resolver(() => TransactionHeader)
 @UseGuards(JwtAuthGuard)
@@ -19,13 +20,15 @@ export class TransactionResolver {
     return this.transactionService.create(tranHeader);
   }
 
-  @Mutation(() => TransactionHeader)
-  addTransactionLine(@Args('input') tranLine: TransactionLineInput) {
-    return this.transactionService.createLine(tranLine);
+  @Mutation(() => TransactionLine)
+  createUpdateLine(@Args('input') input: TransactionLineInput) {
+    return this.transactionService.createLine(input);
   }
 
   @Query(() => [TransactionHeader])
   transactions(@Args() transactionArgs: TransactionArgs): Promise<Array<TransactionHeader>> {
+    //console.log(transactionArgs);
+
     return this.transactionService.findAll(transactionArgs);
   }
 
@@ -39,15 +42,19 @@ export class TransactionResolver {
     return this.transactionService.findOne(id);
   }
 
-  @Mutation(() => TransactionHeader)
-  updateTransaction(
-    @Args('updateTransactionInput') updateTransactionInput: UpdateTransactionInput,
-  ) {
-    return this.transactionService.update(updateTransactionInput.id, updateTransactionInput);
-  }
+  // @Mutation(() => TransactionHeader)
+  // updateTransaction(
+  //   @Args('updateTransactionInput') updateTransactionInput: UpdateTransactionInput,
+  // ) {
+  //   return this.transactionService.update(updateTransactionInput.id, updateTransactionInput);
+  // }
 
+  @Mutation(() => DelResult)
+  removeHeader(@Args('id', { type: () => Int }) id: number) {
+    return this.transactionService.removeHeader(id);
+  }
   @Mutation(() => TransactionHeader)
-  removeTransaction(@Args('id', { type: () => Int }) id: number) {
-    return this.transactionService.remove(id);
+  removeLine(@Args('id', { type: () => Int }) id: number) {
+    return this.transactionService.removeLine(id);
   }
 }

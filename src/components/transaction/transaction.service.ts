@@ -2,13 +2,15 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
-import { Repository } from 'typeorm';
+import { Repository, Transaction, TransactionRepository } from 'typeorm';
 import { TransactionLineInput } from '../dto/transaction.input';
 import { LineArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
 import { UpdateTransactionInput } from './dto/update-transaction.input';
 import { startOfDay, endOfDay } from 'date-fns';
 import { PaginationArgs } from '../dto/pagination.args';
+import { DelResult } from '../user/dto/user.dto';
+import { getConnection } from 'typeorm';
 
 @Injectable()
 export class TransactionService {
@@ -40,9 +42,10 @@ export class TransactionService {
       );
     }
   }
-  async createLine(tranLine: TransactionLineInput): Promise<TransactionHeader> {
+  async createLine(tranLine: TransactionLineInput): Promise<TransactionLine> {
     const { header } = tranLine;
     try {
+      const prevLine = tranLine.id ? await this.lineRepo.findOne({ id: tranLine.id }) : null;
       const line = tranLine.id
         ? await this.lineRepo.preload(tranLine)
         : this.lineRepo.create(tranLine);
@@ -52,16 +55,28 @@ export class TransactionService {
         : this.headerRepo.create(header);
 
       transaction.totalAmount = transaction.totalAmount
-        ? transaction.totalAmount + line.eachPrice
-        : line.eachPrice;
+        ? transaction.totalAmount + line.eachPrice * line.qty
+        : line.eachPrice * line.qty;
+
       transaction.totalQty = transaction.totalQty ? transaction.totalQty + line.qty : line.qty;
       transaction.numberOfItems = transaction.numberOfItems ? transaction.numberOfItems + 1 : 1;
+      if (prevLine) {
+        transaction.totalAmount = transaction.totalAmount - prevLine.eachPrice * prevLine.qty;
+        transaction.totalQty = transaction.totalQty - prevLine.qty;
+        transaction.numberOfItems = transaction.numberOfItems - 1;
+      }
 
       line.header = transaction;
 
       const response = await this.lineRepo.save(line);
-
-      return response.header;
+      if (response) {
+        const ln = await this.lineRepo.findOne(
+          { id: response.id },
+          { relations: ['item', 'header', 'header.warehouse', 'header.businessPartner'] },
+        );
+        return ln;
+        //      return response;
+      }
     } catch (err) {
       throw new HttpException(
         {
@@ -146,11 +161,45 @@ export class TransactionService {
     }
   }
 
-  update(id: number, updateTransactionInput: UpdateTransactionInput) {
-    return `This action updates a #${id} transaction`;
+  async removeHeader(id: number): Promise<DelResult> {
+    const del = await this.headerRepo.delete(id);
+    const res = new DelResult();
+    res.affectedRows = del.affected;
+    return res;
+  }
+  async removeLine(id: number): Promise<TransactionHeader> {
+    try {
+      const line = await this.lineRepo.findOne({ id });
+      const header = await this.headerRepo.findOne({ id: line.headerId });
+      if (line && header) {
+        header.totalAmount = header.totalAmount - line.eachPrice * line.qty;
+        header.totalQty = header.totalQty - line.qty;
+        header.numberOfItems = header.numberOfItems - 1;
+
+        const del = await this.lineRepo.delete(id);
+        const response = await this.headerRepo.save(header);
+        return response;
+        //const res = new DelResult();
+        //res.affectedRows = del.affected;
+        //return res;
+      }
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
-  }
+  // @Transaction()
+  // save(
+  //   user: TransactionHeader,
+  //   @TransactionRepository(TransactionHeader) userRepository: Repository<TransactionHeader>,
+  // ) {
+  //   return userRepository.save(user);
+  // }
 }

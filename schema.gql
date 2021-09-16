@@ -348,9 +348,9 @@ type Mutation {
   removeItem(id: Int!): DelResult!
   removeItemCategory(id: Int!): DelResult!
   createTransaction(input: CreateTransactionInput!): TransactionHeader!
-  addTransactionLine(input: TransactionLineInput!): TransactionHeader!
-  updateTransaction(updateTransactionInput: UpdateTransactionInput!): TransactionHeader!
-  removeTransaction(id: Int!): TransactionHeader!
+  createUpdateLine(input: TransactionLineInput!): TransactionLine!
+  removeHeader(id: Int!): DelResult!
+  removeLine(id: Int!): TransactionHeader!
 }
 
 input GoogleInput {
@@ -435,13 +435,13 @@ input CreateTransactionInput {
   isEnabled: Boolean
   dateRecordCreated: DateTime
   dateLastModified: DateTime
+  transactionDate: DateTime
   warehouseId: Int
   warehouse: DisplayInput
   businessPartnerId: Int
   businessPartner: DisplayInput
   type: TransactionType
   number: String
-  transactionDate: DateTime
   totalAmount: Float
   totalQty: Float
   numberOfItems: Float
@@ -457,10 +457,10 @@ input TransactionLineInput {
   isEnabled: Boolean
   dateRecordCreated: DateTime
   dateLastModified: DateTime
-  header: TransactionInput!
-  itemId: Float!
-  qty: Float!
-  eachPrice: Float!
+  itemId: Int
+  header: TransactionInput
+  qty: Float
+  eachPrice: Float
 }
 
 input TransactionInput {
@@ -472,35 +472,13 @@ input TransactionInput {
   isEnabled: Boolean
   dateRecordCreated: DateTime
   dateLastModified: DateTime
+  transactionDate: DateTime
   warehouseId: Int
   warehouse: DisplayInput
   businessPartnerId: Int
   businessPartner: DisplayInput
   type: TransactionType!
   number: String
-  transactionDate: DateTime
-  totalAmount: Float
-  totalQty: Float
-  numberOfItems: Float
-  lines: [TransactionLineInput!]
-}
-
-input UpdateTransactionInput {
-  id: Int!
-  createdByUserId: Int
-  modifiedByUserId: Int
-  version: Float
-  uuid: String
-  isEnabled: Boolean
-  dateRecordCreated: DateTime
-  dateLastModified: DateTime
-  warehouseId: Int
-  warehouse: DisplayInput
-  businessPartnerId: Int
-  businessPartner: DisplayInput
-  type: TransactionType
-  number: String
-  transactionDate: DateTime
   totalAmount: Float
   totalQty: Float
   numberOfItems: Float
