@@ -4,7 +4,7 @@ import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
 import { Repository } from 'typeorm';
 import { TransactionLineInput } from '../dto/transaction.input';
-import { LineArgs, TransactionArgs } from './dto/transaction.args';
+import { InventoryArgs, LineArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
 import { startOfDay, endOfDay } from 'date-fns';
 import { DelResult } from '../user/dto/user.dto';
@@ -141,6 +141,22 @@ export class TransactionService {
       });
 
     return await linesQB.take(take).skip(skip).getMany();
+  }
+  async findInventories(inventoryArgs: InventoryArgs): Promise<Inventory[]> {
+    const { warehouseId, skip, take } = inventoryArgs;
+    let itemsQB = this.inventoryRepo
+      .createQueryBuilder('i')
+      .innerJoinAndSelect('i.warehouse', 'Warehouse')
+      .innerJoinAndSelect('i.item', 'Item')
+      .innerJoinAndSelect('Item.itemCategory', 'cat')
+      .innerJoinAndSelect('Item.unitOfMeasure', 'uom');
+    if (warehouseId) {
+      itemsQB = itemsQB.andWhere('i.warehouseId = :warehouseId', {
+        warehouseId,
+      });
+    }
+
+    return await itemsQB.take(take).skip(skip).getMany();
   }
 
   async findOne(id: number) {

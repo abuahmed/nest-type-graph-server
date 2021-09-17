@@ -20,3 +20,9 @@ export class LineArgs extends PartialType(PaginationArgs) {
   @Field(() => Int, { nullable: true })
   headerId?: number;
 }
+
+@ArgsType()
+export class InventoryArgs extends PartialType(PaginationArgs) {
+  @Field(() => Int, { nullable: true })
+  warehouseId?: number;
+}
