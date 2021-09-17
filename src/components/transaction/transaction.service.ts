@@ -2,15 +2,15 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
-import { Repository, Transaction, TransactionRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { TransactionLineInput } from '../dto/transaction.input';
 import { LineArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
-import { UpdateTransactionInput } from './dto/update-transaction.input';
 import { startOfDay, endOfDay } from 'date-fns';
-import { PaginationArgs } from '../dto/pagination.args';
 import { DelResult } from '../user/dto/user.dto';
-import { getConnection } from 'typeorm';
+import { TransactionStatus } from 'src/db/enums/transactionStatus';
+import { Inventory } from 'src/db/models/inventory.entity';
+import { TransactionType } from 'src/db/enums/transactionType';
 
 @Injectable()
 export class TransactionService {
@@ -19,6 +19,8 @@ export class TransactionService {
     private readonly headerRepo: Repository<TransactionHeader>,
     @InjectRepository(TransactionLine)
     private readonly lineRepo: Repository<TransactionLine>,
+    @InjectRepository(Inventory)
+    private readonly inventoryRepo: Repository<Inventory>,
   ) {}
 
   async create(header: CreateTransactionInput) {
@@ -161,6 +163,36 @@ export class TransactionService {
     }
   }
 
+  async postHeader(id: number): Promise<TransactionHeader> {
+    const header = await this.headerRepo.findOne(
+      { id },
+      { relations: ['lines', 'lines.item', 'warehouse', 'businessPartner'] },
+    );
+    const invents: Inventory[] = [];
+    const inventories = await this.inventoryRepo.find();
+    header.lines.forEach((line) => {
+      let itemInventory = inventories.find((inv) => inv.itemId === line.item.id);
+      if (!itemInventory) {
+        itemInventory = this.inventoryRepo.create({
+          item: line.item,
+          warehouse: header.warehouse,
+          qtyOnHand: 0,
+        });
+      }
+      itemInventory.qtyOnHand =
+        header.type === TransactionType.Sale
+          ? itemInventory.qtyOnHand - line.qty
+          : header.type === TransactionType.Purchase
+          ? itemInventory.qtyOnHand + line.qty
+          : line.qty;
+      invents.push(itemInventory);
+    });
+    const result = await this.inventoryRepo.save(invents);
+    if (result) {
+      const response = await this.headerRepo.save({ ...header, status: TransactionStatus.Posted });
+      return response;
+    }
+  }
   async removeHeader(id: number): Promise<DelResult> {
     const del = await this.headerRepo.delete(id);
     const res = new DelResult();
