@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
-import { Repository } from 'typeorm';
+import { Brackets, QueryBuilder, Repository } from 'typeorm';
 import { TransactionLineInput } from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
@@ -132,31 +132,83 @@ export class TransactionService {
   }
 
   async findLines(lineArgs: LineArgs): Promise<TransactionLine[]> {
-    const { headerId, skip, take } = lineArgs;
-    const linesQB = this.lineRepo
+    const {
+      headerId,
+      itemId,
+      includeSales,
+      includePurchases,
+      includePIs,
+      includeTransfers,
+      skip,
+      take,
+    } = lineArgs;
+
+    const tranTypes: TransactionType[] = [];
+    if (includeSales) tranTypes.push(TransactionType.Sale);
+    if (includePurchases) tranTypes.push(TransactionType.Purchase);
+    if (includePIs) tranTypes.push(TransactionType.PI);
+    if (includeTransfers) tranTypes.push(TransactionType.Transfer);
+
+    if (!headerId && tranTypes.length === 0) return [];
+    console.log(tranTypes);
+    let linesQB = this.lineRepo
       .createQueryBuilder('l')
-      .innerJoinAndSelect('l.item', 'Item')
-      .where('l.headerId = :headerId', {
+      .innerJoinAndSelect('l.header', 'header')
+      .innerJoinAndSelect('header.warehouse', 'warehouse')
+      .innerJoinAndSelect('header.businessPartner', 'businessPartner')
+      .innerJoinAndSelect('l.item', 'item');
+
+    if (headerId) {
+      linesQB = linesQB.andWhere('l.headerId = :headerId', {
         headerId: headerId,
       });
+    } else {
+      linesQB = linesQB.andWhere(
+        new Brackets((qb) => {
+          qb.where('header.type = :sales', {
+            sales: tranTypes[0],
+          });
+          if (tranTypes.length > 1) {
+            qb = qb.orWhere('header.type = :purchase', {
+              purchase: tranTypes[1],
+            });
+          }
+          if (tranTypes.length > 2) {
+            qb = qb.orWhere('header.type = :pi', {
+              pi: tranTypes[2],
+            });
+          }
+          if (tranTypes.length > 3) {
+            qb = qb.orWhere('header.type = :transfer', {
+              transfer: tranTypes[3],
+            });
+          }
+        }),
+      );
+    }
+    if (itemId) {
+      linesQB = linesQB.andWhere('item.id = :itemId', {
+        itemId: itemId,
+      });
+    }
 
     return await linesQB.take(take).skip(skip).getMany();
   }
   async findInventories(inventoryArgs: InventoryArgs): Promise<Inventory[]> {
     const { warehouseId, skip, take } = inventoryArgs;
-    let itemsQB = this.inventoryRepo
-      .createQueryBuilder('i')
-      .innerJoinAndSelect('i.warehouse', 'Warehouse')
-      .innerJoinAndSelect('i.item', 'Item')
-      .innerJoinAndSelect('Item.itemCategory', 'cat')
-      .innerJoinAndSelect('Item.unitOfMeasure', 'uom');
+    let inventoriesQB = this.inventoryRepo
+      .createQueryBuilder('inv')
+      .innerJoinAndSelect('inv.warehouse', 'warehouse')
+      .innerJoinAndSelect('inv.item', 'item')
+      .innerJoinAndSelect('item.itemCategory', 'cat')
+      .innerJoinAndSelect('item.unitOfMeasure', 'uom');
     if (warehouseId) {
-      itemsQB = itemsQB.andWhere('i.warehouseId = :warehouseId', {
+      inventoriesQB = inventoriesQB.andWhere('inv.warehouseId = :warehouseId', {
         warehouseId,
       });
     }
 
-    return await itemsQB.take(take).skip(skip).getMany();
+    return await inventoriesQB.take(take).skip(skip).getMany();
   }
 
   async findOne(id: number) {

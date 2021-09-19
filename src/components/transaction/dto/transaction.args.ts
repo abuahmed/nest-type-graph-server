@@ -19,6 +19,12 @@ export class TransactionArgs extends PartialType(PaginationArgs) {
 export class LineArgs extends PartialType(PaginationArgs) {
   @Field(() => Int, { nullable: true })
   headerId?: number;
+  @Field(() => Int, { nullable: true })
+  itemId?: number;
+  includeSales?: boolean;
+  includePurchases?: boolean;
+  includePIs?: boolean;
+  includeTransfers?: boolean;
 }
 
 @ArgsType()
