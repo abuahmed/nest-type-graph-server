@@ -150,7 +150,6 @@ export class TransactionService {
     if (includeTransfers) tranTypes.push(TransactionType.Transfer);
 
     if (!headerId && tranTypes.length === 0) return [];
-    console.log(tranTypes);
     let linesQB = this.lineRepo
       .createQueryBuilder('l')
       .innerJoinAndSelect('l.header', 'header')
@@ -163,28 +162,9 @@ export class TransactionService {
         headerId: headerId,
       });
     } else {
-      linesQB = linesQB.andWhere(
-        new Brackets((qb) => {
-          qb.where('header.type = :sales', {
-            sales: tranTypes[0],
-          });
-          if (tranTypes.length > 1) {
-            qb = qb.orWhere('header.type = :purchase', {
-              purchase: tranTypes[1],
-            });
-          }
-          if (tranTypes.length > 2) {
-            qb = qb.orWhere('header.type = :pi', {
-              pi: tranTypes[2],
-            });
-          }
-          if (tranTypes.length > 3) {
-            qb = qb.orWhere('header.type = :transfer', {
-              transfer: tranTypes[3],
-            });
-          }
-        }),
-      );
+      linesQB = linesQB.andWhere('header.type IN (:type)', {
+        type: tranTypes,
+      });
     }
     if (itemId) {
       linesQB = linesQB.andWhere('item.id = :itemId', {
@@ -302,4 +282,26 @@ export class TransactionService {
   // ) {
   //   return userRepository.save(user);
   // }
+  // linesQB = linesQB.andWhere(
+  //   new Brackets((qb) => {
+  //     qb.where('header.type = :sales', {
+  //       sales: tranTypes[0],
+  //     });
+  //     if (tranTypes.length > 1) {
+  //       qb = qb.orWhere('header.type = :purchase', {
+  //         purchase: tranTypes[1],
+  //       });
+  //     }
+  //     if (tranTypes.length > 2) {
+  //       qb = qb.orWhere('header.type = :pi', {
+  //         pi: tranTypes[2],
+  //       });
+  //     }
+  //     if (tranTypes.length > 3) {
+  //       qb = qb.orWhere('header.type = :transfer', {
+  //         transfer: tranTypes[3],
+  //       });
+  //     }
+  //   }),
+  // );
 }
