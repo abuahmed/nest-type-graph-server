@@ -65,3 +65,38 @@ export default [
 
   //   'View Reports',
 ];
+
+export enum Role {
+  ViewDashboard = 'View Dashboard',
+
+  Users = 'Users',
+  Customers = 'Customers Entry',
+  Vendors = 'Vendors Entry',
+  Items = 'Items Entry',
+
+  OnHandInventory = 'OnHand Inventory',
+
+  PI = 'Physical Inventory',
+  ViewPI = 'View Physical Inventory',
+  AddPI = 'Add Physical Inventory',
+  PostPI = 'Post Physical Inventory',
+  UnPostPI = 'UnPost Physical Inventory',
+  DeletePI = 'Delete Physical Inventory',
+  HistoryPI = 'Pi Lines History',
+
+  Sales = 'Sales',
+  ViewSales = 'View Sales',
+  AddSales = 'Add Sales',
+  PostSales = 'Post Sales',
+  UnPostSales = 'UnPost Sales',
+  DeleteSales = 'Delete Sales',
+  HistorySales = 'Sales Lines History',
+
+  Purchase = 'Purchase',
+  ViewPurchase = 'View Purchase',
+  AddPurchase = 'Add Purchase',
+  PostPurchase = 'Post Purchase',
+  UnPostPurchase = 'UnPost Purchase',
+  DeletePurchase = 'Delete Purchase',
+  HistoryPurchase = 'Purchase Lines History',
+}

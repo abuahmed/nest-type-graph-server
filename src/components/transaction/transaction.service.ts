@@ -128,7 +128,11 @@ export class TransactionService {
         },
       );
     }
-    return await transactionsQB.take(take).skip(skip).getMany();
+    return await transactionsQB
+      .take(take)
+      .skip(skip)
+      .orderBy('t.transactionDate', 'DESC')
+      .getMany();
   }
 
   async findLines(lineArgs: LineArgs): Promise<TransactionLine[]> {
@@ -180,7 +184,7 @@ export class TransactionService {
       });
     }
 
-    return await linesQB.take(take).skip(skip).getMany();
+    return await linesQB.take(take).skip(skip).orderBy('header.transactionDate', 'DESC').getMany();
   }
   async findInventories(inventoryArgs: InventoryArgs): Promise<Inventory[]> {
     const { warehouseId, skip, take } = inventoryArgs;
