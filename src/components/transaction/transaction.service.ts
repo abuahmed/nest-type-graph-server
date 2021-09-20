@@ -139,6 +139,8 @@ export class TransactionService {
       includePurchases,
       includePIs,
       includeTransfers,
+      durationBegin: startDate,
+      durationEnd: endDate,
       skip,
       take,
     } = lineArgs;
@@ -171,6 +173,12 @@ export class TransactionService {
         itemId: itemId,
       });
     }
+    if (startDate && endDate) {
+      linesQB = linesQB.andWhere('header.transactionDate BETWEEN :startDate AND :endDate', {
+        startDate: startOfDay(startDate).toISOString(),
+        endDate: endOfDay(endDate).toISOString(),
+      });
+    }
 
     return await linesQB.take(take).skip(skip).getMany();
   }
@@ -188,7 +196,7 @@ export class TransactionService {
       });
     }
 
-    return await inventoriesQB.take(take).skip(skip).getMany();
+    return await inventoriesQB.take(take).skip(skip).orderBy('item.displayName').getMany();
   }
 
   async findOne(id: number) {

@@ -25,6 +25,8 @@ export class LineArgs extends PartialType(PaginationArgs) {
   includePurchases?: boolean;
   includePIs?: boolean;
   includeTransfers?: boolean;
+  durationBegin?: Date;
+  durationEnd?: Date;
 }
 
 @ArgsType()
