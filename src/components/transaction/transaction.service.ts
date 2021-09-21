@@ -11,6 +11,7 @@ import { DelResult } from '../user/dto/user.dto';
 import { TransactionStatus } from 'src/db/enums/transactionStatus';
 import { Inventory } from 'src/db/models/inventory.entity';
 import { TransactionType } from 'src/db/enums/transactionType';
+import { STATUS_CODES } from 'http';
 
 @Injectable()
 export class TransactionService {
@@ -145,6 +146,7 @@ export class TransactionService {
       includeTransfers,
       durationBegin: startDate,
       durationEnd: endDate,
+      status,
       skip,
       take,
     } = lineArgs;
@@ -168,6 +170,10 @@ export class TransactionService {
         headerId: headerId,
       });
     } else {
+      linesQB = linesQB.andWhere('header.status = :status', {
+        status: status,
+      });
+
       linesQB = linesQB.andWhere('header.type IN (:type)', {
         type: tranTypes,
       });
@@ -210,6 +216,23 @@ export class TransactionService {
         {
           relations: ['lines', 'lines.item', 'lines.item.itemCategory', 'lines.item.unitOfMeasure'],
         },
+      );
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+  async getItemInventory(id: number): Promise<Inventory> {
+    try {
+      return await this.inventoryRepo.findOne(
+        { item: { id } },
+        { relations: ['warehouse', 'item', 'item.itemCategory', 'item.unitOfMeasure'] },
       );
     } catch (err) {
       throw new HttpException(
@@ -268,7 +291,7 @@ export class TransactionService {
           ? itemInventory.qtyOnHand + line.qty
           : header.type === TransactionType.Purchase
           ? itemInventory.qtyOnHand - line.qty
-          : itemInventory.qtyOnHand + line.diff;
+          : itemInventory.qtyOnHand - line.diff;
       invents.push(itemInventory);
     });
     const result = await this.inventoryRepo.save(invents);

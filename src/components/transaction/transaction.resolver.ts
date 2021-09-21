@@ -41,9 +41,14 @@ export class TransactionResolver {
     return this.transactionService.findLines(transactionArgs);
   }
 
-  @Query(() => TransactionHeader, { name: 'transaction' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  @Query(() => TransactionHeader)
+  getHeaderById(@Args('id', { type: () => Int }) id: number) {
     return this.transactionService.findOne(id);
+  }
+
+  @Query(() => Inventory)
+  getItemInventory(@Args('id', { type: () => Int }) id: number) {
+    return this.transactionService.getItemInventory(id);
   }
 
   // @Mutation(() => TransactionHeader)

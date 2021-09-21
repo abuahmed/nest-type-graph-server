@@ -335,8 +335,9 @@ type Query {
   getItemUoms: [Category!]!
   transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, type: TransactionType!, durationBegin: DateTime, durationEnd: DateTime): [TransactionHeader!]!
   inventories(skip: Int = 0, take: Int = 25, warehouseId: Int): [Inventory!]!
-  lines(skip: Int = 0, take: Int = 25, headerId: Int, itemId: Int, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime): [TransactionLine!]!
-  transaction(id: Int!): TransactionHeader!
+  lines(skip: Int = 0, take: Int = 25, headerId: Int, itemId: Int, status: TransactionStatus = Draft, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime): [TransactionLine!]!
+  getHeaderById(id: Int!): TransactionHeader!
+  getItemInventory(id: Int!): Inventory!
 }
 
 input ListUserInput {
@@ -479,6 +480,7 @@ input TransactionLineInput {
   header: TransactionInput
   qty: Float
   eachPrice: Float
+  diff: Float
 }
 
 input TransactionInput {

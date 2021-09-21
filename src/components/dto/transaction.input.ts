@@ -34,4 +34,5 @@ export class TransactionLineInput extends PartialType(BasicInput) {
   itemId?: number;
   qty?: number;
   eachPrice?: number;
+  diff?: number;
 }

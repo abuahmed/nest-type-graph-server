@@ -1,7 +1,10 @@
-import { ArgsType, Field, Int, PartialType } from '@nestjs/graphql';
+import { ArgsType, Field, Int, PartialType, registerEnumType } from '@nestjs/graphql';
 import { PaginationArgs } from 'src/components/dto/pagination.args';
+import { TransactionStatus } from 'src/db/enums/transactionStatus';
 import { TransactionType } from 'src/db/enums/transactionType';
-
+registerEnumType(TransactionStatus, {
+  name: 'TransactionStatus',
+});
 @ArgsType()
 export class TransactionArgs extends PartialType(PaginationArgs) {
   type: TransactionType;
@@ -27,6 +30,8 @@ export class LineArgs extends PartialType(PaginationArgs) {
   includeTransfers?: boolean;
   durationBegin?: Date;
   durationEnd?: Date;
+  @Field(() => TransactionStatus, { defaultValue: TransactionStatus.Draft })
+  status?: TransactionStatus;
 }
 
 @ArgsType()
