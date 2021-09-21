@@ -253,6 +253,30 @@ export class TransactionService {
       return response;
     }
   }
+  async unPostHeader(id: number): Promise<TransactionHeader> {
+    const header = await this.headerRepo.findOne(
+      { id },
+      { relations: ['lines', 'lines.item', 'warehouse', 'businessPartner'] },
+    );
+    const invents: Inventory[] = [];
+    const inventories = await this.inventoryRepo.find();
+    header.lines.forEach((line) => {
+      const itemInventory = inventories.find((inv) => inv.itemId === line.item.id);
+
+      itemInventory.qtyOnHand =
+        header.type === TransactionType.Sale
+          ? itemInventory.qtyOnHand + line.qty
+          : header.type === TransactionType.Purchase
+          ? itemInventory.qtyOnHand - line.qty
+          : itemInventory.qtyOnHand + line.diff;
+      invents.push(itemInventory);
+    });
+    const result = await this.inventoryRepo.save(invents);
+    if (result) {
+      const response = await this.headerRepo.save({ ...header, status: TransactionStatus.Draft });
+      return response;
+    }
+  }
   async removeHeader(id: number): Promise<DelResult> {
     const del = await this.headerRepo.delete(id);
     const res = new DelResult();

@@ -57,6 +57,10 @@ export class TransactionResolver {
   postHeader(@Args('id', { type: () => Int }) id: number) {
     return this.transactionService.postHeader(id);
   }
+  @Mutation(() => TransactionHeader)
+  unPostHeader(@Args('id', { type: () => Int }) id: number) {
+    return this.transactionService.unPostHeader(id);
+  }
 
   @Mutation(() => DelResult)
   removeHeader(@Args('id', { type: () => Int }) id: number) {
