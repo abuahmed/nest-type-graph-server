@@ -58,11 +58,15 @@ export class TransactionService {
         : this.headerRepo.create(header);
 
       transaction.totalAmount = transaction.totalAmount
-        ? transaction.totalAmount + line.eachPrice * line.qty
+        ? Number(transaction.totalAmount) + Number(line.eachPrice) * Number(line.qty)
         : line.eachPrice * line.qty;
 
-      transaction.totalQty = transaction.totalQty ? transaction.totalQty + line.qty : line.qty;
-      transaction.numberOfItems = transaction.numberOfItems ? transaction.numberOfItems + 1 : 1;
+      transaction.totalQty = transaction.totalQty
+        ? Number(transaction.totalQty) + Number(line.qty)
+        : line.qty;
+      transaction.numberOfItems = transaction.numberOfItems
+        ? Number(transaction.numberOfItems) + Number(1)
+        : 1;
       if (prevLine) {
         transaction.totalAmount = transaction.totalAmount - prevLine.eachPrice * prevLine.qty;
         transaction.totalQty = transaction.totalQty - prevLine.qty;
@@ -266,7 +270,7 @@ export class TransactionService {
         header.type === TransactionType.Sale
           ? itemInventory.qtyOnHand - line.qty
           : header.type === TransactionType.Purchase
-          ? itemInventory.qtyOnHand + line.qty
+          ? Number(itemInventory.qtyOnHand) + Number(line.qty)
           : line.qty;
       invents.push(itemInventory);
     });
@@ -288,7 +292,7 @@ export class TransactionService {
 
       itemInventory.qtyOnHand =
         header.type === TransactionType.Sale
-          ? itemInventory.qtyOnHand + line.qty
+          ? Number(itemInventory.qtyOnHand) + Number(line.qty)
           : header.type === TransactionType.Purchase
           ? itemInventory.qtyOnHand - line.qty
           : itemInventory.qtyOnHand - line.diff;

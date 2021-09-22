@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { BasicFields } from '../common/basicFields';
 import { Item } from './item.entity';
@@ -22,6 +22,6 @@ export class Inventory extends BasicFields {
   item: Item;
 
   @Column({ type: 'decimal' })
-  @Field()
+  @Field(() => Float)
   qtyOnHand: number;
 }
