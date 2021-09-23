@@ -10,6 +10,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { DelResult } from '../user/dto/user.dto';
 import { Inventory } from 'src/db/models/inventory.entity';
+import { Setting } from 'src/db/models/setting';
 
 @Resolver(() => TransactionHeader)
 @UseGuards(JwtAuthGuard)
@@ -74,5 +75,10 @@ export class TransactionResolver {
   @Mutation(() => TransactionHeader)
   removeLine(@Args('id', { type: () => Int }) id: number) {
     return this.transactionService.removeLine(id);
+  }
+
+  @Query(() => Setting)
+  getSetting(): Promise<Setting> {
+    return this.transactionService.getSetting();
   }
 }

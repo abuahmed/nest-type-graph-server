@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
-import { Brackets, QueryBuilder, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { TransactionLineInput } from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
@@ -11,7 +11,7 @@ import { DelResult } from '../user/dto/user.dto';
 import { TransactionStatus } from 'src/db/enums/transactionStatus';
 import { Inventory } from 'src/db/models/inventory.entity';
 import { TransactionType } from 'src/db/enums/transactionType';
-import { STATUS_CODES } from 'http';
+import { Setting } from 'src/db/models/setting';
 
 @Injectable()
 export class TransactionService {
@@ -22,6 +22,8 @@ export class TransactionService {
     private readonly lineRepo: Repository<TransactionLine>,
     @InjectRepository(Inventory)
     private readonly inventoryRepo: Repository<Inventory>,
+    @InjectRepository(Setting)
+    private readonly settingRepo: Repository<Setting>,
   ) {}
 
   async create(header: CreateTransactionInput) {
@@ -77,6 +79,9 @@ export class TransactionService {
 
       const response = await this.lineRepo.save(line);
       if (response) {
+        //Update setting field for better caching
+        await this.updateSetting(line.header.type);
+        //fetch line with its relations
         const ln = await this.lineRepo.findOne(
           { id: response.id },
           { relations: ['item', 'header', 'header.warehouse', 'header.businessPartner'] },
@@ -95,7 +100,19 @@ export class TransactionService {
       );
     }
   }
+  async updateSetting(type?: TransactionType, isPostUnPost?: boolean) {
+    let setting = await this.settingRepo.findOne();
+    if (!setting) setting = this.settingRepo.create();
+    if (isPostUnPost) setting.lastInventoryUpdated = new Date();
+    if (type === TransactionType.Sale) setting.lastSalesUpdated = new Date();
+    else if (type === TransactionType.Purchase) setting.lastPurchaseUpdated = new Date();
+    else setting.lastPIUpdated == new Date();
 
+    await this.settingRepo.save(setting);
+  }
+  async getSetting(): Promise<Setting> {
+    return await this.settingRepo.findOne();
+  }
   async findAll(transactionArgs: TransactionArgs): Promise<TransactionHeader[]> {
     const {
       type,
@@ -277,6 +294,8 @@ export class TransactionService {
     const result = await this.inventoryRepo.save(invents);
     if (result) {
       const response = await this.headerRepo.save({ ...header, status: TransactionStatus.Posted });
+      //Update setting field for better caching
+      await this.updateSetting(header.type, true);
       return response;
     }
   }
@@ -301,6 +320,8 @@ export class TransactionService {
     const result = await this.inventoryRepo.save(invents);
     if (result) {
       const response = await this.headerRepo.save({ ...header, status: TransactionStatus.Draft });
+      //Update setting field for better caching
+      await this.updateSetting(header.type, true);
       return response;
     }
   }

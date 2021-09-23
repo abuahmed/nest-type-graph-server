@@ -322,6 +322,22 @@ type Inventory {
   item: Item!
 }
 
+type Setting {
+  id: Int!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Int!
+  modifiedByUserId: Int!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  lastInventoryUpdated: DateTime!
+  lastPIUpdated: DateTime!
+  lastPurchaseUpdated: DateTime!
+  lastSalesUpdated: DateTime!
+  lastItemsUpdated: DateTime!
+  lastBusinessPartnersUpdated: DateTime!
+}
+
 type Query {
   Users: [User!]!
   GetUser(input: ListUserInput!): User!
@@ -338,6 +354,7 @@ type Query {
   lines(skip: Int = 0, take: Int = 25, headerId: Int, itemId: Int, status: TransactionStatus = Draft, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime): [TransactionLine!]!
   getHeaderById(id: Int!): TransactionHeader!
   getItemInventory(id: Int!): Inventory!
+  getSetting: Setting!
 }
 
 input ListUserInput {
