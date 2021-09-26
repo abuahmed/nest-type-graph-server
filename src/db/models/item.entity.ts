@@ -41,15 +41,15 @@ export class Item extends DisplayFields {
   @Field(() => Category)
   unitOfMeasure: Category;
 
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: 'decimal', precision: 9, scale: 2, default: 0.0 })
   @Field(() => Float, { nullable: true })
   purchasePrice?: number;
 
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: 'decimal', precision: 9, scale: 2, default: 0.0 })
   @Field(() => Float, { nullable: true })
   sellingPrice?: number;
 
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: 'decimal', precision: 9, scale: 2, default: 0.0 })
   @Field(() => Float, { nullable: true })
   safeQty?: number;
 }

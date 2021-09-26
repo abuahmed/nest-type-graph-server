@@ -349,9 +349,9 @@ type Query {
   getItem(id: Int!): Item!
   getItemCategories: [Category!]!
   getItemUoms: [Category!]!
-  transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, type: TransactionType!, durationBegin: DateTime, durationEnd: DateTime): [TransactionHeader!]!
-  inventories(skip: Int = 0, take: Int = 25, warehouseId: Int): [Inventory!]!
-  lines(skip: Int = 0, take: Int = 25, headerId: Int, itemId: Int, status: TransactionStatus = Draft, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime): [TransactionLine!]!
+  transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, type: TransactionType!, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [TransactionHeader!]!
+  inventories(skip: Int = 0, take: Int = 25, warehouseId: Int, lastUpdated: DateTime): [Inventory!]!
+  lines(skip: Int = 0, take: Int = 25, headerId: Int, itemId: Int, status: TransactionStatus = Draft, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [TransactionLine!]!
   getHeaderById(id: Int!): TransactionHeader!
   getItemInventory(id: Int!): Inventory!
   getSetting: Setting!

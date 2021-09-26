@@ -35,15 +35,15 @@ export abstract class TransactionFields extends BasicFields {
   @Field(() => String, { nullable: true })
   number?: string;
 
-  @Column({ default: 0 })
+  @Column({ type: 'decimal', precision: 9, scale: 2, default: 0.0 })
   @Field(() => Int, { defaultValue: 0 })
   numberOfItems: number;
 
-  @Column({ default: 0 })
+  @Column({ type: 'decimal', precision: 9, scale: 2, default: 0.0 })
   @Field(() => Float, { defaultValue: 0 })
   totalAmount: number;
 
-  @Column({ default: 0 })
+  @Column({ type: 'decimal', precision: 9, scale: 2, default: 0.0 })
   @Field(() => Float, { defaultValue: 0 })
   totalQty: number;
 

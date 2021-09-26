@@ -21,7 +21,7 @@ export class Inventory extends BasicFields {
   @ManyToOne(() => Item, { nullable: false })
   item: Item;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'decimal', precision: 9, scale: 2, default: 0.0 })
   @Field(() => Float)
   qtyOnHand: number;
 }

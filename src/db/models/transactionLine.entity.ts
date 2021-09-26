@@ -23,16 +23,16 @@ export class TransactionLine extends BasicFields {
   // @Field(() => Int)
   // lineNumber: number;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'decimal', precision: 9, scale: 2, default: 0.0 })
   @Field(() => Float)
   qty: number;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'decimal', precision: 9, scale: 2, default: 0.0 })
   @Field(() => Float)
   eachPrice: number;
 
   //FOR PHYSICAL INVENTORY PURPOSE
-  @Column({ type: 'decimal', default: 0 })
+  @Column({ type: 'decimal', precision: 9, scale: 2, default: 0.0 })
   @Field(() => Float, { defaultValue: 0 })
   diff: number;
   // @Column({ type: 'decimal' })

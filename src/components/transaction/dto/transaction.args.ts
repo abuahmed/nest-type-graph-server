@@ -10,6 +10,7 @@ export class TransactionArgs extends PartialType(PaginationArgs) {
   type: TransactionType;
   durationBegin?: Date;
   durationEnd?: Date;
+  lastUpdated?: Date;
   @Field(() => Int, { nullable: true })
   warehouseId?: number;
   @Field(() => Int, { nullable: true })
@@ -30,6 +31,7 @@ export class LineArgs extends PartialType(PaginationArgs) {
   includeTransfers?: boolean;
   durationBegin?: Date;
   durationEnd?: Date;
+  lastUpdated?: Date;
   @Field(() => TransactionStatus, { defaultValue: TransactionStatus.Draft })
   status?: TransactionStatus;
 }
@@ -38,4 +40,6 @@ export class LineArgs extends PartialType(PaginationArgs) {
 export class InventoryArgs extends PartialType(PaginationArgs) {
   @Field(() => Int, { nullable: true })
   warehouseId?: number;
+
+  lastUpdated?: Date;
 }
