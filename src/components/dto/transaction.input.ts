@@ -1,4 +1,11 @@
-import { Field, GraphQLISODateTime, InputType, Int, PartialType } from '@nestjs/graphql';
+import {
+  Field,
+  GraphQLISODateTime,
+  InputType,
+  Int,
+  ObjectType,
+  PartialType,
+} from '@nestjs/graphql';
 import { TransactionType } from 'src/db/enums/transactionType';
 import { BusinessPartner } from 'src/db/models/businessPartner.entity';
 import { Warehouse } from 'src/db/models/warehouse.entity';
@@ -35,4 +42,10 @@ export class TransactionLineInput extends PartialType(BasicInput) {
   qty?: number;
   eachPrice?: number;
   diff?: number;
+}
+
+@ObjectType()
+export class SummaryInput {
+  type?: TransactionType;
+  summaryValue?: number;
 }

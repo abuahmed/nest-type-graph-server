@@ -4,13 +4,14 @@ import { CreateTransactionInput } from './dto/create-transaction.input';
 import { UpdateTransactionInput } from './dto/update-transaction.input';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
-import { TransactionLineInput } from '../dto/transaction.input';
+import { SummaryInput, TransactionLineInput } from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, TransactionArgs } from './dto/transaction.args';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { DelResult } from '../user/dto/user.dto';
 import { Inventory } from 'src/db/models/inventory.entity';
 import { Setting } from 'src/db/models/setting';
+import { number } from '@hapi/joi';
 
 @Resolver(() => TransactionHeader)
 @UseGuards(JwtAuthGuard)
@@ -80,5 +81,10 @@ export class TransactionResolver {
   @Query(() => Setting)
   getSetting(): Promise<Setting> {
     return this.transactionService.getSetting();
+  }
+
+  @Query(() => [SummaryInput])
+  inventorySummary(@Args() transactionArgs: InventoryArgs): Promise<Array<SummaryInput>> {
+    return this.transactionService.findInventorySummary(transactionArgs);
   }
 }

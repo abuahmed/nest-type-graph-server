@@ -338,6 +338,11 @@ type Setting {
   lastBusinessPartnersUpdated: DateTime!
 }
 
+type SummaryInput {
+  type: TransactionType
+  summaryValue: Float
+}
+
 type Query {
   Users: [User!]!
   GetUser(input: ListUserInput!): User!
@@ -355,6 +360,7 @@ type Query {
   getHeaderById(id: Int!): TransactionHeader!
   getItemInventory(id: Int!): Inventory!
   getSetting: Setting!
+  inventorySummary(skip: Int = 0, take: Int = 25, warehouseId: Int, lastUpdated: DateTime): [SummaryInput!]!
 }
 
 input ListUserInput {

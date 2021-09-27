@@ -9,6 +9,7 @@ npm-debug.log
 # compiled output
 /node_modules
 dist
+dist.zip
 # Logs
 logs
 *.log

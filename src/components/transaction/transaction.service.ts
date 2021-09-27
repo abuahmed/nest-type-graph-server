@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
 import { Repository } from 'typeorm';
-import { TransactionLineInput } from '../dto/transaction.input';
+import { SummaryInput, TransactionLineInput } from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
 import { startOfDay, endOfDay } from 'date-fns';
@@ -359,6 +359,34 @@ export class TransactionService {
     }
   }
 
+  async findInventorySummary(inventoryArgs: InventoryArgs): Promise<SummaryInput[]> {
+    const { warehouseId, skip, take } = inventoryArgs;
+    let inventoriesQB = this.inventoryRepo
+      .createQueryBuilder('inv')
+      .innerJoinAndSelect('inv.warehouse', 'warehouse')
+      .innerJoinAndSelect('inv.item', 'item');
+    if (warehouseId) {
+      inventoriesQB = inventoriesQB.andWhere('inv.warehouseId = :warehouseId', {
+        warehouseId,
+      });
+    }
+
+    const result = await inventoriesQB.take(take).skip(skip).orderBy('item.displayName').getMany();
+    let purchaseValue = 0.0;
+    let saleValue = 0.0;
+
+    result.forEach((element) => {
+      purchaseValue = purchaseValue + element.qtyOnHand * element.item.purchasePrice;
+      saleValue = saleValue + element.qtyOnHand * element.item.sellingPrice;
+    });
+    return [
+      { summaryValue: result.length },
+      { summaryValue: purchaseValue },
+      { summaryValue: saleValue },
+      { summaryValue: saleValue - purchaseValue },
+    ];
+    //result.reduce((purchaseValue,){})
+  }
   // @Transaction()
   // save(
   //   user: TransactionHeader,
