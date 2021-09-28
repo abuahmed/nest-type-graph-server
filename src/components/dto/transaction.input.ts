@@ -49,3 +49,10 @@ export class SummaryInput {
   type?: TransactionType;
   summaryValue?: number;
 }
+@ObjectType()
+export class InventorySummary {
+  warehouseId?: number;
+  totalItems?: number;
+  totalPurchases?: number;
+  totalSales?: number;
+}

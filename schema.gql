@@ -343,6 +343,13 @@ type SummaryInput {
   summaryValue: Float
 }
 
+type InventorySummary {
+  warehouseId: Float
+  totalItems: Float
+  totalPurchases: Float
+  totalSales: Float
+}
+
 type Query {
   Users: [User!]!
   GetUser(input: ListUserInput!): User!
@@ -361,6 +368,7 @@ type Query {
   getItemInventory(id: Int!): Inventory!
   getSetting: Setting!
   inventorySummary(skip: Int = 0, take: Int = 25, warehouseId: Int, lastUpdated: DateTime): [SummaryInput!]!
+  getInventorySummary(skip: Int = 0, take: Int = 25, warehouseId: Int, lastUpdated: DateTime): InventorySummary!
 }
 
 input ListUserInput {

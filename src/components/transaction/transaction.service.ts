@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
 import { Repository } from 'typeorm';
-import { SummaryInput, TransactionLineInput } from '../dto/transaction.input';
+import { InventorySummary, SummaryInput, TransactionLineInput } from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
 import { startOfDay, endOfDay } from 'date-fns';
@@ -385,7 +385,24 @@ export class TransactionService {
       { summaryValue: saleValue },
       { summaryValue: saleValue - purchaseValue },
     ];
-    //result.reduce((purchaseValue,){})
+  }
+  async calculateInventorySummary(inventoryArgs: InventoryArgs): Promise<InventorySummary> {
+    const { warehouseId, skip, take } = inventoryArgs;
+    let inventoriesQB = this.inventoryRepo
+      .createQueryBuilder('inv')
+      .innerJoin('inv.warehouse', 'warehouse')
+      .innerJoin('inv.item', 'item')
+      .select('COUNT(inv.id)', 'totalItems')
+      .addSelect('warehouse.id', 'warehouseId')
+      .addSelect('SUM(inv.qtyOnHand * item.purchasePrice)', 'totalPurchases')
+      .addSelect('SUM(inv.qtyOnHand * item.sellingPrice)', 'totalSales');
+    if (warehouseId) {
+      inventoriesQB = inventoriesQB.andWhere('inv.warehouseId = :warehouseId', {
+        warehouseId,
+      });
+    }
+    inventoriesQB = inventoriesQB.groupBy('warehouse.id');
+    return await inventoriesQB.take(take).skip(skip).getRawOne();
   }
   // @Transaction()
   // save(
