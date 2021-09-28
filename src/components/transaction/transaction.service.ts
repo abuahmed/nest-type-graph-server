@@ -3,7 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
 import { Repository } from 'typeorm';
-import { InventorySummary, SummaryInput, TransactionLineInput } from '../dto/transaction.input';
+import {
+  InventorySummary,
+  LineSummary,
+  SummaryInput,
+  TransactionLineInput,
+} from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
 import { startOfDay, endOfDay } from 'date-fns';
@@ -403,6 +408,60 @@ export class TransactionService {
     }
     inventoriesQB = inventoriesQB.groupBy('warehouse.id');
     return await inventoriesQB.take(take).skip(skip).getRawOne();
+  }
+
+  async topItems(lineArgs: LineArgs): Promise<LineSummary[]> {
+    const {
+      warehouseId,
+      includeSales,
+      includePurchases,
+      durationBegin: startDate,
+      durationEnd: endDate,
+      status,
+      skip,
+      take,
+    } = lineArgs;
+
+    const tranTypes: TransactionType[] = [];
+    if (includeSales) tranTypes.push(TransactionType.Sale);
+    if (includePurchases) tranTypes.push(TransactionType.Purchase);
+
+    let linesQB = this.lineRepo
+      .createQueryBuilder('l')
+      .innerJoin('l.header', 'header')
+      .innerJoin('header.warehouse', 'warehouse')
+      .innerJoin('header.businessPartner', 'businessPartner')
+      .innerJoin('l.item', 'item')
+      .select('COUNT(item.id)', 'totalTransactions')
+      .addSelect('item.id', 'itemId')
+      .addSelect('item.displayName', 'itemName')
+      .addSelect('SUM(l.qty * l.eachPrice)', 'totalAmount');
+
+    linesQB = linesQB.andWhere('header.status = :status', {
+      status: status,
+    });
+
+    linesQB = linesQB.andWhere('header.type IN (:type)', {
+      type: tranTypes,
+    });
+
+    if (startDate && endDate) {
+      linesQB = linesQB.andWhere('header.transactionDate BETWEEN :startDate AND :endDate', {
+        startDate: startOfDay(startDate).toISOString(),
+        endDate: endOfDay(endDate).toISOString(),
+      });
+    }
+
+    if (warehouseId) {
+      linesQB = linesQB.andWhere('warehouse.id = :warehouseId', {
+        warehouseId,
+      });
+    }
+
+    linesQB = linesQB.groupBy('item.id');
+    linesQB = linesQB.limit(5);
+
+    return await linesQB.orderBy('totalAmount', 'DESC').getRawMany();
   }
   // @Transaction()
   // save(

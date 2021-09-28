@@ -4,7 +4,12 @@ import { CreateTransactionInput } from './dto/create-transaction.input';
 import { UpdateTransactionInput } from './dto/update-transaction.input';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
-import { InventorySummary, SummaryInput, TransactionLineInput } from '../dto/transaction.input';
+import {
+  InventorySummary,
+  LineSummary,
+  SummaryInput,
+  TransactionLineInput,
+} from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, TransactionArgs } from './dto/transaction.args';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
@@ -91,5 +96,10 @@ export class TransactionResolver {
   @Query(() => InventorySummary)
   getInventorySummary(@Args() transactionArgs: InventoryArgs): Promise<InventorySummary> {
     return this.transactionService.calculateInventorySummary(transactionArgs);
+  }
+
+  @Query(() => [LineSummary])
+  topItems(@Args() transactionArgs: LineArgs): Promise<Array<LineSummary>> {
+    return this.transactionService.topItems(transactionArgs);
   }
 }

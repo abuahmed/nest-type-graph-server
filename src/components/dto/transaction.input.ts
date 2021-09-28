@@ -56,3 +56,12 @@ export class InventorySummary {
   totalPurchases?: number;
   totalSales?: number;
 }
+
+@ObjectType()
+export class LineSummary {
+  warehouseId?: number;
+  itemId?: number;
+  itemName?: string;
+  totalTransactions?: number;
+  totalAmount?: number;
+}
