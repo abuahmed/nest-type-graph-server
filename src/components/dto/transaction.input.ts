@@ -65,3 +65,11 @@ export class LineSummary {
   totalTransactions?: number;
   totalAmount?: number;
 }
+
+@ObjectType()
+export class DailyTransactionsSummary {
+  warehouseId?: number;
+  totalTransactions?: number;
+  transactionDate?: string;
+  totalAmount?: number;
+}

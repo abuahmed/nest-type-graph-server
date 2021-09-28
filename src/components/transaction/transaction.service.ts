@@ -4,6 +4,7 @@ import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
 import { Repository } from 'typeorm';
 import {
+  DailyTransactionsSummary,
   InventorySummary,
   LineSummary,
   SummaryInput,
@@ -462,6 +463,53 @@ export class TransactionService {
     linesQB = linesQB.limit(5);
 
     return await linesQB.orderBy('totalAmount', 'DESC').getRawMany();
+  }
+
+  async currentTransactions(transactionArgs: TransactionArgs): Promise<DailyTransactionsSummary[]> {
+    const {
+      type,
+      warehouseId,
+      businessPartnerId,
+      durationBegin: startDate,
+      durationEnd: endDate,
+      skip,
+      take,
+    } = transactionArgs;
+    let transactionsQB = this.headerRepo
+      .createQueryBuilder('t')
+      .innerJoin('t.warehouse', 'Warehouse')
+      .innerJoin('t.businessPartner', 'BusinessPartner')
+      .select('COUNT(t.id)', 'totalTransactions')
+      .addSelect('DATE_FORMAT(t.transactionDate, "%m/%d/%Y")', 'transactionDate')
+      .addSelect('SUM(t.totalAmount)', 'totalAmount')
+      .where('t.type = :type', {
+        type: type,
+      });
+
+    if (warehouseId) {
+      transactionsQB = transactionsQB.andWhere('t.warehouseId = :warehouseId', {
+        warehouseId,
+      });
+    }
+    if (businessPartnerId) {
+      transactionsQB = transactionsQB.andWhere('t.businessPartnerId = :businessPartnerId', {
+        businessPartnerId,
+      });
+    }
+    // if (startDate && endDate) {
+    //   transactionsQB = transactionsQB.andWhere(
+    //     't.transactionDate BETWEEN :startDate AND :endDate',
+    //     {
+    //       startDate: startOfDay(startDate).toISOString(),
+    //       endDate: endOfDay(endDate).toISOString(),
+    //     },
+    //   );
+    // }
+
+    transactionsQB = transactionsQB.groupBy('DATE_FORMAT(t.transactionDate, "%m/%d/%Y")');
+    transactionsQB = transactionsQB.limit(7);
+
+    return await transactionsQB.orderBy('transactionDate', 'DESC').getRawMany();
   }
   // @Transaction()
   // save(

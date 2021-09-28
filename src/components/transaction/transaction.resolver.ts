@@ -5,6 +5,7 @@ import { UpdateTransactionInput } from './dto/update-transaction.input';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
 import {
+  DailyTransactionsSummary,
   InventorySummary,
   LineSummary,
   SummaryInput,
@@ -101,5 +102,9 @@ export class TransactionResolver {
   @Query(() => [LineSummary])
   topItems(@Args() transactionArgs: LineArgs): Promise<Array<LineSummary>> {
     return this.transactionService.topItems(transactionArgs);
+  }
+  @Query(() => [DailyTransactionsSummary])
+  dailyTransactions(@Args() transactionArgs: TransactionArgs): Promise<Array<LineSummary>> {
+    return this.transactionService.currentTransactions(transactionArgs);
   }
 }
