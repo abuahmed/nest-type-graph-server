@@ -172,7 +172,6 @@ type Item {
   displayName: String!
   description: String
   type: ItemType!
-  code: String
   pictureUrl: String
   itemCategoryId: Int
   itemCategory: Category!

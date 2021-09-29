@@ -17,9 +17,9 @@ export class Item extends DisplayFields {
   @Field(() => ItemType)
   type: ItemType;
 
-  @Column({ unique: true, nullable: true })
-  @Field()
-  code?: string;
+  // @Column({ unique: true, nullable: true })
+  // @Field()
+  // code?: string;
 
   @Column({ nullable: true })
   @Field()

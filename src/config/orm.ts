@@ -11,10 +11,16 @@ const options: TypeOrmModuleOptions = {
   username: MYSQL_USERNAME,
   password: MYSQL_PASSWORD,
   database: 'pinnzzxc_estock',
-  synchronize: true,
   logging: false,
   entities: [path.resolve(__dirname, '..', 'db', 'models', '*')],
+  synchronize: false,
+  migrationsRun: true,
   migrations: [path.resolve(__dirname, '..', 'db', 'migrations', '*')],
+  cli: {
+    // Location of migration should be inside src folder
+    // to be compiled into dist/ folder.
+    migrationsDir: 'src/db/migrations',
+  },
 };
 
 module.exports = options;
