@@ -201,6 +201,8 @@ type TransactionLine {
   qty: Float!
   eachPrice: Float!
   diff: Float!
+  totalPurchaseSaleValue: Float
+  totalPIValue: Float
   header: TransactionHeader!
   item: Item!
 }
