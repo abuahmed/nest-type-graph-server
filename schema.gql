@@ -317,6 +317,9 @@ type Inventory {
   warehouseId: Int!
   itemId: Int!
   qtyOnHand: Float!
+  totalPurchaseValue: Float
+  totalSaleValue: Float
+  totalProfitValue: Float
   warehouse: Warehouse!
   item: Item!
 }

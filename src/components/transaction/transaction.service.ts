@@ -496,48 +496,19 @@ export class TransactionService {
         businessPartnerId,
       });
     }
-    // if (startDate && endDate) {
-    //   transactionsQB = transactionsQB.andWhere(
-    //     't.transactionDate BETWEEN :startDate AND :endDate',
-    //     {
-    //       startDate: startOfDay(startDate).toISOString(),
-    //       endDate: endOfDay(endDate).toISOString(),
-    //     },
-    //   );
-    // }
+    if (startDate && endDate) {
+      transactionsQB = transactionsQB.andWhere(
+        't.transactionDate BETWEEN :startDate AND :endDate',
+        {
+          startDate: startOfDay(startDate).toISOString(),
+          endDate: endOfDay(endDate).toISOString(),
+        },
+      );
+    }
 
     transactionsQB = transactionsQB.groupBy('DATE_FORMAT(t.transactionDate, "%m/%d/%Y")');
     transactionsQB = transactionsQB.limit(7);
 
-    return await transactionsQB.orderBy('transactionDate', 'DESC').getRawMany();
+    return await transactionsQB.orderBy('transactionDate', 'ASC').getRawMany();
   }
-  // @Transaction()
-  // save(
-  //   user: TransactionHeader,
-  //   @TransactionRepository(TransactionHeader) userRepository: Repository<TransactionHeader>,
-  // ) {
-  //   return userRepository.save(user);
-  // }
-  // linesQB = linesQB.andWhere(
-  //   new Brackets((qb) => {
-  //     qb.where('header.type = :sales', {
-  //       sales: tranTypes[0],
-  //     });
-  //     if (tranTypes.length > 1) {
-  //       qb = qb.orWhere('header.type = :purchase', {
-  //         purchase: tranTypes[1],
-  //       });
-  //     }
-  //     if (tranTypes.length > 2) {
-  //       qb = qb.orWhere('header.type = :pi', {
-  //         pi: tranTypes[2],
-  //       });
-  //     }
-  //     if (tranTypes.length > 3) {
-  //       qb = qb.orWhere('header.type = :transfer', {
-  //         transfer: tranTypes[3],
-  //       });
-  //     }
-  //   }),
-  // );
 }

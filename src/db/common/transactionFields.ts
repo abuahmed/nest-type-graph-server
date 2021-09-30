@@ -1,5 +1,5 @@
 import { Field, Float, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { BeforeUpdate, Column, ManyToOne, OneToMany } from 'typeorm';
+import { AfterLoad, BeforeUpdate, Column, ManyToOne, OneToMany } from 'typeorm';
 import { TransactionStatus } from '../enums/transactionStatus';
 import { TransactionType } from '../enums/transactionType';
 import { BusinessPartner } from '../models/businessPartner.entity';
@@ -71,6 +71,7 @@ export abstract class TransactionFields extends BasicFields {
   @OneToMany(() => TransactionLine, (line) => line.header)
   lines: TransactionLine[];
 
+  @AfterLoad()
   @BeforeUpdate()
   updateNumber() {
     const idLength = this.id.toString().length;
