@@ -1,6 +1,7 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { AfterInsert, AfterLoad, AfterUpdate, Column, Entity, ManyToOne } from 'typeorm';
 import { BasicFields } from '../common/basicFields';
+import { TransactionType } from '../enums/transactionType';
 import { Item } from './item.entity';
 import { TransactionHeader } from './transactionHeader.entity';
 
@@ -35,21 +36,17 @@ export class TransactionLine extends BasicFields {
   @Column({ type: 'decimal', precision: 9, scale: 2, default: 0.0 })
   @Field(() => Float, { defaultValue: 0 })
   diff: number;
-  // @Column({ type: 'decimal' })
-  // @Field(() => Float)
-  // linePrice: number;
 
   @Field(() => Float, { nullable: true })
-  totalPurchaseSaleValue?: number;
-
-  @Field(() => Float, { nullable: true })
-  totalPIValue?: number;
+  linePrice?: number;
 
   @AfterLoad()
   @AfterInsert()
   @AfterUpdate()
   generateSummary() {
-    this.totalPurchaseSaleValue = Number.parseFloat((this.qty * this.eachPrice).toFixed(10));
-    this.totalPIValue = Number.parseFloat((this.qty * this.diff).toFixed(10));
+    this.linePrice =
+      this.header.type === TransactionType.PI
+        ? Number.parseFloat((this.diff * this.eachPrice).toFixed(10))
+        : Number.parseFloat((this.qty * this.eachPrice).toFixed(10));
   }
 }
