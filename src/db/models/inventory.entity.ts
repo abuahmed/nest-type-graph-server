@@ -46,8 +46,8 @@ export class Inventory extends BasicFields {
   @AfterInsert()
   @AfterUpdate()
   generateSummary() {
-    this.totalPurchaseValue = this.item.purchasePrice * this.qtyOnHand;
-    this.totalSaleValue = this.item.sellingPrice * this.qtyOnHand;
+    this.totalPurchaseValue = this.item ? this.item.purchasePrice * this.qtyOnHand : 0;
+    this.totalSaleValue = this.item ? this.item.sellingPrice * this.qtyOnHand : 0;
     this.totalProfitValue = this.totalSaleValue - this.totalPurchaseValue;
   }
 }

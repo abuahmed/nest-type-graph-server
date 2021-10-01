@@ -44,9 +44,10 @@ export class TransactionLine extends BasicFields {
   @AfterInsert()
   @AfterUpdate()
   generateSummary() {
-    this.linePrice =
-      this.header.type === TransactionType.PI
+    this.linePrice = this.header
+      ? this.header.type === TransactionType.PI
         ? Number.parseFloat((this.diff * this.eachPrice).toFixed(10))
-        : Number.parseFloat((this.qty * this.eachPrice).toFixed(10));
+        : Number.parseFloat((this.qty * this.eachPrice).toFixed(10))
+      : 0;
   }
 }
