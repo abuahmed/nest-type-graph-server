@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { Contact } from 'src/db/models/contact.entity';
 import { SalesPerson } from 'src/db/models/salesPerson.entity';
 import { DisplayInput } from '../dto/display.input';
+import { BusinessPartnerArgs } from './dto/business-partner.args';
 
 @Injectable()
 export class BusinessPartnerService {
@@ -21,8 +22,14 @@ export class BusinessPartnerService {
     private readonly BusinessPartnerRepository: Repository<BusinessPartner>,
   ) {}
 
-  async findAll(): Promise<BusinessPartner[]> {
-    return this.BusinessPartnerRepository.find();
+  async findAll(bpArgs: BusinessPartnerArgs): Promise<BusinessPartner[]> {
+    const { skip, take } = bpArgs;
+    const bpsQB = this.BusinessPartnerRepository.createQueryBuilder('bp')
+      .innerJoinAndSelect('bp.address', 'address')
+      .innerJoinAndSelect('bp.contact', 'contact')
+      .innerJoinAndSelect('contact.address', 'contactAddress');
+
+    return await bpsQB.take(take).skip(skip).getMany();
   }
 
   async create(createBusinessPartnerDto: DisplayInput): Promise<BusinessPartner> {

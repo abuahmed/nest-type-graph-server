@@ -1,5 +1,13 @@
-import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { AfterInsert, BeforeInsert, Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Field, Float, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import {
+  AfterInsert,
+  AfterLoad,
+  BeforeUpdate,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { DisplayFields } from '../common/displayFields';
 import { BusinessPartnerCategory } from '../enums/businessPartnerCategory';
 import { BusinessPartnerType } from '../enums/businessPartnerType';
@@ -31,8 +39,28 @@ export class BusinessPartner extends DisplayFields {
   code: string;
 
   @Column({ default: 0 })
-  @Field()
+  @Field(() => Float, { defaultValue: 0 })
   creditLimit: number;
+
+  @Column({ default: 0 })
+  @Field(() => Int, { defaultValue: 0 })
+  creditTransactionsLimit: number;
+
+  @Column({ default: false })
+  @Field()
+  creditsWithoutCheck?: boolean;
+
+  @Column({ default: 0 })
+  @Field(() => Float, { defaultValue: 0 })
+  totalOutstandingCredit: number;
+
+  @Column({ default: 0 })
+  @Field(() => Float, { defaultValue: 0 })
+  initialOutstandingCredit: number;
+
+  @Column({ default: 0 })
+  @Field(() => Int, { defaultValue: 0 })
+  noOfOutstandingTransactions?: number;
 
   @Column({
     default: BusinessPartnerType.Customer,
@@ -62,8 +90,16 @@ export class BusinessPartner extends DisplayFields {
   @OneToMany(() => TransactionHeader, (tran) => tran.businessPartner)
   transactions: TransactionHeader[];
 
-  // @AfterInsert()
-  // createCode() {
-  //   this.code = 'Cu' + this.id.toString();
-  // }
+  @AfterLoad()
+  @AfterInsert()
+  @BeforeUpdate()
+  generateCode() {
+    const idLength = this.id.toString().length;
+    const numLength = 6 - idLength;
+    let prefix = this.type.substring(0, 2).toUpperCase();
+    for (let i = 0; i < numLength; i++) {
+      prefix = prefix + '0';
+    }
+    this.code = prefix + this.id;
+  }
 }

@@ -122,6 +122,11 @@ type BusinessPartner {
   vatNumber: String!
   code: String!
   creditLimit: Float!
+  creditTransactionsLimit: Int!
+  creditsWithoutCheck: Boolean
+  totalOutstandingCredit: Float!
+  initialOutstandingCredit: Float!
+  noOfOutstandingTransactions: Int!
   type: BusinessPartnerType!
   category: BusinessPartnerCategory!
   address: Address!
@@ -374,7 +379,7 @@ type Query {
   getUserProfile(input: ListUserInput!): User!
   GetRoles: [Role!]!
   Warehouses: [Warehouse!]!
-  BusinessPartners: [BusinessPartner!]!
+  businessPartners(skip: Int = 0, take: Int = 25, minimumOutstandingCredits: Float): [BusinessPartner!]!
   items(skip: Int = 0, take: Int = 25, itemCategoryId: Int, subCategoryId: Int, unitOfMeasureId: Int): [Item!]!
   getItem(id: Int!): Item!
   getItemCategories: [Category!]!

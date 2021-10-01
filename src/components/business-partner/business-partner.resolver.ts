@@ -4,6 +4,7 @@ import { BusinessPartner } from 'src/db/models/businessPartner.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { DisplayInput } from '../dto/display.input';
 import { BusinessPartnerService } from './business-partner.service';
+import { BusinessPartnerArgs } from './dto/business-partner.args';
 
 @Resolver()
 @UseGuards(JwtAuthGuard)
@@ -12,8 +13,8 @@ export class BusinessPartnerResolver {
 
   //Query
   @Query(() => [BusinessPartner])
-  async BusinessPartners(): Promise<Array<BusinessPartner>> {
-    return this._businessPartnerService.findAll();
+  async businessPartners(@Args() bpArgs: BusinessPartnerArgs): Promise<Array<BusinessPartner>> {
+    return this._businessPartnerService.findAll(bpArgs);
   }
 
   @Mutation(() => BusinessPartner)
