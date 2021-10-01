@@ -65,9 +65,15 @@ export class TransactionService {
         ? await this.headerRepo.preload(header)
         : this.headerRepo.create(header);
 
-      transaction.totalAmount = transaction.totalAmount
-        ? Number(transaction.totalAmount) + Number(line.eachPrice) * Number(line.qty)
-        : line.eachPrice * line.qty;
+      if (header.type === TransactionType.PI) {
+        transaction.totalAmount = transaction.totalAmount
+          ? Number(transaction.totalAmount) + Number(line.eachPrice) * Number(line.diff)
+          : line.eachPrice * line.diff;
+      } else {
+        transaction.totalAmount = transaction.totalAmount
+          ? Number(transaction.totalAmount) + Number(line.eachPrice) * Number(line.qty)
+          : line.eachPrice * line.qty;
+      }
 
       transaction.totalQty = transaction.totalQty
         ? Number(transaction.totalQty) + Number(line.qty)
