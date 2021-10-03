@@ -382,8 +382,7 @@ type Query {
   businessPartners(skip: Int = 0, take: Int = 25, minimumOutstandingCredits: Float): [BusinessPartner!]!
   items(skip: Int = 0, take: Int = 25, itemCategoryId: Int, subCategoryId: Int, unitOfMeasureId: Int): [Item!]!
   getItem(id: Int!): Item!
-  getItemCategories: [Category!]!
-  getItemUoms: [Category!]!
+  getCategories(skip: Int = 0, take: Int = 25, type: CategoryType!): [Category!]!
   transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, type: TransactionType!, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [TransactionHeader!]!
   inventories(skip: Int = 0, take: Int = 25, warehouseId: Int, lastUpdated: DateTime): [Inventory!]!
   lines(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, itemId: Int, status: TransactionStatus = Draft, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [TransactionLine!]!

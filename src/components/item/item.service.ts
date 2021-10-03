@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { CategoryInput } from '../dto/category.input';
 import { DelResult } from '../user/dto/user.dto';
 import { CreateItemInput } from './dto/create-item.input';
-import { ItemArgs } from './dto/item.args';
+import { CategoryArgs, ItemArgs } from './dto/item.args';
 
 @Injectable()
 export class ItemService {
@@ -94,12 +94,8 @@ export class ItemService {
     return res;
   }
 
-  async getItemCategories(): Promise<Array<Category>> {
-    return await this.categoryRepository.find({ type: CategoryType.ItemCategory });
-  }
-
-  async getItemUoms(): Promise<Array<Category>> {
-    return await this.categoryRepository.find({ type: CategoryType.UnitOfMeasure });
+  async getCategories(categoryArgs: CategoryArgs): Promise<Array<Category>> {
+    return await this.categoryRepository.find({ type: categoryArgs.type });
   }
 
   async createItemCategory(input: CategoryInput): Promise<Category> {

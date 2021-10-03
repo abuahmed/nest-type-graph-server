@@ -2,7 +2,7 @@ import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { ItemService } from './item.service';
 import { CreateItemInput } from './dto/create-item.input';
 import { Item } from 'src/db/models/item.entity';
-import { ItemArgs } from './dto/item.args';
+import { CategoryArgs, ItemArgs } from './dto/item.args';
 import { DelResult } from '../user/dto/user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
@@ -31,13 +31,8 @@ export class ItemResolver {
   }
 
   @Query(() => [Category])
-  getItemCategories(): Promise<Array<Category>> {
-    return this.itemService.getItemCategories();
-  }
-
-  @Query(() => [Category])
-  getItemUoms(): Promise<Array<Category>> {
-    return this.itemService.getItemUoms();
+  getCategories(@Args() categoryArgs: CategoryArgs): Promise<Array<Category>> {
+    return this.itemService.getCategories(categoryArgs);
   }
 
   @Mutation(() => Category)
