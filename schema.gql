@@ -418,7 +418,7 @@ type Mutation {
   createItem(input: CreateItemInput!): Item!
   createItemCategory(input: CategoryInput!): Category!
   removeItem(id: Int!): DelResult!
-  removeItemCategory(id: Int!): DelResult!
+  removeCategory(id: Int!): DelResult!
   createTransaction(input: CreateTransactionInput!): TransactionHeader!
   createUpdateLine(input: TransactionLineInput!): TransactionLine!
   postHeader(id: Int!): TransactionHeader!

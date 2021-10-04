@@ -122,7 +122,7 @@ export class ItemService {
     }
   }
 
-  async removeItemCategory(id: number): Promise<DelResult> {
+  async removeCategory(id: number): Promise<DelResult> {
     const del = await this.categoryRepository.delete(id);
     const res = new DelResult();
     res.affectedRows = del.affected;
