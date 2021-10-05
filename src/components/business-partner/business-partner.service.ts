@@ -8,6 +8,8 @@ import { Contact } from 'src/db/models/contact.entity';
 import { SalesPerson } from 'src/db/models/salesPerson.entity';
 import { DisplayInput } from '../dto/display.input';
 import { BusinessPartnerArgs } from './dto/business-partner.args';
+import { DelResult } from '../user/dto/user.dto';
+import { CreateBusinessPartnerInput } from './dto/create-bp.input';
 
 @Injectable()
 export class BusinessPartnerService {
@@ -19,48 +21,77 @@ export class BusinessPartnerService {
     @InjectRepository(SalesPerson)
     private readonly salesPersonRepository: Repository<SalesPerson>,
     @InjectRepository(BusinessPartner)
-    private readonly BusinessPartnerRepository: Repository<BusinessPartner>,
+    private readonly businessPartnerRepository: Repository<BusinessPartner>,
   ) {}
 
   async findAll(bpArgs: BusinessPartnerArgs): Promise<BusinessPartner[]> {
-    const { skip, take } = bpArgs;
-    const bpsQB = this.BusinessPartnerRepository.createQueryBuilder('bp')
+    const { skip, take, type } = bpArgs;
+    const bpsQB = this.businessPartnerRepository
+      .createQueryBuilder('bp')
       .innerJoinAndSelect('bp.address', 'address')
       .innerJoinAndSelect('bp.contact', 'contact')
-      .innerJoinAndSelect('contact.address', 'contactAddress');
+      .innerJoinAndSelect('contact.address', 'contactAddress')
+      .where('bp.type = :type', { type });
 
     return await bpsQB.take(take).skip(skip).getMany();
   }
-
-  async create(createBusinessPartnerDto: DisplayInput): Promise<BusinessPartner> {
-    const { displayName } = createBusinessPartnerDto;
+  async findOne(id: number): Promise<BusinessPartner> {
+    return await this.businessPartnerRepository.findOne(
+      { id },
+      { relations: ['address', 'contact', 'contact.address'] },
+    );
+  }
+  async createUpdate(creatBPInput: CreateBusinessPartnerInput): Promise<BusinessPartner> {
+    const { displayName, contact, address } = creatBPInput;
     try {
-      await validate(displaySchema, createBusinessPartnerDto);
-      const found = await this.BusinessPartnerRepository.findOne({ displayName });
+      await validate(displaySchema, { displayName });
 
-      if (found) {
-        throw new HttpException(
-          {
-            status: HttpStatus.BAD_REQUEST,
-            error: 'BusinessPartner already exists',
-          },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+      const bp = creatBPInput.id
+        ? await this.businessPartnerRepository.preload(creatBPInput)
+        : this.businessPartnerRepository.create(creatBPInput);
 
-      const contact = this.contactRepository.create({ fullName: displayName });
-      contact.address = this.addressRepository.create({
-        country: 'Ethiopia',
-        city: 'Addis Ababa',
-      });
+      // const found = await this.businessPartnerRepository.findOne({ displayName });
+      // if (found) {
+      //   throw new HttpException(
+      //     {
+      //       status: HttpStatus.BAD_REQUEST,
+      //       error: 'BusinessPartner already exists',
+      //     },
+      //     HttpStatus.BAD_REQUEST,
+      //   );
+      // }
 
-      const BusinessPartner = this.BusinessPartnerRepository.create({ displayName });
-      BusinessPartner.contact = contact;
-      BusinessPartner.address = this.addressRepository.create({
-        country: 'Ethiopia',
-        city: 'Addis Ababa',
-      });
-      const response = await this.BusinessPartnerRepository.save(BusinessPartner);
+      const addr = address.id
+        ? await this.addressRepository.preload(address)
+        : this.addressRepository.create(address);
+
+      const ctct = contact.id
+        ? await this.contactRepository.preload(contact)
+        : this.contactRepository.create(contact);
+
+      const ctctaddr =
+        contact.address && contact.address.id
+          ? await this.addressRepository.preload(contact.address)
+          : this.addressRepository.create(contact.address);
+
+      ctct.address = ctctaddr;
+
+      // const contact = this.contactRepository.create({ fullName: displayName });
+      // contact.address = this.addressRepository.create({
+      //   country: 'Ethiopia',
+      //   city: 'Addis Ababa',
+      // });
+
+      bp.contact = ctct;
+      bp.address = addr;
+
+      // const BusinessPartner = this.businessPartnerRepository.create({ displayName });
+      // BusinessPartner.contact = contact;
+      // BusinessPartner.address = this.addressRepository.create({
+      //   country: 'Ethiopia',
+      //   city: 'Addis Ababa',
+      // });
+      const response = await this.businessPartnerRepository.save(bp);
       return response;
     } catch (err) {
       throw new HttpException(
@@ -72,5 +103,12 @@ export class BusinessPartnerService {
         HttpStatus.FORBIDDEN,
       );
     }
+  }
+
+  async remove(id: number): Promise<DelResult> {
+    const del = await this.businessPartnerRepository.delete(id);
+    const res = new DelResult();
+    res.affectedRows = del.affected;
+    return res;
   }
 }

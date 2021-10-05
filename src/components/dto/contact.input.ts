@@ -4,6 +4,6 @@ import { BasicInput } from './basic.input';
 
 @InputType()
 export class ContactInput extends PartialType(BasicInput) {
-  fullName?: string;
-  address?: AddressInput;
+  fullName: string;
+  address: AddressInput;
 }

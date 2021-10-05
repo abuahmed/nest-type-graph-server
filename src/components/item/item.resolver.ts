@@ -7,7 +7,6 @@ import { DelResult } from '../user/dto/user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { Category } from 'src/db/models/category.entity';
-import { DisplayInput } from '../dto/display.input';
 import { CategoryInput } from '../dto/category.input';
 
 @Resolver(() => Item)
