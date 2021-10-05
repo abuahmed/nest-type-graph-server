@@ -5,11 +5,11 @@ import { BasicFields } from '../common/basicFields';
 @ObjectType()
 @Entity({ name: 'addresses' })
 export class Address extends BasicFields {
-  @Column()
-  @Field()
+  @Column({ default: 'Ethiopia' })
+  @Field({ defaultValue: 'Ethiopia' })
   country: string;
-  @Column()
-  @Field()
+  @Column({ default: 'Addis Ababa' })
+  @Field({ defaultValue: 'Addis Ababa' })
   city: string;
   @Column({ nullable: true })
   @Field()

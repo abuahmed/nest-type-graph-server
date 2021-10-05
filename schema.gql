@@ -379,7 +379,8 @@ type Query {
   getUserProfile(input: ListUserInput!): User!
   GetRoles: [Role!]!
   Warehouses: [Warehouse!]!
-  businessPartners(skip: Int = 0, take: Int = 25, minimumOutstandingCredits: Float): [BusinessPartner!]!
+  businessPartners(skip: Int = 0, take: Int = 25, minimumOutstandingCredits: Float, type: BusinessPartnerType!): [BusinessPartner!]!
+  getBusinessPartner(id: Int!): BusinessPartner!
   items(skip: Int = 0, take: Int = 25, itemCategoryId: Int, subCategoryId: Int, unitOfMeasureId: Int): [Item!]!
   getItem(id: Int!): Item!
   getCategories(skip: Int = 0, take: Int = 25, type: CategoryType!): [Category!]!
