@@ -33,16 +33,18 @@ type Address {
   subCity: String!
   streetAddress: String!
   woreda: String!
-  kebele: String!
-  houseNumber: String!
-  telephone: String!
-  alternateTelephone: String!
-  email: String!
-  alternateEmail: String!
-  webAddress: String!
-  fax: String!
-  poBox: String!
-  notes: String!
+  kebele: String
+  houseNumber: String
+  telephone: String
+  alternateTelephone: String
+  mobile: String
+  alternateMobile: String
+  email: String
+  alternateEmail: String
+  webAddress: String
+  fax: String
+  poBox: String
+  notes: String
 }
 
 type Client {
@@ -415,7 +417,8 @@ type Mutation {
   addUserWarehouses(input: IdList!): User!
   deleteAll: Float!
   create(input: DisplayInput!): Warehouse!
-  createBusinessPartner(input: DisplayInput!): BusinessPartner!
+  createBusinessPartner(input: CreateBusinessPartnerInput!): BusinessPartner!
+  removeBusinessPartner(id: Int!): DelResult!
   createItem(input: CreateItemInput!): Item!
   createItemCategory(input: CategoryInput!): Category!
   removeItem(id: Int!): DelResult!
@@ -465,6 +468,63 @@ input DisplayInput {
   dateLastModified: DateTime
   displayName: String
   description: String
+}
+
+input CreateBusinessPartnerInput {
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  displayName: String
+  description: String
+  type: BusinessPartnerType!
+  address: AddressInput!
+  contact: ContactInput!
+}
+
+input AddressInput {
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  country: String
+  city: String
+  subCity: String
+  streetAddress: String
+  woreda: String
+  kebele: String
+  houseNumber: String
+  mobile: String
+  alternateMobile: String
+  telephone: String
+  alternateTelephone: String
+  email: String
+  alternateEmail: String
+  webAddress: String
+  fax: String
+  poBox: String
+  notes: String
+}
+
+input ContactInput {
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  fullName: String!
+  address: AddressInput!
 }
 
 input CreateItemInput {

@@ -22,32 +22,38 @@ export class Address extends BasicFields {
   woreda: string;
   @Column({ nullable: true })
   @Field()
-  kebele: string;
+  kebele?: string;
   @Column({ nullable: true })
   @Field()
-  houseNumber: string;
+  houseNumber?: string;
   @Column({ nullable: true })
   @Field()
-  telephone: string;
+  telephone?: string;
   @Column({ nullable: true })
   @Field()
-  alternateTelephone: string;
+  alternateTelephone?: string;
   @Column({ nullable: true })
   @Field()
-  email: string;
+  mobile?: string;
   @Column({ nullable: true })
   @Field()
-  alternateEmail: string;
+  alternateMobile?: string;
   @Column({ nullable: true })
   @Field()
-  webAddress: string;
+  email?: string;
   @Column({ nullable: true })
   @Field()
-  fax: string;
+  alternateEmail?: string;
   @Column({ nullable: true })
   @Field()
-  poBox: string;
+  webAddress?: string;
   @Column({ nullable: true })
   @Field()
-  notes: string;
+  fax?: string;
+  @Column({ nullable: true })
+  @Field()
+  poBox?: string;
+  @Column({ nullable: true })
+  @Field()
+  notes?: string;
 }
