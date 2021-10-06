@@ -481,7 +481,10 @@ input CreateBusinessPartnerInput {
   dateLastModified: DateTime
   displayName: String
   description: String
+  creditTransactionsLimit: Int = 0
   type: BusinessPartnerType!
+  initialOutstandingCredit: Float
+  creditLimit: Float
   address: AddressInput!
   contact: ContactInput!
 }
