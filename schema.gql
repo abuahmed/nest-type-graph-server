@@ -58,6 +58,7 @@ type Client {
   displayName: String!
   description: String
   type: ClientType!
+  addressId: Int!
   organizations: [Organization!]!
   address: Address!
 }
@@ -80,6 +81,7 @@ type Organization {
   displayName: String!
   description: String
   clientId: Int!
+  addressId: Int!
   client: Client!
   warehouses: [Warehouse!]!
   address: Address!
@@ -277,6 +279,7 @@ type Warehouse {
   displayName: String!
   description: String
   organizationId: Int!
+  addressId: Int!
   organization: Organization!
   address: Address!
   transactions: [TransactionHeader!]!

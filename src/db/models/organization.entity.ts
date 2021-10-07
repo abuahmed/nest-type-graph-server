@@ -18,6 +18,10 @@ export class Organization extends DisplayFields {
   @OneToMany(() => Warehouse, (warehouse) => warehouse.organization)
   warehouses: Warehouse[];
 
+  @Column({ nullable: false })
+  @Field(() => Int, { nullable: false })
+  addressId: number;
+
   @ManyToOne(() => Address, { cascade: true, nullable: false })
   address: Address;
 }
