@@ -1,5 +1,5 @@
-import { ObjectType } from '@nestjs/graphql';
-import { Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { DisplayFields } from '../common/displayFields';
 import { Address } from './address.entity';
 import { Organization } from './organization.entity';
@@ -8,6 +8,10 @@ import { TransactionHeader } from './transactionHeader.entity';
 @ObjectType()
 @Entity({ name: 'warehouses' })
 export class Warehouse extends DisplayFields {
+  @Column({ nullable: false })
+  @Field(() => Int, { nullable: false })
+  organizationId: number;
+
   @ManyToOne(() => Organization, (organization) => organization.warehouses, {
     cascade: true,
     nullable: false,
