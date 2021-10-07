@@ -225,7 +225,7 @@ export class UserService {
       where: {
         id: userId,
       },
-      relations: ['roles'],
+      relations: ['roles', 'warehouses'],
     });
   }
 

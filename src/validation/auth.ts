@@ -39,6 +39,10 @@ export const resendEmailSchema = Joi.object({
   id,
 });
 
+export const parentRequiredSchema = Joi.object({
+  id,
+});
+
 export const displaySchema = Joi.object({
   displayName,
 });

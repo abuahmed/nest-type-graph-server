@@ -79,6 +79,7 @@ type Organization {
   dateLastModified: DateTime!
   displayName: String!
   description: String
+  clientId: Int!
   client: Client!
   warehouses: [Warehouse!]!
   address: Address!
@@ -275,6 +276,7 @@ type Warehouse {
   dateLastModified: DateTime!
   displayName: String!
   description: String
+  organizationId: Int!
   organization: Organization!
   address: Address!
   transactions: [TransactionHeader!]!
@@ -380,7 +382,12 @@ type Query {
   GetUser(input: ListUserInput!): User!
   getUserProfile(input: ListUserInput!): User!
   GetRoles: [Role!]!
-  Warehouses: [Warehouse!]!
+  Warehouses(skip: Int = 0, take: Int = 25, organizationId: Int, warehouseId: Int): [Warehouse!]!
+  findOneWarehouse(id: Int!): Warehouse!
+  Organizations(skip: Int = 0, take: Int = 25, clientId: Int, organizationId: Int): [Organization!]!
+  findOneOrganization(id: Int!): Organization!
+  Clients(skip: Int = 0, take: Int = 25, clientId: Int): [Client!]!
+  findOneClient(id: Int!): Client!
   businessPartners(skip: Int = 0, take: Int = 25, minimumOutstandingCredits: Float, type: BusinessPartnerType!): [BusinessPartner!]!
   getBusinessPartner(id: Int!): BusinessPartner!
   items(skip: Int = 0, take: Int = 25, itemCategoryId: Int, subCategoryId: Int, unitOfMeasureId: Int): [Item!]!
@@ -416,7 +423,9 @@ type Mutation {
   addUserRoles(input: IdList!): User!
   addUserWarehouses(input: IdList!): User!
   deleteAll: Float!
-  create(input: DisplayInput!): Warehouse!
+  createUpdateWarehouse(input: WarehouseInput!): Warehouse!
+  createUpdateOrganization(input: OrganizationInput!): Organization!
+  createUpdateClient(input: ClientInput!): Client!
   createBusinessPartner(input: CreateBusinessPartnerInput!): BusinessPartner!
   removeBusinessPartner(id: Int!): DelResult!
   createItem(input: CreateItemInput!): Item!
@@ -457,7 +466,7 @@ input IdList {
   ids: [Int!]!
 }
 
-input DisplayInput {
+input WarehouseInput {
   id: Int
   createdByUserId: Int
   modifiedByUserId: Int
@@ -468,25 +477,8 @@ input DisplayInput {
   dateLastModified: DateTime
   displayName: String
   description: String
-}
-
-input CreateBusinessPartnerInput {
-  id: Int
-  createdByUserId: Int
-  modifiedByUserId: Int
-  version: Float
-  uuid: String
-  isEnabled: Boolean
-  dateRecordCreated: DateTime
-  dateLastModified: DateTime
-  displayName: String
-  description: String
-  creditTransactionsLimit: Int = 0
-  type: BusinessPartnerType!
-  initialOutstandingCredit: Float
-  creditLimit: Float
+  organizationId: Int!
   address: AddressInput!
-  contact: ContactInput!
 }
 
 input AddressInput {
@@ -515,6 +507,54 @@ input AddressInput {
   fax: String
   poBox: String
   notes: String
+}
+
+input OrganizationInput {
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  displayName: String
+  description: String
+  clientId: Int!
+  address: AddressInput!
+}
+
+input ClientInput {
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  displayName: String
+  description: String
+  address: AddressInput!
+}
+
+input CreateBusinessPartnerInput {
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  displayName: String
+  description: String
+  creditTransactionsLimit: Int = 0
+  type: BusinessPartnerType!
+  initialOutstandingCredit: Float
+  creditLimit: Float
+  address: AddressInput!
+  contact: ContactInput!
 }
 
 input ContactInput {
@@ -584,6 +624,19 @@ input CreateTransactionInput {
   totalQty: Float
   numberOfItems: Float
   lines: [TransactionLineInput!]
+}
+
+input DisplayInput {
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  displayName: String
+  description: String
 }
 
 input TransactionLineInput {
