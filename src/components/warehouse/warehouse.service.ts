@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Args } from '@nestjs/graphql';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Address } from 'src/db/models/address.entity';
 import { Client } from 'src/db/models/client.entity';
@@ -7,7 +6,6 @@ import { Organization } from 'src/db/models/organization.entity';
 import { Warehouse } from 'src/db/models/warehouse.entity';
 import { displaySchema, parentRequiredSchema, validate } from 'src/validation';
 import { Repository } from 'typeorm';
-import { DisplayInput } from '../dto/display.input';
 import { ClientInput, OrganizationInput, WarehouseInput } from './dto/create-update.input';
 import { ClientArgs, OrganizationArgs, WarehouseArgs } from './dto/list.args';
 

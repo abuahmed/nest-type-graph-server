@@ -385,12 +385,12 @@ type Query {
   GetUser(input: ListUserInput!): User!
   getUserProfile(input: ListUserInput!): User!
   GetRoles: [Role!]!
-  Warehouses(skip: Int = 0, take: Int = 25, organizationId: Int, warehouseId: Int): [Warehouse!]!
-  findOneWarehouse(id: Int!): Warehouse!
-  Organizations(skip: Int = 0, take: Int = 25, clientId: Int, organizationId: Int): [Organization!]!
-  findOneOrganization(id: Int!): Organization!
-  Clients(skip: Int = 0, take: Int = 25, clientId: Int): [Client!]!
-  findOneClient(id: Int!): Client!
+  warehouses(skip: Int = 0, take: Int = 25, organizationId: Int, warehouseId: Int): [Warehouse!]!
+  getWarehouse(id: Int!): Warehouse!
+  organizations(skip: Int = 0, take: Int = 25, clientId: Int, organizationId: Int): [Organization!]!
+  getOrganization(id: Int!): Organization!
+  clients(skip: Int = 0, take: Int = 25, clientId: Int): [Client!]!
+  getClient(id: Int!): Client!
   businessPartners(skip: Int = 0, take: Int = 25, minimumOutstandingCredits: Float, type: BusinessPartnerType!): [BusinessPartner!]!
   getBusinessPartner(id: Int!): BusinessPartner!
   items(skip: Int = 0, take: Int = 25, itemCategoryId: Int, subCategoryId: Int, unitOfMeasureId: Int): [Item!]!
