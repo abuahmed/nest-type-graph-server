@@ -1,5 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { BasicFields } from '../common/basicFields';
 import { Address } from './address.entity';
 
@@ -10,6 +10,7 @@ export class Contact extends BasicFields {
   @Field()
   fullName: string;
 
-  @ManyToOne(() => Address, { cascade: true, nullable: false })
+  @OneToOne(() => Address, { cascade: true, nullable: false })
+  @JoinColumn()
   address: Address;
 }

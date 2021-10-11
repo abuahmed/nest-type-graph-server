@@ -5,8 +5,10 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { DisplayFields } from '../common/displayFields';
 import { BusinessPartnerCategory } from '../enums/businessPartnerCategory';
@@ -78,10 +80,12 @@ export class BusinessPartner extends DisplayFields {
   @Field(() => BusinessPartnerCategory)
   category: BusinessPartnerCategory;
 
-  @ManyToOne(() => Address, { cascade: true, nullable: false })
+  @OneToOne(() => Address, { cascade: true, nullable: false })
+  @JoinColumn()
   address: Address;
 
-  @ManyToOne(() => Contact, { cascade: true, nullable: false })
+  @OneToOne(() => Contact, { cascade: true, nullable: false })
+  @JoinColumn()
   contact: Contact;
 
   @ManyToOne(() => SalesPerson, (sp) => sp.businessPartners)

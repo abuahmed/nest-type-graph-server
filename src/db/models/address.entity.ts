@@ -1,6 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToOne } from 'typeorm';
 import { BasicFields } from '../common/basicFields';
+import { Client } from './client.entity';
+import { Warehouse } from './warehouse.entity';
 
 @ObjectType()
 @Entity({ name: 'addresses' })
@@ -56,4 +58,10 @@ export class Address extends BasicFields {
   @Column({ nullable: true })
   @Field()
   notes?: string;
+
+  @OneToOne(() => Client, { onDelete: 'CASCADE' })
+  client: Client;
+
+  @OneToOne(() => Warehouse, { onDelete: 'CASCADE' })
+  warehouse: Warehouse;
 }

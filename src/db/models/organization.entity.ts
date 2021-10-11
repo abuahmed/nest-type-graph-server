@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { DisplayFields } from '../common/displayFields';
 import { Address } from './address.entity';
 import { Client } from './client.entity';
@@ -12,7 +12,10 @@ export class Organization extends DisplayFields {
   @Field(() => Int, { nullable: false })
   clientId: number;
 
-  @ManyToOne(() => Client, (client) => client.organizations, { cascade: true, nullable: false })
+  @ManyToOne(() => Client, (client) => client.organizations, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
   client: Client;
 
   @OneToMany(() => Warehouse, (warehouse) => warehouse.organization)
@@ -21,7 +24,13 @@ export class Organization extends DisplayFields {
   @Column({ nullable: false })
   @Field(() => Int, { nullable: false })
   addressId: number;
-
-  @ManyToOne(() => Address, { cascade: true, nullable: false })
+  @OneToOne(() => Address, { cascade: true, nullable: false })
+  @JoinColumn()
   address: Address;
+  // @Column({ nullable: false })
+  // @Field(() => Int, { nullable: false })
+  // addressId: number;
+
+  // @ManyToOne(() => Address, { cascade: true, onDelete: 'CASCADE', nullable: false })
+  // address: Address;
 }

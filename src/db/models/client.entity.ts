@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { DisplayFields } from '../common/displayFields';
 import { ClientType } from '../enums/clientType';
 import { Address } from './address.entity';
@@ -24,6 +24,7 @@ export class Client extends DisplayFields {
   @Column({ nullable: false })
   @Field(() => Int, { nullable: false })
   addressId: number;
-  @ManyToOne(() => Address, { cascade: true, nullable: false })
+  @OneToOne(() => Address, { cascade: true, nullable: false })
+  @JoinColumn()
   address: Address;
 }

@@ -45,6 +45,8 @@ type Address {
   fax: String
   poBox: String
   notes: String
+  client: Client!
+  warehouse: Warehouse!
 }
 
 type Client {

@@ -1,5 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { BasicFields } from '../common/basicFields';
 import { BusinessPartner } from './businessPartner.entity';
 import { Contact } from './contact.entity';
@@ -15,7 +15,7 @@ export class SalesPerson extends BasicFields {
   @Field()
   salesLimit: number;
 
-  @ManyToOne(() => Contact, { cascade: true, nullable: false })
+  @OneToOne(() => Contact, { cascade: true, nullable: false })
   contact: Contact;
 
   @OneToMany(() => BusinessPartner, (bp) => bp.salesPerson)
