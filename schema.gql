@@ -387,12 +387,12 @@ type Query {
   GetUser(input: ListUserInput!): User!
   getUserProfile(input: ListUserInput!): User!
   GetRoles: [Role!]!
-  warehouses(skip: Int = 0, take: Int = 25, organizationId: Int, warehouseId: Int): [Warehouse!]!
-  getWarehouse(id: Int!): Warehouse!
-  organizations(skip: Int = 0, take: Int = 25, clientId: Int, organizationId: Int): [Organization!]!
-  getOrganization(id: Int!): Organization!
   clients(skip: Int = 0, take: Int = 25, clientId: Int): [Client!]!
   getClient(id: Int!): Client!
+  organizations(skip: Int = 0, take: Int = 25, clientId: Int, organizationId: Int): [Organization!]!
+  getOrganization(id: Int!): Organization!
+  warehouses(skip: Int = 0, take: Int = 25, organizationId: Int, warehouseId: Int): [Warehouse!]!
+  getWarehouse(id: Int!): Warehouse!
   businessPartners(skip: Int = 0, take: Int = 25, minimumOutstandingCredits: Float, type: BusinessPartnerType!): [BusinessPartner!]!
   getBusinessPartner(id: Int!): BusinessPartner!
   items(skip: Int = 0, take: Int = 25, itemCategoryId: Int, subCategoryId: Int, unitOfMeasureId: Int): [Item!]!
@@ -428,9 +428,12 @@ type Mutation {
   addUserRoles(input: IdList!): User!
   addUserWarehouses(input: IdList!): User!
   deleteAll: Float!
-  createUpdateWarehouse(input: WarehouseInput!): Warehouse!
-  createUpdateOrganization(input: OrganizationInput!): Organization!
   createUpdateClient(input: ClientInput!): Client!
+  removeClient(id: Int!): DelResult!
+  createUpdateOrganization(input: OrganizationInput!): Organization!
+  removeOrganization(id: Int!): DelResult!
+  createUpdateWarehouse(input: WarehouseInput!): Warehouse!
+  removeWarehouse(id: Int!): DelResult!
   createBusinessPartner(input: CreateBusinessPartnerInput!): BusinessPartner!
   removeBusinessPartner(id: Int!): DelResult!
   createItem(input: CreateItemInput!): Item!
@@ -471,7 +474,7 @@ input IdList {
   ids: [Int!]!
 }
 
-input WarehouseInput {
+input ClientInput {
   id: Int
   createdByUserId: Int
   modifiedByUserId: Int
@@ -482,7 +485,6 @@ input WarehouseInput {
   dateLastModified: DateTime
   displayName: String
   description: String
-  organizationId: Int!
   address: AddressInput!
 }
 
@@ -529,7 +531,7 @@ input OrganizationInput {
   address: AddressInput!
 }
 
-input ClientInput {
+input WarehouseInput {
   id: Int
   createdByUserId: Int
   modifiedByUserId: Int
@@ -540,6 +542,7 @@ input ClientInput {
   dateLastModified: DateTime
   displayName: String
   description: String
+  organizationId: Int!
   address: AddressInput!
 }
 

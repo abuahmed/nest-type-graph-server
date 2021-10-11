@@ -4,6 +4,7 @@ import { Client } from 'src/db/models/client.entity';
 import { Organization } from 'src/db/models/organization.entity';
 import { Warehouse } from 'src/db/models/warehouse.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { DelResult } from '../user/dto/user.dto';
 import { ClientInput, OrganizationInput, WarehouseInput } from './dto/create-update.input';
 import { ClientArgs, OrganizationArgs, WarehouseArgs } from './dto/list.args';
 import { WarehouseService } from './warehouse.service';
@@ -13,20 +14,25 @@ import { WarehouseService } from './warehouse.service';
 export class WarehouseResolver {
   constructor(private readonly _warehouseService: WarehouseService) {}
 
-  //Warehouse
-  @Query(() => [Warehouse])
-  async warehouses(@Args() warehouseArgs: WarehouseArgs): Promise<Array<Warehouse>> {
-    return this._warehouseService.findAllWarehouses(warehouseArgs);
+  //Client
+  @Query(() => [Client])
+  async clients(@Args() clientArgs: ClientArgs): Promise<Array<Client>> {
+    return this._warehouseService.findAllClients(clientArgs);
   }
 
-  @Query(() => Warehouse)
-  async getWarehouse(@Args('id', { type: () => Int }) id: number): Promise<Warehouse> {
-    return this._warehouseService.findOneWarehouse(id);
+  @Query(() => Client)
+  async getClient(@Args('id', { type: () => Int }) id: number): Promise<Client> {
+    return this._warehouseService.findOneClient(id);
   }
 
-  @Mutation(() => Warehouse)
-  async createUpdateWarehouse(@Args('input') input: WarehouseInput) {
-    return this._warehouseService.createUpdateWarehouse(input);
+  @Mutation(() => Client)
+  async createUpdateClient(@Args('input') input: ClientInput) {
+    return this._warehouseService.createUpdateClient(input);
+  }
+
+  @Mutation(() => DelResult)
+  removeClient(@Args('id', { type: () => Int }) id: number) {
+    return this._warehouseService.removeClient(id);
   }
 
   //Organization
@@ -44,20 +50,29 @@ export class WarehouseResolver {
   async createUpdateOrganization(@Args('input') input: OrganizationInput) {
     return this._warehouseService.createUpdateOrganization(input);
   }
-
-  //Client
-  @Query(() => [Client])
-  async clients(@Args() clientArgs: ClientArgs): Promise<Array<Client>> {
-    return this._warehouseService.findAllClients(clientArgs);
+  @Mutation(() => DelResult)
+  removeOrganization(@Args('id', { type: () => Int }) id: number) {
+    return this._warehouseService.removeOrganization(id);
   }
 
-  @Query(() => Client)
-  async getClient(@Args('id', { type: () => Int }) id: number): Promise<Client> {
-    return this._warehouseService.findOneClient(id);
+  //Warehouse
+  @Query(() => [Warehouse])
+  async warehouses(@Args() warehouseArgs: WarehouseArgs): Promise<Array<Warehouse>> {
+    return this._warehouseService.findAllWarehouses(warehouseArgs);
   }
 
-  @Mutation(() => Client)
-  async createUpdateClient(@Args('input') input: ClientInput) {
-    return this._warehouseService.createUpdateClient(input);
+  @Query(() => Warehouse)
+  async getWarehouse(@Args('id', { type: () => Int }) id: number): Promise<Warehouse> {
+    return this._warehouseService.findOneWarehouse(id);
+  }
+
+  @Mutation(() => Warehouse)
+  async createUpdateWarehouse(@Args('input') input: WarehouseInput) {
+    return this._warehouseService.createUpdateWarehouse(input);
+  }
+
+  @Mutation(() => DelResult)
+  removeWarehouse(@Args('id', { type: () => Int }) id: number) {
+    return this._warehouseService.removeWarehouse(id);
   }
 }

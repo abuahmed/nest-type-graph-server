@@ -6,6 +6,7 @@ import { Organization } from 'src/db/models/organization.entity';
 import { Warehouse } from 'src/db/models/warehouse.entity';
 import { displaySchema, parentRequiredSchema, validate } from 'src/validation';
 import { Repository } from 'typeorm';
+import { DelResult } from '../user/dto/user.dto';
 import { ClientInput, OrganizationInput, WarehouseInput } from './dto/create-update.input';
 import { ClientArgs, OrganizationArgs, WarehouseArgs } from './dto/list.args';
 
@@ -27,7 +28,7 @@ export class WarehouseService {
   // }
 
   async findAllClients(clientArgs: ClientArgs): Promise<Client[]> {
-    return this.clientRepository.find();
+    return this.clientRepository.find({ relations: ['address'] });
   }
   async findOneClient(id: number): Promise<Client> {
     return await this.clientRepository.findOne({ id }, { relations: ['address'] });
@@ -59,6 +60,12 @@ export class WarehouseService {
         HttpStatus.FORBIDDEN,
       );
     }
+  }
+  async removeClient(id: number): Promise<DelResult> {
+    const del = await this.clientRepository.delete(id);
+    const res = new DelResult();
+    res.affectedRows = del.affected;
+    return res;
   }
 
   async findAllOrganizations(organizationArgs: OrganizationArgs): Promise<Organization[]> {
@@ -103,6 +110,13 @@ export class WarehouseService {
       );
     }
   }
+  async removeOrganization(id: number): Promise<DelResult> {
+    const del = await this.organizationRepository.delete(id);
+    const res = new DelResult();
+    res.affectedRows = del.affected;
+    return res;
+  }
+
   async findAllWarehouses(warehouseArgs: WarehouseArgs): Promise<Warehouse[]> {
     const { organizationId } = warehouseArgs;
     return this.warehouseRepository.find({
@@ -144,6 +158,12 @@ export class WarehouseService {
         HttpStatus.FORBIDDEN,
       );
     }
+  }
+  async removeWarehouse(id: number): Promise<DelResult> {
+    const del = await this.warehouseRepository.delete(id);
+    const res = new DelResult();
+    res.affectedRows = del.affected;
+    return res;
   }
 
   // async create(createItemDto: DisplayInput): Promise<Warehouse> {
