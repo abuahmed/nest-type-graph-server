@@ -22,7 +22,7 @@ export class Item extends DisplayFields {
   // code?: string;
 
   @Column({ nullable: true })
-  @Field()
+  @Field({ defaultValue: '' })
   pictureUrl?: string;
 
   @Column({ nullable: true })

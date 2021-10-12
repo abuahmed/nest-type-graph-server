@@ -33,18 +33,18 @@ type Address {
   subCity: String!
   streetAddress: String!
   woreda: String!
-  kebele: String
-  houseNumber: String
-  telephone: String
-  alternateTelephone: String
-  mobile: String
-  alternateMobile: String
-  email: String
-  alternateEmail: String
-  webAddress: String
-  fax: String
-  poBox: String
-  notes: String
+  kebele: String!
+  houseNumber: String!
+  telephone: String!
+  alternateTelephone: String!
+  mobile: String!
+  alternateMobile: String!
+  email: String!
+  alternateEmail: String!
+  webAddress: String!
+  fax: String!
+  poBox: String!
+  notes: String!
   client: Client!
   warehouse: Warehouse!
 }
@@ -184,7 +184,7 @@ type Item {
   displayName: String!
   description: String
   type: ItemType!
-  pictureUrl: String
+  pictureUrl: String!
   itemCategoryId: Int
   itemCategory: Category!
   unitOfMeasureId: Int

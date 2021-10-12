@@ -5,7 +5,7 @@ import { DisplayFields } from '../common/displayFields';
 @ObjectType()
 @Entity({ name: 'roles' })
 export class Role extends DisplayFields {
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   descriptionShort: string;
 }

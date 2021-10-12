@@ -6,8 +6,8 @@ import { Address } from './address.entity';
 @ObjectType()
 @Entity({ name: 'contacts' })
 export class Contact extends BasicFields {
-  @Column()
-  @Field()
+  @Column({ default: '' })
+  @Field({ defaultValue: '' })
   fullName: string;
 
   @OneToOne(() => Address, { cascade: true, nullable: false })

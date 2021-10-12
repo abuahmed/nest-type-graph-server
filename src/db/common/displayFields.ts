@@ -8,7 +8,7 @@ export abstract class DisplayFields extends BasicFields {
   @Column({ unique: true })
   displayName: string;
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '', nullable: true })
   description?: string;
 }

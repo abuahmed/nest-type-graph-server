@@ -13,50 +13,50 @@ export class Address extends BasicFields {
   @Column({ default: 'Addis Ababa' })
   @Field({ defaultValue: 'Addis Ababa' })
   city: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   subCity: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   streetAddress: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   woreda: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   kebele?: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   houseNumber?: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   telephone?: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   alternateTelephone?: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   mobile?: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   alternateMobile?: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   email?: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   alternateEmail?: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   webAddress?: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   fax?: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   poBox?: string;
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   notes?: string;
 
   @OneToOne(() => Client, { onDelete: 'CASCADE' })

@@ -7,8 +7,8 @@ import { Contact } from './contact.entity';
 @ObjectType()
 @Entity({ name: 'salesPersons' })
 export class SalesPerson extends BasicFields {
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   code: string;
 
   @Column({ default: 0 })

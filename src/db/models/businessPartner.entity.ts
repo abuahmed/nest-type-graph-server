@@ -28,16 +28,16 @@ registerEnumType(BusinessPartnerCategory, {
 @ObjectType()
 @Entity({ name: 'businessPartners' })
 export class BusinessPartner extends DisplayFields {
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   tinNumber: string;
 
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   vatNumber: string;
 
-  @Column({ nullable: true })
-  @Field()
+  @Column({ default: '', nullable: true })
+  @Field({ defaultValue: '' })
   code: string;
 
   @Column({ default: 0 })
