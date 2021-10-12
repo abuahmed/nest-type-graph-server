@@ -97,8 +97,13 @@ export class WarehouseService {
 
       organization.address = addr;
       organization.clientId = clientId;
-      const response = await this.organizationRepository.save(organization);
-      return response;
+      await this.organizationRepository.save(organization);
+
+      return await this.organizationRepository.findOne(
+        { displayName: organization.displayName },
+        { relations: ['address', 'client', 'client.address'] },
+      );
+      //return response;
     } catch (err) {
       throw new HttpException(
         {
@@ -120,14 +125,28 @@ export class WarehouseService {
   async findAllWarehouses(warehouseArgs: WarehouseArgs): Promise<Warehouse[]> {
     const { organizationId } = warehouseArgs;
     return this.warehouseRepository.find({
-      relations: ['address', 'organization', 'organization.address'],
+      relations: [
+        'address',
+        'organization',
+        'organization.address',
+        'organization.client',
+        'organization.client.address',
+      ],
       where: { organizationId },
     });
   }
   async findOneWarehouse(id: number): Promise<Warehouse> {
     return await this.warehouseRepository.findOne(
       { id },
-      { relations: ['address', 'organization', 'organization.address'] },
+      {
+        relations: [
+          'address',
+          'organization',
+          'organization.address',
+          'organization.client',
+          'organization.client.address',
+        ],
+      },
     );
   }
   async createUpdateWarehouse(warehouseInput: WarehouseInput): Promise<Warehouse> {
@@ -146,8 +165,20 @@ export class WarehouseService {
 
       warehouse.address = addr;
       warehouse.organizationId = organizationId;
-      const response = await this.warehouseRepository.save(warehouse);
-      return response;
+      await this.warehouseRepository.save(warehouse);
+      return await this.warehouseRepository.findOne(
+        { displayName: warehouse.displayName },
+        {
+          relations: [
+            'address',
+            'organization',
+            'organization.address',
+            'organization.client',
+            'organization.client.address',
+          ],
+        },
+      );
+      //return response;
     } catch (err) {
       throw new HttpException(
         {
