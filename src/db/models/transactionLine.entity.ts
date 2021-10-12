@@ -11,14 +11,18 @@ export class TransactionLine extends BasicFields {
   @Column({ nullable: true })
   @Field(() => Int, { nullable: true })
   headerId: number;
-  @ManyToOne(() => TransactionHeader, (tran) => tran.lines, { cascade: true })
+  @ManyToOne(() => TransactionHeader, (tran) => tran.lines, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
   header: TransactionHeader;
 
   @Column({ nullable: true })
   @Field(() => Int, { nullable: true })
   itemId: number;
   @ManyToOne(() => Item)
-  item: Item;
+  item: Item; //Do not Add on-delete-cascade will create very odd results
 
   // @Column({ type: 'int' })
   // @Field(() => Int)

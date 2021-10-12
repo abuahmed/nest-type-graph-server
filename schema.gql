@@ -234,7 +234,7 @@ type TransactionHeader {
   totalQty: Float!
   transactionDate: DateTime!
   warehouseId: Int!
-  warehouse: Warehouse
+  warehouse: Warehouse!
   businessPartnerId: Int
   businessPartner: BusinessPartner
   lines: [TransactionLine!]!

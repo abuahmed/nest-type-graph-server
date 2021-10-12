@@ -55,15 +55,17 @@ export abstract class TransactionFields extends BasicFields {
   @Field(() => Int, { nullable: false })
   warehouseId: number;
 
-  @ManyToOne(() => Warehouse, (ware) => ware.transactions)
-  @Field(() => Warehouse, { nullable: true })
+  @ManyToOne(() => Warehouse, (ware) => ware.transactions, { onDelete: 'CASCADE' })
+  @Field(() => Warehouse, { nullable: false })
   warehouse: Warehouse;
 
   @Column({ nullable: true })
   @Field(() => Int, { nullable: true })
   businessPartnerId?: number;
 
-  @ManyToOne(() => BusinessPartner, (ware) => ware.transactions)
+  @ManyToOne(() => BusinessPartner, (ware) => ware.transactions, {
+    onDelete: 'CASCADE',
+  })
   @Field(() => BusinessPartner, { nullable: true })
   businessPartner!: BusinessPartner; //Will be null for PI
 
