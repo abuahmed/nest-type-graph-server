@@ -40,8 +40,14 @@ export class TransactionService {
         : this.headerRepo.create(header);
 
       const response = await this.headerRepo.save(transaction);
-
-      return response;
+      if (response) {
+        //console.log(response);
+        return await this.headerRepo.findOne({
+          relations: ['warehouse', 'toWarehouse', 'businessPartner'],
+          where: { id: response.id },
+        });
+      }
+      //return response;
     } catch (err) {
       throw new HttpException(
         {
