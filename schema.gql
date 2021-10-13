@@ -235,6 +235,8 @@ type TransactionHeader {
   transactionDate: DateTime!
   warehouseId: Int!
   warehouse: Warehouse!
+  toWarehouseId: Int
+  toWarehouse: Warehouse
   businessPartnerId: Int
   businessPartner: BusinessPartner
   lines: [TransactionLine!]!
@@ -624,6 +626,8 @@ input CreateTransactionInput {
   transactionDate: DateTime
   warehouseId: Int
   warehouse: DisplayInput
+  toWarehouseId: Int
+  toWarehouse: DisplayInput
   businessPartnerId: Int
   businessPartner: DisplayInput
   type: TransactionType
@@ -675,6 +679,8 @@ input TransactionInput {
   transactionDate: DateTime
   warehouseId: Int
   warehouse: DisplayInput
+  toWarehouseId: Int
+  toWarehouse: DisplayInput
   businessPartnerId: Int
   businessPartner: DisplayInput
   type: TransactionType!

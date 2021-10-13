@@ -25,6 +25,10 @@ export class TransactionInput extends PartialType(BasicInput) {
   @Field(() => DisplayInput)
   warehouse?: Warehouse;
   @Field(() => Int)
+  toWarehouseId?: number;
+  @Field(() => DisplayInput)
+  toWarehouse?: Warehouse;
+  @Field(() => Int)
   businessPartnerId?: number;
   @Field(() => DisplayInput)
   businessPartner?: BusinessPartner;

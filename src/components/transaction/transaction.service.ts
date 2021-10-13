@@ -285,24 +285,53 @@ export class TransactionService {
       { relations: ['lines', 'lines.item', 'warehouse', 'businessPartner'] },
     );
     const invents: Inventory[] = [];
-    const inventories = await this.inventoryRepo.find();
-    header.lines.forEach((line) => {
-      let itemInventory = inventories.find((inv) => inv.itemId === line.item.id);
-      if (!itemInventory) {
-        itemInventory = this.inventoryRepo.create({
-          item: line.item,
-          warehouse: header.warehouse,
-          qtyOnHand: 0,
-        });
-      }
-      itemInventory.qtyOnHand =
-        header.type === TransactionType.Sale
-          ? itemInventory.qtyOnHand - line.qty
-          : header.type === TransactionType.Purchase
-          ? Number(itemInventory.qtyOnHand) + Number(line.qty)
-          : line.qty;
-      invents.push(itemInventory);
-    });
+    if (header.type === TransactionType.Transfer) {
+      const fromInventories = await this.inventoryRepo.find({ warehouseId: header.warehouse.id });
+      const toInventories = await this.inventoryRepo.find({ warehouseId: header?.toWarehouse.id });
+      header.lines.forEach((line) => {
+        let fromItemInventory = fromInventories.find((inv) => inv.itemId === line.item.id);
+        if (!fromItemInventory) {
+          fromItemInventory = this.inventoryRepo.create({
+            item: line.item,
+            warehouse: header.warehouse,
+            qtyOnHand: 0,
+          });
+        }
+        fromItemInventory.qtyOnHand = fromItemInventory.qtyOnHand - line.qty;
+        invents.push(fromItemInventory);
+
+        let toItemInventory = toInventories.find((inv) => inv.itemId === line.item.id);
+        if (!toItemInventory) {
+          toItemInventory = this.inventoryRepo.create({
+            item: line.item,
+            warehouse: header.toWarehouse,
+            qtyOnHand: 0,
+          });
+        }
+        toItemInventory.qtyOnHand = toItemInventory.qtyOnHand + line.qty;
+        invents.push(toItemInventory);
+      });
+    } else {
+      const inventories = await this.inventoryRepo.find();
+      header.lines.forEach((line) => {
+        let itemInventory = inventories.find((inv) => inv.itemId === line.item.id);
+        if (!itemInventory) {
+          itemInventory = this.inventoryRepo.create({
+            item: line.item,
+            warehouse: header.warehouse,
+            qtyOnHand: 0,
+          });
+        }
+        itemInventory.qtyOnHand =
+          header.type === TransactionType.Sale
+            ? itemInventory.qtyOnHand - line.qty
+            : header.type === TransactionType.Purchase
+            ? Number(itemInventory.qtyOnHand) + Number(line.qty)
+            : line.qty;
+        invents.push(itemInventory);
+      });
+    }
+
     const result = await this.inventoryRepo.save(invents);
     if (result) {
       const response = await this.headerRepo.save({ ...header, status: TransactionStatus.Posted });
@@ -317,18 +346,32 @@ export class TransactionService {
       { relations: ['lines', 'lines.item', 'warehouse', 'businessPartner'] },
     );
     const invents: Inventory[] = [];
-    const inventories = await this.inventoryRepo.find();
-    header.lines.forEach((line) => {
-      const itemInventory = inventories.find((inv) => inv.itemId === line.item.id);
+    if (header.type === TransactionType.Transfer) {
+      const fromInventories = await this.inventoryRepo.find({ warehouseId: header.warehouse.id });
+      const toInventories = await this.inventoryRepo.find({ warehouseId: header?.toWarehouse.id });
+      header.lines.forEach((line) => {
+        const fromItemInventory = fromInventories.find((inv) => inv.itemId === line.item.id);
+        fromItemInventory.qtyOnHand = fromItemInventory.qtyOnHand + line.qty;
+        invents.push(fromItemInventory);
 
-      itemInventory.qtyOnHand =
-        header.type === TransactionType.Sale
-          ? Number(itemInventory.qtyOnHand) + Number(line.qty)
-          : header.type === TransactionType.Purchase
-          ? itemInventory.qtyOnHand - line.qty
-          : itemInventory.qtyOnHand - line.diff;
-      invents.push(itemInventory);
-    });
+        const toItemInventory = toInventories.find((inv) => inv.itemId === line.item.id);
+        toItemInventory.qtyOnHand = toItemInventory.qtyOnHand - line.qty;
+        invents.push(toItemInventory);
+      });
+    } else {
+      const inventories = await this.inventoryRepo.find();
+      header.lines.forEach((line) => {
+        const itemInventory = inventories.find((inv) => inv.itemId === line.item.id);
+
+        itemInventory.qtyOnHand =
+          header.type === TransactionType.Sale
+            ? Number(itemInventory.qtyOnHand) + Number(line.qty)
+            : header.type === TransactionType.Purchase
+            ? itemInventory.qtyOnHand - line.qty
+            : itemInventory.qtyOnHand - line.diff;
+        invents.push(itemInventory);
+      });
+    }
     const result = await this.inventoryRepo.save(invents);
     if (result) {
       const response = await this.headerRepo.save({ ...header, status: TransactionStatus.Draft });
