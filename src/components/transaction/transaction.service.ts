@@ -253,7 +253,15 @@ export class TransactionService {
       return await this.headerRepo.findOne(
         { id },
         {
-          relations: ['lines', 'lines.item', 'lines.item.itemCategory', 'lines.item.unitOfMeasure'],
+          relations: [
+            'warehouse',
+            'toWarehouse',
+            'businessPartner',
+            'lines',
+            'lines.item',
+            'lines.item.itemCategory',
+            'lines.item.unitOfMeasure',
+          ],
         },
       );
     } catch (err) {
