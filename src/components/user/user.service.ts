@@ -273,6 +273,7 @@ export class UserService {
   async findAllRoles(): Promise<Role[]> {
     return await this.roleRepository.find();
   }
+
   async addUserWarehouses(warehouses: [number]): Promise<User> {
     try {
       let user = await this.userRepository.findOne({ id: warehouses[0] });
