@@ -41,7 +41,6 @@ export class TransactionService {
 
       const response = await this.headerRepo.save(transaction);
       if (response) {
-        //console.log(response);
         return await this.headerRepo.findOne({
           relations: ['warehouse', 'toWarehouse', 'businessPartner'],
           where: { id: response.id },
@@ -102,7 +101,15 @@ export class TransactionService {
         //fetch line with its relations
         const ln = await this.lineRepo.findOne(
           { id: response.id },
-          { relations: ['item', 'header', 'header.warehouse', 'header.businessPartner'] },
+          {
+            relations: [
+              'item',
+              'header',
+              'header.warehouse',
+              'header.toWarehouse',
+              'header.businessPartner',
+            ],
+          },
         );
         return ln;
         //      return response;
@@ -143,11 +150,15 @@ export class TransactionService {
     } = transactionArgs;
     let transactionsQB = this.headerRepo
       .createQueryBuilder('t')
-      .innerJoinAndSelect('t.warehouse', 'Warehouse')
-      .innerJoinAndSelect('t.businessPartner', 'BusinessPartner')
-      .where('t.type = :type', {
-        type: type,
-      });
+      .innerJoinAndSelect('t.warehouse', 'Warehouse');
+    if (type === TransactionType.Transfer) {
+      transactionsQB = transactionsQB.innerJoinAndSelect('t.toWarehouse', 'ToWarehouse');
+    } else if (type === TransactionType.Sale || type === TransactionType.Purchase) {
+      transactionsQB = transactionsQB.innerJoinAndSelect('t.businessPartner', 'BusinessPartner');
+    }
+    transactionsQB = transactionsQB.where('t.type = :type', {
+      type: type,
+    });
 
     if (warehouseId) {
       transactionsQB = transactionsQB.andWhere('t.warehouseId = :warehouseId', {
@@ -201,8 +212,8 @@ export class TransactionService {
       .createQueryBuilder('l')
       .innerJoinAndSelect('l.header', 'header')
       .innerJoinAndSelect('header.warehouse', 'warehouse')
-      .innerJoinAndSelect('header.businessPartner', 'businessPartner')
       .innerJoinAndSelect('l.item', 'item');
+    //.innerJoinAndSelect('header.businessPartner', 'businessPartner');
 
     if (headerId) {
       linesQB = linesQB.andWhere('l.headerId = :headerId', {
@@ -294,104 +305,134 @@ export class TransactionService {
   }
 
   async postHeader(id: number): Promise<TransactionHeader> {
-    const header = await this.headerRepo.findOne(
-      { id },
-      { relations: ['lines', 'lines.item', 'warehouse', 'businessPartner'] },
-    );
-    const invents: Inventory[] = [];
-    if (header.type === TransactionType.Transfer) {
-      const fromInventories = await this.inventoryRepo.find({ warehouseId: header.warehouse.id });
-      const toInventories = await this.inventoryRepo.find({ warehouseId: header?.toWarehouse.id });
-      header.lines.forEach((line) => {
-        let fromItemInventory = fromInventories.find((inv) => inv.itemId === line.item.id);
-        if (!fromItemInventory) {
-          fromItemInventory = this.inventoryRepo.create({
-            item: line.item,
-            warehouse: header.warehouse,
-            qtyOnHand: 0,
-          });
-        }
-        fromItemInventory.qtyOnHand = fromItemInventory.qtyOnHand - line.qty;
-        invents.push(fromItemInventory);
+    try {
+      const header = await this.headerRepo.findOne(
+        { id },
+        { relations: ['lines', 'lines.item', 'warehouse', 'toWarehouse', 'businessPartner'] },
+      );
+      const invents: Inventory[] = [];
+      if (header.type === TransactionType.Transfer) {
+        const fromInventories = await this.inventoryRepo.find({ warehouseId: header.warehouse.id });
+        const toInventories = await this.inventoryRepo.find({
+          warehouseId: header?.toWarehouse.id,
+        });
+        header.lines.forEach((line) => {
+          let fromItemInventory = fromInventories.find((inv) => inv.itemId === line.item.id);
+          if (!fromItemInventory) {
+            fromItemInventory = this.inventoryRepo.create({
+              item: line.item,
+              warehouse: header.warehouse,
+              qtyOnHand: 0,
+            });
+          }
+          fromItemInventory.qtyOnHand = fromItemInventory.qtyOnHand - line.qty;
+          invents.push(fromItemInventory);
 
-        let toItemInventory = toInventories.find((inv) => inv.itemId === line.item.id);
-        if (!toItemInventory) {
-          toItemInventory = this.inventoryRepo.create({
-            item: line.item,
-            warehouse: header.toWarehouse,
-            qtyOnHand: 0,
-          });
-        }
-        toItemInventory.qtyOnHand = toItemInventory.qtyOnHand + line.qty;
-        invents.push(toItemInventory);
-      });
-    } else {
-      const inventories = await this.inventoryRepo.find();
-      header.lines.forEach((line) => {
-        let itemInventory = inventories.find((inv) => inv.itemId === line.item.id);
-        if (!itemInventory) {
-          itemInventory = this.inventoryRepo.create({
-            item: line.item,
-            warehouse: header.warehouse,
-            qtyOnHand: 0,
-          });
-        }
-        itemInventory.qtyOnHand =
-          header.type === TransactionType.Sale
-            ? itemInventory.qtyOnHand - line.qty
-            : header.type === TransactionType.Purchase
-            ? Number(itemInventory.qtyOnHand) + Number(line.qty)
-            : line.qty;
-        invents.push(itemInventory);
-      });
-    }
+          let toItemInventory = toInventories.find((inv) => inv.itemId === line.item.id);
+          if (!toItemInventory) {
+            toItemInventory = this.inventoryRepo.create({
+              item: line.item,
+              warehouse: header.toWarehouse,
+              qtyOnHand: 0,
+            });
+          }
+          toItemInventory.qtyOnHand = Number(toItemInventory.qtyOnHand) + Number(line.qty);
+          invents.push(toItemInventory);
+          console.log(invents);
+        });
+      } else {
+        const inventories = await this.inventoryRepo.find({ warehouseId: header.warehouse.id });
+        header.lines.forEach((line) => {
+          let itemInventory = inventories.find((inv) => inv.itemId === line.item.id);
+          if (!itemInventory) {
+            itemInventory = this.inventoryRepo.create({
+              item: line.item,
+              warehouse: header.warehouse,
+              qtyOnHand: 0,
+            });
+          }
+          itemInventory.qtyOnHand =
+            header.type === TransactionType.Sale
+              ? itemInventory.qtyOnHand - line.qty
+              : header.type === TransactionType.Purchase
+              ? Number(itemInventory.qtyOnHand) + Number(line.qty)
+              : line.qty;
+          invents.push(itemInventory);
+        });
+      }
 
-    const result = await this.inventoryRepo.save(invents);
-    if (result) {
-      const response = await this.headerRepo.save({ ...header, status: TransactionStatus.Posted });
-      //Update setting field for better caching
-      await this.updateSetting(header.type, true);
-      return response;
+      const result = await this.inventoryRepo.save(invents);
+      if (result) {
+        const response = await this.headerRepo.save({
+          ...header,
+          status: TransactionStatus.Posted,
+        });
+        //Update setting field for better caching
+        await this.updateSetting(header.type, true);
+        return response;
+      }
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
     }
   }
   async unPostHeader(id: number): Promise<TransactionHeader> {
-    const header = await this.headerRepo.findOne(
-      { id },
-      { relations: ['lines', 'lines.item', 'warehouse', 'businessPartner'] },
-    );
-    const invents: Inventory[] = [];
-    if (header.type === TransactionType.Transfer) {
-      const fromInventories = await this.inventoryRepo.find({ warehouseId: header.warehouse.id });
-      const toInventories = await this.inventoryRepo.find({ warehouseId: header?.toWarehouse.id });
-      header.lines.forEach((line) => {
-        const fromItemInventory = fromInventories.find((inv) => inv.itemId === line.item.id);
-        fromItemInventory.qtyOnHand = fromItemInventory.qtyOnHand + line.qty;
-        invents.push(fromItemInventory);
+    try {
+      const header = await this.headerRepo.findOne(
+        { id },
+        { relations: ['lines', 'lines.item', 'warehouse', 'toWarehouse', 'businessPartner'] },
+      );
+      const invents: Inventory[] = [];
+      if (header.type === TransactionType.Transfer) {
+        const fromInventories = await this.inventoryRepo.find({ warehouseId: header.warehouse.id });
+        const toInventories = await this.inventoryRepo.find({
+          warehouseId: header?.toWarehouse.id,
+        });
+        header.lines.forEach((line) => {
+          const fromItemInventory = fromInventories.find((inv) => inv.itemId === line.item.id);
+          fromItemInventory.qtyOnHand = Number(fromItemInventory.qtyOnHand) + Number(line.qty);
+          invents.push(fromItemInventory);
 
-        const toItemInventory = toInventories.find((inv) => inv.itemId === line.item.id);
-        toItemInventory.qtyOnHand = toItemInventory.qtyOnHand - line.qty;
-        invents.push(toItemInventory);
-      });
-    } else {
-      const inventories = await this.inventoryRepo.find();
-      header.lines.forEach((line) => {
-        const itemInventory = inventories.find((inv) => inv.itemId === line.item.id);
+          const toItemInventory = toInventories.find((inv) => inv.itemId === line.item.id);
+          toItemInventory.qtyOnHand = toItemInventory.qtyOnHand - line.qty;
+          invents.push(toItemInventory);
+        });
+      } else {
+        const inventories = await this.inventoryRepo.find({ warehouseId: header.warehouse.id });
+        header.lines.forEach((line) => {
+          const itemInventory = inventories.find((inv) => inv.itemId === line.item.id);
 
-        itemInventory.qtyOnHand =
-          header.type === TransactionType.Sale
-            ? Number(itemInventory.qtyOnHand) + Number(line.qty)
-            : header.type === TransactionType.Purchase
-            ? itemInventory.qtyOnHand - line.qty
-            : itemInventory.qtyOnHand - line.diff;
-        invents.push(itemInventory);
-      });
-    }
-    const result = await this.inventoryRepo.save(invents);
-    if (result) {
-      const response = await this.headerRepo.save({ ...header, status: TransactionStatus.Draft });
-      //Update setting field for better caching
-      await this.updateSetting(header.type, true);
-      return response;
+          itemInventory.qtyOnHand =
+            header.type === TransactionType.Sale
+              ? Number(itemInventory.qtyOnHand) + Number(line.qty)
+              : header.type === TransactionType.Purchase
+              ? itemInventory.qtyOnHand - line.qty
+              : itemInventory.qtyOnHand - line.diff;
+          invents.push(itemInventory);
+        });
+      }
+      const result = await this.inventoryRepo.save(invents);
+      if (result) {
+        const response = await this.headerRepo.save({ ...header, status: TransactionStatus.Draft });
+        //Update setting field for better caching
+        await this.updateSetting(header.type, true);
+        return response;
+      }
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
     }
   }
   async removeHeader(id: number): Promise<DelResult> {
