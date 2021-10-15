@@ -19,4 +19,8 @@ export class WarehouseArgs extends PartialType(PaginationArgs) {
   organizationId?: number;
   @Field(() => Int)
   warehouseId?: number;
+  @Field(() => String)
+  parent?: string;
+  @Field(() => Int)
+  parentId?: number;
 }

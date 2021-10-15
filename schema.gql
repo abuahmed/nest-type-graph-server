@@ -393,7 +393,7 @@ type Query {
   getClient(id: Int!): Client!
   organizations(skip: Int = 0, take: Int = 25, clientId: Int, organizationId: Int): [Organization!]!
   getOrganization(id: Int!): Organization!
-  warehouses(skip: Int = 0, take: Int = 25, organizationId: Int, warehouseId: Int): [Warehouse!]!
+  warehouses(skip: Int = 0, take: Int = 25, organizationId: Int, warehouseId: Int, parent: String, parentId: Int): [Warehouse!]!
   getWarehouse(id: Int!): Warehouse!
   businessPartners(skip: Int = 0, take: Int = 25, minimumOutstandingCredits: Float, type: BusinessPartnerType!): [BusinessPartner!]!
   getBusinessPartner(id: Int!): BusinessPartner!

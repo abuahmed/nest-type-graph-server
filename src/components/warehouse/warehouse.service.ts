@@ -123,17 +123,35 @@ export class WarehouseService {
   }
 
   async findAllWarehouses(warehouseArgs: WarehouseArgs): Promise<Warehouse[]> {
-    const { organizationId } = warehouseArgs;
-    return this.warehouseRepository.find({
-      relations: [
-        'address',
-        'organization',
-        'organization.address',
-        'organization.client',
-        'organization.client.address',
-      ],
-      where: { organizationId },
-    });
+    const { parent, parentId, take, skip } = warehouseArgs;
+    let warehousesQB = this.warehouseRepository
+      .createQueryBuilder('w')
+      .innerJoinAndSelect('w.address', 'address')
+      .innerJoinAndSelect('w.organization', 'org')
+      .innerJoinAndSelect('org.address', 'orgAddress')
+      .innerJoinAndSelect('org.client', 'client')
+      .innerJoinAndSelect('client.address', 'clientAddress');
+    if (parent === 'Organization') {
+      warehousesQB = warehousesQB.andWhere('org.id = :orgId', {
+        orgId: parentId,
+      });
+    } else {
+      warehousesQB = warehousesQB.andWhere('client.id = :clientId', {
+        clientId: parentId,
+      });
+    }
+
+    return await warehousesQB.take(take).skip(skip).getMany();
+    // return this.warehouseRepository.find({
+    //   relations: [
+    //     'address',
+    //     'organization',
+    //     'organization.address',
+    //     'organization.client',
+    //     'organization.client.address',
+    //   ],
+    //   where: { organizationId },
+    // });
   }
   async findOneWarehouse(id: number): Promise<Warehouse> {
     return await this.warehouseRepository.findOne(
