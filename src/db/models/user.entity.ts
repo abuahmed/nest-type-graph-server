@@ -67,5 +67,5 @@ export class User extends BasicFields {
   @ManyToMany(() => Warehouse)
   @JoinTable()
   @Field(() => [Warehouse])
-  warehouses?: Warehouse[];
+  warehouses: Warehouse[];
 }

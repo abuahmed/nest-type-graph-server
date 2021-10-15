@@ -274,16 +274,16 @@ export class UserService {
     return await this.roleRepository.find();
   }
 
-  async addUserWarehouses(warehouses: [number]): Promise<User> {
+  async addUserWarehouses(ids: [number]): Promise<User> {
     try {
-      let user = await this.userRepository.findOne({ id: warehouses[0] });
-      const rls = [];
-      for (let i = 1; i < warehouses.length; i++) {
-        const rl = await this.warehouseRepository.findOne({ id: warehouses[i] });
-        rls.push(rl);
+      let user = await this.userRepository.findOne({ id: ids[0] });
+      const warehouses: Warehouse[] = [];
+      for (let i = 1; i < ids.length; i++) {
+        const rl = await this.warehouseRepository.findOne({ id: ids[i] });
+        warehouses.push(rl);
       }
 
-      user.warehouses = rls;
+      user.warehouses = warehouses;
       user = await this.userRepository.save(user);
       return user;
     } catch (err) {
@@ -300,7 +300,7 @@ export class UserService {
   async addUserRoles(roles: [number]): Promise<User> {
     try {
       let user = await this.userRepository.findOne({ id: roles[0] });
-      const rls = [];
+      const rls: Role[] = [];
       for (let i = 1; i < roles.length; i++) {
         const rl = await this.roleRepository.findOne({ id: roles[i] });
         rls.push(rl);

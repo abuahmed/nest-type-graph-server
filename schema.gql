@@ -309,7 +309,7 @@ type User {
   token: String!
   expiredAt: DateTime!
   roles: [Role!]!
-  warehouses: [Warehouse!]
+  warehouses: [Warehouse!]!
 }
 
 enum UserStatus {
