@@ -285,7 +285,13 @@ export class UserService {
 
       user.warehouses = warehouses;
       user = await this.userRepository.save(user);
-      return user;
+      if (user) {
+        return await this.userRepository.findOne({
+          where: { id: user.id },
+          relations: ['roles', 'warehouses'],
+        });
+      }
+      //return user;
     } catch (err) {
       throw new HttpException(
         {
@@ -308,7 +314,13 @@ export class UserService {
 
       user.roles = rls;
       user = await this.userRepository.save(user);
-      return user;
+      if (user) {
+        return await this.userRepository.findOne({
+          where: { id: user.id },
+          relations: ['roles', 'warehouses'],
+        });
+      }
+      //return user;
     } catch (err) {
       throw new HttpException(
         {
