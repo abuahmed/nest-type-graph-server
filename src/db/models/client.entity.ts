@@ -4,6 +4,7 @@ import { DisplayFields } from '../common/displayFields';
 import { ClientType } from '../enums/clientType';
 import { Address } from './address.entity';
 import { Organization } from './organization.entity';
+import { User } from './user.entity';
 registerEnumType(ClientType, {
   name: 'ClientType',
 });
@@ -20,6 +21,9 @@ export class Client extends DisplayFields {
 
   @OneToMany(() => Organization, (org) => org.client)
   organizations: Organization[];
+
+  @OneToMany(() => User, (org) => org.client)
+  users: User[];
 
   @Column({ nullable: false })
   @Field(() => Int, { nullable: false })

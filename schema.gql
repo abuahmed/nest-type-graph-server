@@ -62,6 +62,7 @@ type Client {
   type: ClientType!
   addressId: Int!
   organizations: [Organization!]!
+  users: [User!]!
   address: Address!
 }
 
@@ -310,6 +311,8 @@ type User {
   expiredAt: DateTime!
   roles: [Role!]!
   warehouses: [Warehouse!]!
+  clientId: Int!
+  client: Client!
 }
 
 enum UserStatus {

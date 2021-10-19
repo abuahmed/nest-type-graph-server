@@ -1,7 +1,8 @@
-import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
+import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { BasicFields } from '../common/basicFields';
 import { UserStatus } from '../enums/userStatus';
+import { Client } from './client.entity';
 import { Role } from './role.entity';
 import { Warehouse } from './warehouse.entity';
 
@@ -68,4 +69,14 @@ export class User extends BasicFields {
   @JoinTable()
   @Field(() => [Warehouse])
   warehouses: Warehouse[];
+
+  @Column({ nullable: false })
+  @Field(() => Int, { nullable: false })
+  clientId: number;
+
+  @ManyToOne(() => Client, (client) => client.users, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
+  client: Client;
 }
