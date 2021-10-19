@@ -74,9 +74,6 @@ export class User extends BasicFields {
   @Field(() => Int, { nullable: false })
   clientId: number;
 
-  @ManyToOne(() => Client, (client) => client.users, {
-    onDelete: 'CASCADE',
-    nullable: false,
-  })
+  @ManyToOne(() => Client)
   client: Client;
 }

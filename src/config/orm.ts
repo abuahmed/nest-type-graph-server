@@ -13,7 +13,7 @@ const options: TypeOrmModuleOptions = {
   database: 'pinnzzxc_estock',
   logging: false,
   entities: [path.resolve(__dirname, '..', 'db', 'models', '*')],
-  synchronize: false,
+  synchronize: true,
   migrationsRun: true,
   migrations: [path.resolve(__dirname, '..', 'db', 'migrations', '*')],
   cli: {

@@ -62,7 +62,6 @@ type Client {
   type: ClientType!
   addressId: Int!
   organizations: [Organization!]!
-  users: [User!]!
   address: Address!
 }
 
