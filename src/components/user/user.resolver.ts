@@ -58,6 +58,10 @@ export class UserResolver {
     return await this._userService.create(input);
   }
   @Mutation(() => User)
+  async registerFederatedUser(@Args('input') input: CreateUserInput) {
+    return await this._userService.createFederatedUser(input);
+  }
+  @Mutation(() => User)
   @UseGuards(JwtAuthGuard)
   async updateUser(@Args('input') input: UpdateUserInput) {
     return await this._userService.update(input);

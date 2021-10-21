@@ -19,17 +19,20 @@ export class ListUserInput {
 
 @InputType()
 export class CreateUserInput {
-  @Field()
-  name: string;
+  @Field(() => Int, { nullable: true })
+  clientId?: number;
 
-  @Field()
-  email: string;
+  @Field({ nullable: true })
+  name?: string;
 
-  @Field()
-  password: string;
+  @Field({ nullable: true })
+  email?: string;
 
-  @Field()
-  confirmPassword: string;
+  @Field({ nullable: true })
+  password?: string;
+
+  @Field({ nullable: true })
+  confirmPassword?: string;
 }
 
 @InputType()

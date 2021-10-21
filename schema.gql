@@ -426,6 +426,7 @@ type Mutation {
   googleLogin(input: GoogleInput!): User!
   facebookLogin(input: FacebookInput!): User!
   register(input: CreateUserInput!): User!
+  registerFederatedUser(input: CreateUserInput!): User!
   updateUser(input: UpdateUserInput!): User!
   deleteUser(id: Float!): DelResult!
   addRoles: [Role!]!
@@ -462,10 +463,11 @@ input FacebookInput {
 }
 
 input CreateUserInput {
-  name: String!
-  email: String!
-  password: String!
-  confirmPassword: String!
+  clientId: Int
+  name: String
+  email: String
+  password: String
+  confirmPassword: String
 }
 
 input UpdateUserInput {

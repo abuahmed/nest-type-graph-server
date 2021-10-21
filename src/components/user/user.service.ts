@@ -6,7 +6,12 @@ import axios from 'axios';
 import { DelResult, FacebookInput, GoogleInput } from './dto/user.dto';
 import { User } from '../../db/models/user.entity';
 import { CreateUserInput, ListUserInput, UpdateUserInput } from './dto/user.dto';
-import { validate, registerSchema, loginSchema } from '../../validation';
+import {
+  validate,
+  registerSchema,
+  loginSchema,
+  registerFederatedUserSchema,
+} from '../../validation';
 //import generateToken from 'src/utils/jwt';
 import { sendMail } from 'src/utils/mail';
 import { APP_HOSTNAME } from 'src/config';
@@ -35,7 +40,7 @@ export class UserService {
   ) {}
 
   async findAll(): Promise<User[]> {
-    return this.userRepository.find({ relations: ['roles', 'warehouses'] });
+    return this.userRepository.find({ relations: ['roles', 'warehouses', 'client'] });
   }
 
   async authUser(listUserInput: ListUserInput): Promise<User> {
@@ -49,13 +54,12 @@ export class UserService {
       throw new HttpException(
         {
           status: HttpStatus.UNAUTHORIZED,
-          error: 'Incorrect email or password',
+          message: 'Incorrect email or password',
         },
         HttpStatus.UNAUTHORIZED,
       );
     }
     return await this.login(user);
-    //return user;
   }
 
   async getUserProfile(listUserInput: ListUserInput): Promise<User> {
@@ -65,7 +69,7 @@ export class UserService {
       throw new HttpException(
         {
           status: HttpStatus.UNAUTHORIZED,
-          error: 'Incorrect email or password',
+          message: 'Incorrect email or password',
         },
         HttpStatus.UNAUTHORIZED,
       );
@@ -83,7 +87,7 @@ export class UserService {
         throw new HttpException(
           {
             status: HttpStatus.BAD_REQUEST,
-            error: 'User already exists',
+            message: 'User already exists',
           },
           HttpStatus.BAD_REQUEST,
         );
@@ -93,7 +97,6 @@ export class UserService {
       user = await this.preSave(user);
 
       const response = await this.userRepository.save(user);
-      //console.log(user);
       if (response) {
         const link = this.verificationUrl(user);
         await sendMail({
@@ -112,7 +115,7 @@ export class UserService {
         throw new HttpException(
           {
             status: HttpStatus.BAD_REQUEST,
-            error: 'Invalid user data',
+            message: 'Invalid user data',
           },
           HttpStatus.BAD_REQUEST,
         );
@@ -121,7 +124,47 @@ export class UserService {
       throw new HttpException(
         {
           status: HttpStatus.FORBIDDEN,
-          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+  async createFederatedUser(createUserDto: CreateUserInput): Promise<User> {
+    const { email, clientId } = createUserDto;
+    try {
+      await validate(registerFederatedUserSchema, createUserDto);
+      const found = await this.userRepository.findOne({ email });
+
+      if (found) {
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            message: 'User already exists',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      const password = '123456';
+      const name = email.substring(0, email.indexOf('@'));
+      const user = this.userRepository.create({ email, clientId, name, password });
+
+      const response = await this.userRepository.save(user);
+      if (response) {
+        return user;
+      } else {
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            message: 'Invalid user data',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
           message: err.message,
         },
         HttpStatus.FORBIDDEN,
@@ -137,36 +180,35 @@ export class UserService {
         idToken,
         audience: process.env.GOOGLE_CLIENT_ID,
       });
-      //console.log(idToken);
-      //console.log('GOOGLE LOGIN RESPONSE', result);
       const payload = result.getPayload();
       const email_verified = payload?.email_verified;
       const name = payload?.name;
       const email = payload?.email;
       const avatar = payload?.picture;
-      //const { email_verified,name, email } = payload
 
       if (email_verified) {
         let user = await this.userRepository.findOne({ email });
 
         if (!user) {
-          //const password = "(email as string) + process.env.JWT_SECRET";
-          const password = '123456';
-          user = this.userRepository.create({ email, name, password, avatar });
-          user = await this.preSave(user);
-
-          await this.userRepository.save(user);
+          throw new HttpException(
+            {
+              status: HttpStatus.BAD_REQUEST,
+              message: 'User Not Found!',
+            },
+            HttpStatus.BAD_REQUEST,
+          );
         }
         if (user) {
-          // const token = generateToken(user._id)
-          // const { _id, email, name } = user;
-          return await this.login(user);
+          const password = '123456';
+          user = { ...user, name, password, avatar };
+          if (user) user = await this.userRepository.save(user);
+          if (user) return await this.login(user);
         }
       } else {
         throw new HttpException(
           {
             status: HttpStatus.BAD_REQUEST,
-            error: 'Email not Verified',
+            message: 'Email not Verified',
           },
           HttpStatus.BAD_REQUEST,
         );
@@ -175,7 +217,6 @@ export class UserService {
       throw new HttpException(
         {
           status: HttpStatus.FORBIDDEN,
-          error: err,
           message: err.message,
         },
         HttpStatus.FORBIDDEN,
@@ -198,20 +239,25 @@ export class UserService {
       let user = await this.userRepository.findOne({ email });
 
       if (!user) {
-        const password = (email as string) + process.env.JWT_SECRET;
-        user = this.userRepository.create({ email, name, password, avatar });
-        user = await this.preSave(user);
-
-        await this.userRepository.save(user);
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            message: 'User Not Found!',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
       }
       if (user) {
-        return await this.login(user);
+        const password = '123456';
+        user = { ...user, name, password, avatar };
+
+        if (user) user = await this.userRepository.save(user);
+        if (user) return await this.login(user);
       }
     } catch (err) {
       throw new HttpException(
         {
           status: HttpStatus.FORBIDDEN,
-          error: err,
           message: err.message,
         },
         HttpStatus.FORBIDDEN,
@@ -225,7 +271,7 @@ export class UserService {
       where: {
         id: userId,
       },
-      relations: ['roles', 'warehouses'],
+      relations: ['roles', 'warehouses', 'client'],
     });
   }
 
@@ -262,7 +308,6 @@ export class UserService {
       throw new HttpException(
         {
           status: HttpStatus.FORBIDDEN,
-          error: err,
           message: err.message,
         },
         HttpStatus.FORBIDDEN,
@@ -288,7 +333,7 @@ export class UserService {
       if (user) {
         return await this.userRepository.findOne({
           where: { id: user.id },
-          relations: ['roles', 'warehouses'],
+          relations: ['roles', 'warehouses', 'client'],
         });
       }
       //return user;
@@ -296,7 +341,6 @@ export class UserService {
       throw new HttpException(
         {
           status: HttpStatus.FORBIDDEN,
-          error: err,
           message: err.message,
         },
         HttpStatus.FORBIDDEN,
@@ -317,7 +361,7 @@ export class UserService {
       if (user) {
         return await this.userRepository.findOne({
           where: { id: user.id },
-          relations: ['roles', 'warehouses'],
+          relations: ['roles', 'warehouses', 'client'],
         });
       }
       //return user;
@@ -325,7 +369,6 @@ export class UserService {
       throw new HttpException(
         {
           status: HttpStatus.FORBIDDEN,
-          error: err,
           message: err.message,
         },
         HttpStatus.FORBIDDEN,
@@ -333,31 +376,20 @@ export class UserService {
     }
   }
   async login(user: User): Promise<User> {
-    //const payload = { userId: user.id };
     const payload: JwtDto = { userId: user.id };
 
     const usr = await this.userRepository.findOne({
       where: {
         id: user.id,
       },
-      relations: ['roles', 'warehouses'],
+      relations: ['roles', 'warehouses', 'client'],
     });
     usr.token = this.jwtService.sign(payload);
-    //console.log(usr);
     return { ...usr };
-    // return {
-    //   id: user.id,
-    //   name: user.name,
-    //   email: user.email,
-    //   isAdmin: user.isAdmin,
-    //   avatar: user.avatar,
-    //   token: this.jwtService.sign(payload),
-    // };
   }
 
   preSave = async (user: User) => {
     const salt = await genSalt(10);
-    //this.password = await hash(this.password, salt)
     user.password = await hash(user.password, salt);
 
     user.token = hashedToken(user.token as string);

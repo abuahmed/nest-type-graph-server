@@ -1,6 +1,7 @@
 import { Joi } from './joi';
 //import Joi from '@hapi/joi';
 const id = Joi.number().required();
+const clientId = Joi.number().required();
 
 const email = Joi.string().email().min(8).max(254).lowercase().trim().required();
 
@@ -21,6 +22,10 @@ export const registerSchema = Joi.object({
   name,
   password,
   confirmPassword,
+});
+export const registerFederatedUserSchema = Joi.object({
+  email,
+  clientId,
 });
 
 export const loginSchema = Joi.object({
