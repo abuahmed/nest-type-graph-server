@@ -3,7 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LoginTicket, OAuth2Client } from 'google-auth-library';
 import axios from 'axios';
-import { DelResult, FacebookInput, GoogleInput } from './dto/user.dto';
+import {
+  DelResult,
+  FacebookInput,
+  ForgotAuth,
+  GoogleInput,
+  ResetAuth,
+  UpdatePassword,
+  VerifyAuth,
+  VerifyResendAuth,
+} from './dto/user.dto';
 import { User } from '../../db/models/user.entity';
 import { CreateUserInput, ListUserInput, UpdateUserInput } from './dto/user.dto';
 import {
@@ -11,8 +20,11 @@ import {
   registerSchema,
   loginSchema,
   registerFederatedUserSchema,
+  verifyEmailSchema,
+  resendEmailSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from '../../validation';
-//import generateToken from 'src/utils/jwt';
 import { sendMail } from 'src/utils/mail';
 import { APP_HOSTNAME } from 'src/config';
 import { JwtService } from '@nestjs/jwt';
@@ -20,7 +32,12 @@ import { JwtService } from '@nestjs/jwt';
 import { hash, compare, genSalt } from 'bcryptjs';
 import { createHash, timingSafeEqual } from 'crypto';
 import { EMAIL_VERIFICATION_TIMEOUT, CLIENT_ORIGIN, PASSWORD_RESET_TIMEOUT } from '../../config';
-import { hashedToken, signVerificationUrl } from '../../utils/utils';
+import {
+  hashedToken,
+  hasValidVerificationUrl,
+  plaintextToken,
+  signVerificationUrl,
+} from '../../utils/utils';
 import { Role } from 'src/db/models/role.entity';
 import { JwtDto } from '../auth/dto/jwt.dto';
 import roles from 'src/data/roles';
@@ -77,7 +94,7 @@ export class UserService {
     return user;
   }
 
-  async create(createUserDto: CreateUserInput): Promise<User> {
+  async signUpUser(createUserDto: CreateUserInput): Promise<User> {
     const { email, name, password } = createUserDto;
     try {
       await validate(registerSchema, createUserDto);
@@ -131,7 +148,7 @@ export class UserService {
     }
   }
   async createFederatedUser(createUserDto: CreateUserInput): Promise<User> {
-    const { email, clientId } = createUserDto;
+    const { email, accountVerified, clientId } = createUserDto;
     try {
       await validate(registerFederatedUserSchema, createUserDto);
       const found = await this.userRepository.findOne({ email });
@@ -147,10 +164,12 @@ export class UserService {
       }
       const password = '123456';
       const name = email.substring(0, email.indexOf('@'));
-      const user = this.userRepository.create({ email, clientId, name, password });
-
+      let user = this.userRepository.create({ email, clientId, name, password });
+      if (accountVerified) user = await this.markAsVerified(user);
       const response = await this.userRepository.save(user);
       if (response) {
+        //Better to use Resend Verify Email Verification
+
         return user;
       } else {
         throw new HttpException(
@@ -199,8 +218,10 @@ export class UserService {
           );
         }
         if (user) {
-          const password = '123456';
-          user = { ...user, name, password, avatar };
+          const password = user.password.length > 0 ? user.password : '123456';
+          const avatarPicture = user.avatar.length > 0 ? user.avatar : avatar;
+          const verified = user.verifiedAt ? user.verifiedAt : new Date();
+          user = { ...user, name, password, avatar: avatarPicture, verifiedAt: verified };
           if (user) user = await this.userRepository.save(user);
           if (user) return await this.login(user);
         }
@@ -248,9 +269,10 @@ export class UserService {
         );
       }
       if (user) {
-        const password = '123456';
-        user = { ...user, name, password, avatar };
-
+        const password = user.password.length > 0 ? user.password : '123456';
+        const avatarPicture = user.avatar.length > 0 ? user.avatar : avatar;
+        const verified = user.verifiedAt ? user.verifiedAt : new Date();
+        user = { ...user, name, password, avatar: avatarPicture, verifiedAt: verified };
         if (user) user = await this.userRepository.save(user);
         if (user) return await this.login(user);
       }
@@ -275,13 +297,16 @@ export class UserService {
     });
   }
 
-  async update(updateUserDto: UpdateUserInput): Promise<User> {
-    await this.userRepository.update(updateUserDto.id, {
-      name: updateUserDto.name,
-      email: updateUserDto.email,
+  async updateUserProfile(updateUserDto: UpdateUserInput): Promise<User> {
+    const { id, name, bio, avatar } = updateUserDto;
+
+    await this.userRepository.update(id, {
+      name,
+      bio,
+      avatar,
     });
 
-    const user = await this.userRepository.findOne({ id: updateUserDto.id });
+    const user = await this.userRepository.findOne({ id });
     return user;
   }
 
@@ -375,6 +400,7 @@ export class UserService {
       );
     }
   }
+
   async login(user: User): Promise<User> {
     const payload: JwtDto = { userId: user.id };
 
@@ -425,4 +451,153 @@ export class UserService {
       (expiredAt as Date) > new Date()
     );
   };
+
+  markAsVerified = async (user: User) => {
+    user.verifiedAt = new Date();
+    return await this.userRepository.save(user);
+  };
+
+  forgetPassword = async (user: User, token: string) => {
+    user.token = token;
+    return await this.userRepository.save(user);
+  };
+
+  resetPassword = async (user: User, password: string) => {
+    //console.log(password)
+    user.password = password;
+    user.token = undefined;
+    user.expiredAt = undefined;
+    return await this.userRepository.save(user);
+  };
+
+  changePassword = async (updatePassword: UpdatePassword) => {
+    const { userId, oldPassword, password } = updatePassword;
+    const user = await this.findUserById(userId);
+    if (!user || !(await this.matchesPassword(oldPassword, user))) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          message: 'Incorrect password',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return await this.resetPassword(user, password);
+  };
+
+  async verifyEmail(verifyAuth: VerifyAuth): Promise<User> {
+    await validate(verifyEmailSchema, verifyAuth);
+
+    const { id, token, expires, signature } = verifyAuth;
+
+    const user = await this.findUserById(id);
+    if (!user || !hasValidVerificationUrl(id.toString(), token, expires, signature)) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          message: 'Invalid activation link',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (user.verifiedAt) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          message: 'Email already verified',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const res = await this.markAsVerified(user);
+    if (res) return res;
+    else
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          message: "Email can't be verified",
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+  }
+
+  async resendVerificationEmail(verifyResendAuth: VerifyResendAuth): Promise<User> {
+    await validate(resendEmailSchema, verifyResendAuth);
+
+    const { id } = verifyResendAuth;
+
+    const user = await this.findUserById(id);
+
+    if (user && !user.verifiedAt) {
+      const link = this.verificationUrl(user);
+      await sendMail({
+        to: user.email,
+        subject: 'Verify your email address',
+        html: `
+                <h1>Please use the following link to activate your account</h1>
+                <p>${link}</p>
+                <hr />
+                <p>This email may contain sensitive information</p>
+                <p>${process.env.APP_HOSTNAME}</p>`,
+      });
+    }
+
+    return user;
+  }
+
+  async forgotPassword(forgotAuth: ForgotAuth): Promise<User> {
+    await validate(forgotPasswordSchema, forgotAuth);
+
+    const { email } = forgotAuth;
+    const user = await this.userRepository.findOne({ email });
+
+    if (user) {
+      const token = plaintextToken();
+
+      await this.forgetPassword(user, token);
+
+      await sendMail({
+        to: email,
+        subject: `Password Reset link`,
+        html: `
+                <h1>Please use the following link to reset your password</h1>
+                <p>${this.url(token, user.id.toString())}</p>
+                <hr />
+                <p>This email may contain sensitive information</p>
+                <p>${process.env.CLIENT_URL}</p>`,
+      });
+    }
+
+    return user;
+  }
+
+  async resetUserPassword(resetAuth: ResetAuth): Promise<User> {
+    await validate(resetPasswordSchema, resetAuth);
+
+    //const { id, token } = query
+    const { password, id, token } = resetAuth;
+    const user = await this.findUserById(id);
+    //console.log(user)
+    if (!user || !this.isValid(token as string, user.token, user.expiredAt)) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          message: 'Invalid password reset token',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.resetPassword(user, password);
+
+    await sendMail({
+      to: user.email,
+      subject: 'Password reset',
+      text: 'Your password was successfully reset',
+    });
+
+    return user;
+  }
 }

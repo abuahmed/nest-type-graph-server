@@ -55,7 +55,7 @@ export class UserResolver {
   }
   @Mutation(() => User)
   async register(@Args('input') input: CreateUserInput) {
-    return await this._userService.create(input);
+    return await this._userService.signUpUser(input);
   }
   @Mutation(() => User)
   async registerFederatedUser(@Args('input') input: CreateUserInput) {
@@ -64,7 +64,7 @@ export class UserResolver {
   @Mutation(() => User)
   @UseGuards(JwtAuthGuard)
   async updateUser(@Args('input') input: UpdateUserInput) {
-    return await this._userService.update(input);
+    return await this._userService.updateUserProfile(input);
   }
 
   @Mutation(() => DelResult)

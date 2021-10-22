@@ -1,5 +1,4 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
-import { ListTypeNode } from 'graphql';
 import { User } from '../../../db/models/user.entity';
 
 @InputType()
@@ -21,6 +20,9 @@ export class ListUserInput {
 export class CreateUserInput {
   @Field(() => Int, { nullable: true })
   clientId?: number;
+
+  @Field(() => Boolean, { defaultValue: false })
+  accountVerified?: boolean;
 
   @Field({ nullable: true })
   name?: string;
@@ -45,6 +47,43 @@ export class UpdateUserInput {
 
   @Field(() => String, { nullable: true })
   email?: string;
+
+  @Field(() => String, { nullable: true })
+  bio?: string;
+
+  @Field(() => String, { nullable: true })
+  avatar?: string;
+}
+@InputType()
+export class UpdatePassword {
+  userId: number;
+  oldPassword: string;
+  password: string;
+  confirmPassword: string;
+}
+@InputType()
+export class ForgotAuth {
+  email: string;
+}
+@InputType()
+export class ResetAuth {
+  password: string;
+  confirmPassword: string;
+  id: number;
+  token: string;
+}
+
+@InputType()
+export class VerifyAuth {
+  expires: string;
+  id: number;
+  token: string;
+  signature: string;
+}
+
+@InputType()
+export class VerifyResendAuth {
+  id: number;
 }
 
 @InputType()

@@ -464,6 +464,7 @@ input FacebookInput {
 
 input CreateUserInput {
   clientId: Int
+  accountVerified: Boolean = false
   name: String
   email: String
   password: String
@@ -474,6 +475,8 @@ input UpdateUserInput {
   id: Int!
   name: String
   email: String
+  bio: String
+  avatar: String
 }
 
 input IdList {
