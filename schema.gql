@@ -426,6 +426,11 @@ type Mutation {
   facebookLogin(input: FacebookInput!): User!
   register(input: CreateUserInput!): User!
   registerFederatedUser(input: CreateUserInput!): User!
+  changePassword(input: UpdatePassword!): User!
+  verifyEmail(input: VerifyAuth!): User!
+  resendVerificationEmail(input: VerifyResendAuth!): User!
+  forgotPassword(input: ForgotAuth!): User!
+  resetUserPassword(input: ResetAuth!): User!
   updateUser(input: UpdateUserInput!): User!
   deleteUser(id: Float!): DelResult!
   addRoles: [Role!]!
@@ -468,6 +473,35 @@ input CreateUserInput {
   email: String
   password: String
   confirmPassword: String
+}
+
+input UpdatePassword {
+  userId: Int!
+  oldPassword: String!
+  password: String!
+  confirmPassword: String!
+}
+
+input VerifyAuth {
+  expires: String!
+  id: Int!
+  token: String!
+  signature: String!
+}
+
+input VerifyResendAuth {
+  id: Int!
+}
+
+input ForgotAuth {
+  email: String!
+}
+
+input ResetAuth {
+  password: String!
+  confirmPassword: String!
+  id: Int!
+  token: String!
 }
 
 input UpdateUserInput {

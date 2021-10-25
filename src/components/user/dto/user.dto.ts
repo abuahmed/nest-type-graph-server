@@ -56,33 +56,47 @@ export class UpdateUserInput {
 }
 @InputType()
 export class UpdatePassword {
+  @Field(() => Int, { nullable: false })
   userId: number;
+  @Field(() => String, { nullable: false })
   oldPassword: string;
+  @Field(() => String, { nullable: false })
   password: string;
+  @Field(() => String, { nullable: false })
   confirmPassword: string;
 }
 @InputType()
 export class ForgotAuth {
+  @Field(() => String, { nullable: false })
   email: string;
 }
 @InputType()
 export class ResetAuth {
+  @Field(() => String, { nullable: false })
   password: string;
+  @Field(() => String, { nullable: false })
   confirmPassword: string;
+  @Field(() => Int, { nullable: false })
   id: number;
+  @Field(() => String, { nullable: false })
   token: string;
 }
 
 @InputType()
 export class VerifyAuth {
+  @Field(() => String, { nullable: false })
   expires: string;
+  @Field(() => Int, { nullable: false })
   id: number;
+  @Field(() => String, { nullable: false })
   token: string;
+  @Field(() => String, { nullable: false })
   signature: string;
 }
 
 @InputType()
 export class VerifyResendAuth {
+  @Field(() => Int, { nullable: false })
   id: number;
 }
 

@@ -132,7 +132,7 @@ export class UserService {
       );
     }
   }
-  async createFederatedUser(createUserDto: CreateUserInput): Promise<User> {
+  async createUser(createUserDto: CreateUserInput): Promise<User> {
     const { email, accountVerified, clientId } = createUserDto;
     try {
       await validate(registerFederatedUserSchema, createUserDto);
@@ -455,7 +455,7 @@ export class UserService {
     return await this.userRepository.save(user);
   };
 
-  changePassword = async (updatePassword: UpdatePassword) => {
+  async changePassword(updatePassword: UpdatePassword): Promise<User> {
     const { userId, oldPassword, password } = updatePassword;
     const user = await this.findUserById(userId);
     if (!user || !(await this.matchesPassword(oldPassword, user))) {
@@ -468,7 +468,7 @@ export class UserService {
       );
     }
     return await this.resetPassword(user, password);
-  };
+  }
 
   async verifyEmail(verifyAuth: VerifyAuth): Promise<User> {
     await validate(verifyEmailSchema, verifyAuth);
@@ -540,7 +540,7 @@ export class UserService {
 
     if (user) {
       const token = plaintextToken();
-
+      const link = this.url(token, user.id.toString());
       await this.forgetPassword(user, token);
 
       await sendMail({
@@ -548,10 +548,10 @@ export class UserService {
         subject: `Password Reset link`,
         html: `
                 <h1>Please use the following link to reset your password</h1>
-                <p>${this.url(token, user.id.toString())}</p>
+                <p>${link}</p>
                 <hr />
-                <p>This email may contain sensitive information</p>
-                <p>${process.env.CLIENT_URL}</p>`,
+                <p>This email may contain sensitive information</p><p>${process.env.APP_HOSTNAME}</p>
+                `,
       });
     }
 

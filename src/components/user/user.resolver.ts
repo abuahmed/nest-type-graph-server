@@ -5,15 +5,19 @@ import {
   CreateUserInput,
   DelResult,
   FacebookInput,
+  ForgotAuth,
   GoogleInput,
   IdList,
   ListUserInput,
+  ResetAuth,
+  UpdatePassword,
   UpdateUserInput,
+  VerifyAuth,
+  VerifyResendAuth,
 } from './dto/user.dto';
 import { User } from '../../db/models/user.entity';
 import { UserService } from './user.service';
 import { Role } from 'src/db/models/role.entity';
-import { DisplayInput } from '../dto/display.input';
 
 @Resolver()
 export class UserResolver {
@@ -34,17 +38,14 @@ export class UserResolver {
 
   //Mutations
   @Mutation(() => User)
-  //@UseGuards(LocalAuthGuard)
   async authUser(@Args('input') input: ListUserInput) {
     return await this._userService.authUser(input);
   }
   @Mutation(() => User)
-  //@UseGuards(GoogleAuthGuard)
   async googleLogin(@Args('input') input: GoogleInput) {
     return await this._userService.googleLogin(input);
   }
   @Mutation(() => User)
-  //@UseGuards(FacebookAuthGuard)
   async facebookLogin(@Args('input') input: FacebookInput) {
     return await this._userService.facebookLogin(input);
   }
@@ -54,14 +55,37 @@ export class UserResolver {
   }
   @Mutation(() => User)
   async registerFederatedUser(@Args('input') input: CreateUserInput) {
-    return await this._userService.createFederatedUser(input);
+    return await this._userService.createUser(input);
   }
+
+  @Mutation(() => User)
+  @UseGuards(JwtAuthGuard)
+  async changePassword(@Args('input') input: UpdatePassword) {
+    return await this._userService.changePassword(input);
+  }
+  @Mutation(() => User)
+  async verifyEmail(@Args('input') input: VerifyAuth) {
+    return await this._userService.verifyEmail(input);
+  }
+  @Mutation(() => User)
+  @UseGuards(JwtAuthGuard)
+  async resendVerificationEmail(@Args('input') input: VerifyResendAuth) {
+    return await this._userService.resendVerificationEmail(input);
+  }
+  @Mutation(() => User)
+  async forgotPassword(@Args('input') input: ForgotAuth) {
+    return await this._userService.forgotPassword(input);
+  }
+  @Mutation(() => User)
+  async resetUserPassword(@Args('input') input: ResetAuth) {
+    return await this._userService.resetUserPassword(input);
+  }
+
   @Mutation(() => User)
   @UseGuards(JwtAuthGuard)
   async updateUser(@Args('input') input: UpdateUserInput) {
     return await this._userService.updateUserProfile(input);
   }
-
   @Mutation(() => DelResult)
   @UseGuards(JwtAuthGuard)
   async deleteUser(@Args('id') id: number) {
