@@ -32,11 +32,6 @@ export class UserResolver {
     return await this._userService.findUserById(input.id);
   }
 
-  @Query(() => User)
-  @UseGuards(JwtAuthGuard)
-  async getUserProfile(@Args('input') input: ListUserInput) {
-    return await this._userService.getUserProfile(input);
-  }
   //Mutations
   @Mutation(() => User)
   //@UseGuards(LocalAuthGuard)

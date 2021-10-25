@@ -389,7 +389,6 @@ type DailyTransactionsSummary {
 type Query {
   Users: [User!]!
   GetUser(input: ListUserInput!): User!
-  getUserProfile(input: ListUserInput!): User!
   GetRoles: [Role!]!
   clients(skip: Int = 0, take: Int = 25, clientId: Int): [Client!]!
   getClient(id: Int!): Client!

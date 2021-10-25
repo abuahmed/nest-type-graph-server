@@ -79,21 +79,6 @@ export class UserService {
     return await this.login(user);
   }
 
-  async getUserProfile(listUserInput: ListUserInput): Promise<User> {
-    const { id } = listUserInput;
-    const user = await this.userRepository.findOne({ id });
-    if (!user) {
-      throw new HttpException(
-        {
-          status: HttpStatus.UNAUTHORIZED,
-          message: 'Incorrect email or password',
-        },
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-    return user;
-  }
-
   async signUpUser(createUserDto: CreateUserInput): Promise<User> {
     const { email, name, password } = createUserDto;
     try {
