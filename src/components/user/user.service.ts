@@ -430,6 +430,7 @@ export class UserService {
 
   isValid = (plaintextToken: string, token: string, expiredAt: Date) => {
     const hash = hashedToken(plaintextToken);
+    //console.log(hash);
 
     return (
       timingSafeEqual(Buffer.from(hash), Buffer.from(token as string)) &&
@@ -443,13 +444,17 @@ export class UserService {
   };
 
   forgetPassword = async (user: User, token: string) => {
-    user.token = token;
+    user.token = hashedToken(token);
+    user.expiredAt = new Date(new Date().getTime() + Number(String(PASSWORD_RESET_TIMEOUT)));
     return await this.userRepository.save(user);
   };
 
   resetPassword = async (user: User, password: string) => {
-    //console.log(password)
-    user.password = password;
+    const salt = await genSalt(10);
+    const password2 = await hash(password, salt);
+    //console.log(password2);
+
+    user.password = password2;
     user.token = undefined;
     user.expiredAt = undefined;
     return await this.userRepository.save(user);
@@ -457,6 +462,7 @@ export class UserService {
 
   async changePassword(updatePassword: UpdatePassword): Promise<User> {
     const { userId, oldPassword, password } = updatePassword;
+
     const user = await this.findUserById(userId);
     if (!user || !(await this.matchesPassword(oldPassword, user))) {
       throw new HttpException(
@@ -560,7 +566,7 @@ export class UserService {
 
   async resetUserPassword(resetAuth: ResetAuth): Promise<User> {
     await validate(resetPasswordSchema, resetAuth);
-
+    //console.log(resetAuth);
     //const { id, token } = query
     const { password, id, token } = resetAuth;
     const user = await this.findUserById(id);

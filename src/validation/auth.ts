@@ -61,14 +61,12 @@ export const resetPasswordSchema = Joi.object({
   //     id,
   //     token: Joi.string().length(40 * 2).required()
   // }),
-  body: Joi.object({
-    id,
-    token: Joi.string()
-      .length(40 * 2)
-      .required(),
-    password,
-    confirmPassword,
-  }),
+  //body: Joi.object({
+  id,
+  token: Joi.string().required(),
+  password,
+  confirmPassword,
+  //}),
 });
 
 // const roleName = Joi.string().min(3).max(128).trim().required()
