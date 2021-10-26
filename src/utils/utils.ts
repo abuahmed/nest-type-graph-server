@@ -14,7 +14,7 @@ export const hasValidVerificationUrl = function (
   _expires: string,
   _signature: string,
 ) {
-  const url = `${CLIENT_ORIGIN}/email/verify/${_id}/${_token}/${_expires}`;
+  const url = `${CLIENT_ORIGIN}/verify/${_id}/${_token}/${_expires}`;
   //const original = url.slice(0, url.lastIndexOf('&'))
   const signature = this.signVerificationUrl(url);
   return timingSafeEqual(Buffer.from(signature), Buffer.from(_signature)) && +_expires > Date.now();

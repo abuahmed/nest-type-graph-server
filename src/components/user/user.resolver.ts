@@ -68,7 +68,6 @@ export class UserResolver {
     return await this._userService.verifyEmail(input);
   }
   @Mutation(() => User)
-  @UseGuards(JwtAuthGuard)
   async resendVerificationEmail(@Args('input') input: VerifyResendAuth) {
     return await this._userService.resendVerificationEmail(input);
   }

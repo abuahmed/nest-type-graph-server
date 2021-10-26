@@ -418,7 +418,7 @@ export class UserService {
     const token = createHash('sha1').update(user.email).digest('hex');
     const expires = Date.now() + Number(String(EMAIL_VERIFICATION_TIMEOUT));
 
-    const url = `${CLIENT_ORIGIN}/email/verify/${user.id}/${token}/${expires}`;
+    const url = `${CLIENT_ORIGIN}/verify/${user.id}/${token}/${expires}`;
     const signature = signVerificationUrl(url);
 
     return `${url}/${signature}`;
@@ -430,7 +430,6 @@ export class UserService {
 
   isValid = (plaintextToken: string, token: string, expiredAt: Date) => {
     const hash = hashedToken(plaintextToken);
-    //console.log(hash);
 
     return (
       timingSafeEqual(Buffer.from(hash), Buffer.from(token as string)) &&
@@ -440,6 +439,8 @@ export class UserService {
 
   markAsVerified = async (user: User) => {
     user.verifiedAt = new Date();
+    user.token = '';
+    user.expiredAt = null;
     return await this.userRepository.save(user);
   };
 
@@ -455,8 +456,8 @@ export class UserService {
     //console.log(password2);
 
     user.password = password2;
-    user.token = undefined;
-    user.expiredAt = undefined;
+    user.token = '';
+    user.expiredAt = null;
     return await this.userRepository.save(user);
   };
 
