@@ -7,7 +7,7 @@ import { Item } from 'src/db/models/item.entity';
 import { Category } from 'src/db/models/category.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Inventory } from 'src/db/models/inventory.entity';
-import { Setting } from 'src/db/models/setting';
+import { Setting } from 'src/db/models/setting.entity';
 
 @Module({
   imports: [

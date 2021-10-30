@@ -17,7 +17,7 @@ import { DelResult } from '../user/dto/user.dto';
 import { TransactionStatus } from 'src/db/enums/transactionStatus';
 import { Inventory } from 'src/db/models/inventory.entity';
 import { TransactionType } from 'src/db/enums/transactionType';
-import { Setting } from 'src/db/models/setting';
+import { Setting } from 'src/db/models/setting.entity';
 
 @Injectable()
 export class TransactionService {

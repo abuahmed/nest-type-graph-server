@@ -1,7 +1,6 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { TransactionService } from './transaction.service';
 import { CreateTransactionInput } from './dto/create-transaction.input';
-import { UpdateTransactionInput } from './dto/update-transaction.input';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
 import {
@@ -16,8 +15,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { DelResult } from '../user/dto/user.dto';
 import { Inventory } from 'src/db/models/inventory.entity';
-import { Setting } from 'src/db/models/setting';
-import { number } from '@hapi/joi';
+import { Setting } from 'src/db/models/setting.entity';
 
 @Resolver(() => TransactionHeader)
 @UseGuards(JwtAuthGuard)
