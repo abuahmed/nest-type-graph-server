@@ -41,6 +41,10 @@ export class BusinessPartner extends DisplayFields {
   code: string;
 
   @Column({ default: 0 })
+  @Field(() => Int, { defaultValue: 0 })
+  paymentTerm: number;
+
+  @Column({ default: 0 })
   @Field(() => Float, { defaultValue: 0 })
   creditLimit: number;
 
