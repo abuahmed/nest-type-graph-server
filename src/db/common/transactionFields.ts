@@ -3,6 +3,7 @@ import { AfterLoad, BeforeUpdate, Column, ManyToOne, OneToMany } from 'typeorm';
 import { TransactionStatus } from '../enums/transactionStatus';
 import { TransactionType } from '../enums/transactionType';
 import { BusinessPartner } from '../models/businessPartner.entity';
+import { Payment } from '../models/payment.entity';
 import { TransactionLine } from '../models/transactionLine.entity';
 import { Warehouse } from '../models/warehouse.entity';
 import { BasicFields } from './basicFields';
@@ -75,11 +76,15 @@ export abstract class TransactionFields extends BasicFields {
     onDelete: 'CASCADE',
   })
   @Field(() => BusinessPartner, { nullable: true })
-  businessPartner!: BusinessPartner; //Will be null for PI
+  businessPartner!: BusinessPartner; //Will be null for PI and Transfer
 
   @Field(() => [TransactionLine])
   @OneToMany(() => TransactionLine, (line) => line.header)
   lines: TransactionLine[];
+
+  @Field(() => [Payment])
+  @OneToMany(() => Payment, (line) => line.header)
+  payments: Payment[];
 
   @AfterLoad()
   @BeforeUpdate()

@@ -1,11 +1,8 @@
-import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { BasicFields } from '../common/basicFields';
-import { TaxTypes } from '../enums/taxTypes';
 import { FinancialAccount } from './financialAccount.entity';
-registerEnumType(TaxTypes, {
-  name: 'TaxTypes',
-});
+
 @ObjectType()
 @Entity({ name: 'checks' })
 export class Check extends BasicFields {
@@ -15,7 +12,7 @@ export class Check extends BasicFields {
 
   @Column({ default: '', nullable: true })
   @Field({ defaultValue: '' })
-  checkNumber: string;
+  number: string;
 
   @Column({ nullable: false })
   @Field(() => Int, { nullable: false })

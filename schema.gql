@@ -128,6 +128,7 @@ type BusinessPartner {
   tinNumber: String!
   vatNumber: String!
   code: String!
+  paymentTerm: Int!
   creditLimit: Float!
   creditTransactionsLimit: Int!
   creditsWithoutCheck: Boolean
@@ -171,6 +172,121 @@ enum CategoryType {
   ItemCategory
   UnitOfMeasure
   Bank
+}
+
+type FinancialAccount {
+  id: Int!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Int!
+  modifiedByUserId: Int!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  displayName: String!
+  description: String
+  bankId: Int
+  bank: Category!
+  branch: String!
+  accountNumber: String!
+  accountFormat: String!
+  iban: String!
+  swiftCode: String!
+  country: String!
+  organizationId: Int
+  organization: Organization
+  businessPartnerId: Int
+  businessPartner: BusinessPartner
+}
+
+type Check {
+  id: Int!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Int!
+  modifiedByUserId: Int!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  checkDate: DateTime
+  number: String!
+  customerAccountId: Int!
+  customerAccount: FinancialAccount!
+  organizationAccountId: Int
+  organizationAccount: FinancialAccount
+}
+
+type Clearance {
+  id: Int!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Int!
+  modifiedByUserId: Int!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  statementNumber: String!
+  statementDate: DateTime
+  depositedDate: DateTime
+  depositedById: Int
+  depositedBy: User
+  clearedDate: DateTime
+  clearedById: Int
+  clearedBy: User
+  organizationAccountId: Int!
+  organizationAccount: FinancialAccount!
+}
+
+type Payment {
+  id: Int!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Int!
+  modifiedByUserId: Int!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  displayName: String!
+  description: String
+  method: PaymentMethods!
+  type: PaymentTypes!
+  status: PaymentStatus!
+  paymentDate: DateTime!
+  dueDate: DateTime
+  amount: Float!
+  reason: String!
+  paymentRemark: String!
+  personName: String!
+  checkId: Int
+  clearanceId: Int
+  headerId: Int
+  warehouseId: Int
+  warehouse: Warehouse
+  check: Check!
+  clearance: Clearance!
+  header: TransactionHeader!
+}
+
+enum PaymentMethods {
+  Cash
+  Credit
+  Check
+}
+
+enum PaymentTypes {
+  Sale
+  Purchase
+  CashIn
+  CashOut
+  SaleCredit
+  PurchaseCredit
+}
+
+enum PaymentStatus {
+  Draft
+  OnProcess
+  NotDeposited
+  CreditNotCleared
+  NotCleared
+  Cleared
+  NoPayment
+  Refunded
 }
 
 type Item {
@@ -240,6 +356,7 @@ type TransactionHeader {
   businessPartnerId: Int
   businessPartner: BusinessPartner
   lines: [TransactionLine!]!
+  payments: [Payment!]!
   comment: String!
 }
 
@@ -272,6 +389,39 @@ enum TransactionStatus {
   Refunded
 }
 
+type Setting {
+  id: Int!
+  uuid: String!
+  isEnabled: Boolean!
+  createdByUserId: Int!
+  modifiedByUserId: Int!
+  dateRecordCreated: DateTime!
+  dateLastModified: DateTime!
+  checkCreditLimit: Boolean!
+  handleBankTransaction: Boolean!
+  enableReservations: Boolean!
+  enableCheckEntry: Boolean!
+  postWithLessStock: Boolean!
+  taxType: TaxTypes!
+  byDefaultItemsHaveThisTaxRate: Boolean!
+  itemPricesAreTaxInclusive: Boolean!
+  taxPercent: Float!
+  warehouseId: Int!
+  lastInventoryUpdated: DateTime!
+  lastPIUpdated: DateTime!
+  lastPurchaseUpdated: DateTime!
+  lastSalesUpdated: DateTime!
+  lastItemsUpdated: DateTime!
+  lastBusinessPartnersUpdated: DateTime!
+  warehouse: Warehouse!
+}
+
+enum TaxTypes {
+  Vat
+  Tot
+  NoTax
+}
+
 type Warehouse {
   id: Int!
   uuid: String!
@@ -287,6 +437,8 @@ type Warehouse {
   organization: Organization!
   address: Address!
   transactions: [TransactionHeader!]!
+  payments: [Payment!]!
+  setting: Setting!
 }
 
 type User {
@@ -341,22 +493,6 @@ type Inventory {
   totalProfitValue: Float
   warehouse: Warehouse!
   item: Item!
-}
-
-type Setting {
-  id: Int!
-  uuid: String!
-  isEnabled: Boolean!
-  createdByUserId: Int!
-  modifiedByUserId: Int!
-  dateRecordCreated: DateTime!
-  dateLastModified: DateTime!
-  lastInventoryUpdated: DateTime!
-  lastPIUpdated: DateTime!
-  lastPurchaseUpdated: DateTime!
-  lastSalesUpdated: DateTime!
-  lastItemsUpdated: DateTime!
-  lastBusinessPartnersUpdated: DateTime!
 }
 
 type SummaryInput {
