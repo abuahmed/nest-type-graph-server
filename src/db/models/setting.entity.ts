@@ -52,7 +52,7 @@ export class Setting extends BasicFields {
   @Column({ nullable: false })
   @Field(() => Int, { nullable: false })
   warehouseId: number;
-  @OneToOne(() => Warehouse, { cascade: true, nullable: true })
+  @OneToOne(() => Warehouse, { cascade: true, nullable: false })
   @JoinColumn()
   warehouse: Warehouse;
 

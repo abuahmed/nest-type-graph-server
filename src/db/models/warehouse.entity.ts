@@ -3,6 +3,8 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'type
 import { DisplayFields } from '../common/displayFields';
 import { Address } from './address.entity';
 import { Organization } from './organization.entity';
+import { Payment } from './payment.entity';
+import { Setting } from './setting.entity';
 import { TransactionHeader } from './transactionHeader.entity';
 
 @ObjectType()
@@ -27,4 +29,10 @@ export class Warehouse extends DisplayFields {
 
   @OneToMany(() => TransactionHeader, (tran) => tran.warehouse, { cascade: true })
   transactions: TransactionHeader[];
+
+  @OneToMany(() => Payment, (tran) => tran.warehouse)
+  payments: Payment[];
+
+  @OneToOne(() => Setting, { onDelete: 'CASCADE' })
+  setting: Setting;
 }
