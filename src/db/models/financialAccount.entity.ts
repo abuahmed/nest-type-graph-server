@@ -1,13 +1,13 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne } from 'typeorm';
-import { DisplayFields } from '../common/displayFields';
+import { BasicFields } from '../common/basicFields';
 import { BusinessPartner } from './businessPartner.entity';
 import { Category } from './category.entity';
 import { Organization } from './organization.entity';
 
 @ObjectType()
 @Entity({ name: 'financialAccounts' })
-export class FinancialAccount extends DisplayFields {
+export class FinancialAccount extends BasicFields {
   @Column({ nullable: true })
   @Field(() => Int, { nullable: true })
   bankId: number;

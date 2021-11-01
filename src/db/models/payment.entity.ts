@@ -1,6 +1,6 @@
 import { Field, Float, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
-import { DisplayFields } from '../common/displayFields';
+import { BasicFields } from '../common/basicFields';
 import { PaymentMethods, PaymentStatus, PaymentTypes } from '../enums/paymentEnums';
 import { Check } from './check.entity';
 import { Clearance } from './clearance.entity';
@@ -21,7 +21,7 @@ registerEnumType(PaymentStatus, {
 
 @ObjectType()
 @Entity({ name: 'payments' })
-export class Payment extends DisplayFields {
+export class Payment extends BasicFields {
   @Column({
     default: PaymentMethods.Cash,
     enum: PaymentMethods,

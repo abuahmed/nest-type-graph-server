@@ -182,8 +182,6 @@ type FinancialAccount {
   modifiedByUserId: Int!
   dateRecordCreated: DateTime!
   dateLastModified: DateTime!
-  displayName: String!
-  description: String
   bankId: Int
   bank: Category!
   branch: String!
@@ -242,8 +240,6 @@ type Payment {
   modifiedByUserId: Int!
   dateRecordCreated: DateTime!
   dateLastModified: DateTime!
-  displayName: String!
-  description: String
   method: PaymentMethods!
   type: PaymentTypes!
   status: PaymentStatus!
