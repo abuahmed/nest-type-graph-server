@@ -37,7 +37,14 @@ export class TransactionInput extends PartialType(BasicInput) {
   numberOfItems?: number;
   lines?: TransactionLineInput[];
 }
-
+@InputType()
+export class PaymentInput {
+  @Field(() => Int, { nullable: true })
+  headerId?: number;
+  paymentDate?: Date;
+  amount?: number;
+  amountRequired?: number;
+}
 @InputType()
 export class TransactionLineInput extends PartialType(BasicInput) {
   //  @Field(() => Int)

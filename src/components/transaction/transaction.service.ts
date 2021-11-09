@@ -7,6 +7,7 @@ import {
   DailyTransactionsSummary,
   InventorySummary,
   LineSummary,
+  PaymentInput,
   SummaryInput,
   TransactionLineInput,
 } from '../dto/transaction.input';
@@ -18,12 +19,15 @@ import { TransactionStatus } from 'src/db/enums/transactionStatus';
 import { Inventory } from 'src/db/models/inventory.entity';
 import { TransactionType } from 'src/db/enums/transactionType';
 import { Setting } from 'src/db/models/setting.entity';
+import { Payment } from 'src/db/models/payment.entity';
 
 @Injectable()
 export class TransactionService {
   constructor(
     @InjectRepository(TransactionHeader)
     private readonly headerRepo: Repository<TransactionHeader>,
+    @InjectRepository(Payment)
+    private readonly paymentRepo: Repository<Payment>,
     @InjectRepository(TransactionLine)
     private readonly lineRepo: Repository<TransactionLine>,
     @InjectRepository(Inventory)
@@ -370,6 +374,25 @@ export class TransactionService {
         //Update setting field for better caching
         await this.updateSetting(header.type, true);
         return response;
+      }
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+  async postHeaderWithPayment(paymentInput: PaymentInput): Promise<TransactionHeader> {
+    try {
+      // const { headerId, paymentDate, amount, amountRequired } = payment;
+      const payment = this.paymentRepo.create(paymentInput);
+      const result = await this.paymentRepo.save(payment);
+      if (result) {
+        return await this.postHeader(paymentInput.headerId);
       }
     } catch (err) {
       throw new HttpException(

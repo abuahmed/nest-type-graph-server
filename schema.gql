@@ -584,6 +584,7 @@ type Mutation {
   createTransaction(input: CreateTransactionInput!): TransactionHeader!
   createUpdateLine(input: TransactionLineInput!): TransactionLine!
   postHeader(id: Int!): TransactionHeader!
+  postHeaderWithPayment(input: PaymentInput!): TransactionHeader!
   unPostHeader(id: Int!): TransactionHeader!
   removeHeader(id: Int!): DelResult!
   removeLine(id: Int!): TransactionHeader!
@@ -861,4 +862,11 @@ input TransactionInput {
   totalQty: Float
   numberOfItems: Float
   lines: [TransactionLineInput!]
+}
+
+input PaymentInput {
+  headerId: Int
+  paymentDate: DateTime
+  amount: Float
+  amountRequired: Float
 }

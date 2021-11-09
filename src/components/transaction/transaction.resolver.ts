@@ -7,6 +7,7 @@ import {
   DailyTransactionsSummary,
   InventorySummary,
   LineSummary,
+  PaymentInput,
   SummaryInput,
   TransactionLineInput,
 } from '../dto/transaction.input';
@@ -16,6 +17,7 @@ import { UseGuards } from '@nestjs/common';
 import { DelResult } from '../user/dto/user.dto';
 import { Inventory } from 'src/db/models/inventory.entity';
 import { Setting } from 'src/db/models/setting.entity';
+import { Payment } from 'src/db/models/payment.entity';
 
 @Resolver(() => TransactionHeader)
 @UseGuards(JwtAuthGuard)
@@ -67,6 +69,10 @@ export class TransactionResolver {
   @Mutation(() => TransactionHeader)
   postHeader(@Args('id', { type: () => Int }) id: number) {
     return this.transactionService.postHeader(id);
+  }
+  @Mutation(() => TransactionHeader)
+  postHeaderWithPayment(@Args('input') input: PaymentInput) {
+    return this.transactionService.postHeaderWithPayment(input);
   }
   @Mutation(() => TransactionHeader)
   unPostHeader(@Args('id', { type: () => Int }) id: number) {
