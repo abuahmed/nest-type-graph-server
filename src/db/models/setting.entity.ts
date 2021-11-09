@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { BasicFields } from '../common/basicFields';
 import { TaxTypes } from '../enums/taxTypes';
 import { Warehouse } from './warehouse.entity';

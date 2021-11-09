@@ -88,10 +88,10 @@ export class TransactionResolver {
     return this.transactionService.removeLine(id);
   }
 
-  @Query(() => Setting)
-  getSetting(): Promise<Setting> {
-    return this.transactionService.getSetting();
-  }
+  // @Query(() => Setting)
+  // getSetting(): Promise<Setting> {
+  //   return this.transactionService.getSetting();
+  // }
 
   @Query(() => [SummaryInput])
   inventorySummary(@Args() transactionArgs: InventoryArgs): Promise<Array<SummaryInput>> {

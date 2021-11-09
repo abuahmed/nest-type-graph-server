@@ -538,7 +538,6 @@ type Query {
   lines(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, itemId: Int, status: TransactionStatus = Draft, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [TransactionLine!]!
   getHeaderById(id: Int!): TransactionHeader!
   getItemInventory(id: Int!): Inventory!
-  getSetting: Setting!
   inventorySummary(skip: Int = 0, take: Int = 25, warehouseId: Int, lastUpdated: DateTime): [SummaryInput!]!
   getInventorySummary(skip: Int = 0, take: Int = 25, warehouseId: Int, lastUpdated: DateTime): InventorySummary!
   topItems(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, itemId: Int, status: TransactionStatus = Draft, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [LineSummary!]!

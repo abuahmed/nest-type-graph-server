@@ -19,7 +19,6 @@ import { Payment } from 'src/db/models/payment.entity';
       Item,
       Category,
       Inventory,
-      Setting,
     ]),
   ],
   providers: [TransactionResolver, TransactionService],

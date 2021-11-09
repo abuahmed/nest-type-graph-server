@@ -32,8 +32,6 @@ export class TransactionService {
     private readonly lineRepo: Repository<TransactionLine>,
     @InjectRepository(Inventory)
     private readonly inventoryRepo: Repository<Inventory>,
-    @InjectRepository(Setting)
-    private readonly settingRepo: Repository<Setting>,
   ) {}
 
   async create(header: CreateTransactionInput) {
@@ -100,8 +98,6 @@ export class TransactionService {
 
       const response = await this.lineRepo.save(line);
       if (response) {
-        //Update setting field for better caching
-        await this.updateSetting(line.header.type);
         //fetch line with its relations
         const ln = await this.lineRepo.findOne(
           { id: response.id },
@@ -129,19 +125,7 @@ export class TransactionService {
       );
     }
   }
-  async updateSetting(type?: TransactionType, isPostUnPost?: boolean) {
-    let setting = await this.settingRepo.findOne();
-    if (!setting) setting = this.settingRepo.create();
-    if (isPostUnPost) setting.lastInventoryUpdated = new Date();
-    if (type === TransactionType.Sale) setting.lastSalesUpdated = new Date();
-    else if (type === TransactionType.Purchase) setting.lastPurchaseUpdated = new Date();
-    else setting.lastPIUpdated == new Date();
 
-    await this.settingRepo.save(setting);
-  }
-  async getSetting(): Promise<Setting> {
-    return await this.settingRepo.findOne();
-  }
   async findAll(transactionArgs: TransactionArgs): Promise<TransactionHeader[]> {
     const {
       type,
@@ -371,8 +355,7 @@ export class TransactionService {
           ...header,
           status: TransactionStatus.Posted,
         });
-        //Update setting field for better caching
-        await this.updateSetting(header.type, true);
+
         return response;
       }
     } catch (err) {
@@ -443,8 +426,7 @@ export class TransactionService {
       const result = await this.inventoryRepo.save(invents);
       if (result) {
         const response = await this.headerRepo.save({ ...header, status: TransactionStatus.Draft });
-        //Update setting field for better caching
-        await this.updateSetting(header.type, true);
+
         return response;
       }
     } catch (err) {
