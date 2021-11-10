@@ -6,10 +6,9 @@ import {
   ObjectType,
   PartialType,
 } from '@nestjs/graphql';
-import { BasicFields } from 'src/db/common/basicFields';
+import { PaymentTypes } from 'src/db/enums/paymentEnums';
 import { TransactionType } from 'src/db/enums/transactionType';
 import { BusinessPartner } from 'src/db/models/businessPartner.entity';
-import { Item } from 'src/db/models/item.entity';
 import { Warehouse } from 'src/db/models/warehouse.entity';
 import { BasicInput } from './basic.input';
 import { DisplayInput } from './display.input';
@@ -39,6 +38,7 @@ export class TransactionInput extends PartialType(BasicInput) {
 }
 @InputType()
 export class PaymentInput {
+  type?: PaymentTypes;
   @Field(() => Int, { nullable: true })
   headerId?: number;
   paymentDate?: Date;

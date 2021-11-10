@@ -20,6 +20,7 @@ import { Inventory } from 'src/db/models/inventory.entity';
 import { TransactionType } from 'src/db/enums/transactionType';
 import { Setting } from 'src/db/models/setting.entity';
 import { Payment } from 'src/db/models/payment.entity';
+import { PaymentMethods } from 'src/db/enums/paymentEnums';
 
 @Injectable()
 export class TransactionService {
@@ -371,9 +372,21 @@ export class TransactionService {
   }
   async postHeaderWithPayment(paymentInput: PaymentInput): Promise<TransactionHeader> {
     try {
-      // const { headerId, paymentDate, amount, amountRequired } = payment;
-      const payment = this.paymentRepo.create(paymentInput);
-      const result = await this.paymentRepo.save(payment);
+      const { amount, amountRequired } = paymentInput;
+      const payments: Payment[] = [];
+      const cashPayment = this.paymentRepo.create(paymentInput);
+      payments.push(cashPayment);
+      if (amount !== amountRequired) {
+        const creditAmount = amountRequired - amount;
+        const creditPayment = this.paymentRepo.create({
+          ...paymentInput,
+          amount: creditAmount,
+          method: PaymentMethods.Credit,
+        });
+        payments.push(creditPayment);
+      }
+
+      const result = await this.paymentRepo.save(payments);
       if (result) {
         return await this.postHeader(paymentInput.headerId);
       }

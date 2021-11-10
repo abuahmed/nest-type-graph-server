@@ -865,6 +865,7 @@ input TransactionInput {
 
 input PaymentInput {
   headerId: Int
+  type: PaymentTypes
   paymentDate: DateTime
   amount: Float
   amountRequired: Float
