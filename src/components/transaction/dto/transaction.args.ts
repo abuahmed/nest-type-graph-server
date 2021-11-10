@@ -1,9 +1,19 @@
 import { ArgsType, Field, Int, PartialType, registerEnumType } from '@nestjs/graphql';
 import { PaginationArgs } from 'src/components/dto/pagination.args';
+import { PaymentTypes, PaymentMethods, PaymentStatus } from 'src/db/enums/paymentEnums';
 import { TransactionStatus } from 'src/db/enums/transactionStatus';
 import { TransactionType } from 'src/db/enums/transactionType';
 registerEnumType(TransactionStatus, {
   name: 'TransactionStatus',
+});
+registerEnumType(PaymentMethods, {
+  name: 'PaymentMethods',
+});
+registerEnumType(PaymentTypes, {
+  name: 'PaymentTypes',
+});
+registerEnumType(PaymentStatus, {
+  name: 'PaymentStatus',
 });
 @ArgsType()
 export class TransactionArgs extends PartialType(PaginationArgs) {
@@ -36,6 +46,22 @@ export class LineArgs extends PartialType(PaginationArgs) {
   lastUpdated?: Date;
   @Field(() => TransactionStatus, { defaultValue: TransactionStatus.Draft })
   status?: TransactionStatus;
+}
+
+@ArgsType()
+export class PaymentArgs extends PartialType(PaginationArgs) {
+  @Field(() => Int, { nullable: true })
+  headerId?: number;
+  @Field(() => Int, { nullable: true })
+  warehouseId?: number;
+  durationBegin?: Date;
+  durationEnd?: Date;
+  @Field(() => PaymentTypes, { defaultValue: PaymentTypes.Sale })
+  type?: PaymentTypes;
+  @Field(() => PaymentMethods, { defaultValue: PaymentMethods.Cash })
+  method?: PaymentMethods;
+  @Field(() => PaymentStatus, { defaultValue: PaymentStatus.Draft })
+  status?: PaymentStatus;
 }
 
 @ArgsType()

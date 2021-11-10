@@ -11,14 +11,13 @@ import {
   SummaryInput,
   TransactionLineInput,
 } from '../dto/transaction.input';
-import { InventoryArgs, LineArgs, TransactionArgs } from './dto/transaction.args';
+import { InventoryArgs, LineArgs, PaymentArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
 import { startOfDay, endOfDay } from 'date-fns';
 import { DelResult } from '../user/dto/user.dto';
 import { TransactionStatus } from 'src/db/enums/transactionStatus';
 import { Inventory } from 'src/db/models/inventory.entity';
 import { TransactionType } from 'src/db/enums/transactionType';
-import { Setting } from 'src/db/models/setting.entity';
 import { Payment } from 'src/db/models/payment.entity';
 import { PaymentMethods } from 'src/db/enums/paymentEnums';
 
@@ -231,6 +230,42 @@ export class TransactionService {
 
     return await linesQB.take(take).skip(skip).orderBy('header.transactionDate', 'DESC').getMany();
   }
+  async findPayments(paymentArgs: PaymentArgs): Promise<Payment[]> {
+    const {
+      headerId,
+      durationBegin: startDate,
+      durationEnd: endDate,
+      status,
+      type,
+      method,
+      skip,
+      take,
+    } = paymentArgs;
+    let paymentsQB = this.paymentRepo
+      .createQueryBuilder('p')
+      .innerJoinAndSelect('p.header', 'header')
+      .innerJoinAndSelect('header.warehouse', 'warehouse');
+
+    if (headerId) {
+      paymentsQB = paymentsQB.andWhere('p.headerId = :headerId', {
+        headerId: headerId,
+      });
+    }
+
+    if (startDate && endDate) {
+      paymentsQB = paymentsQB.andWhere('header.transactionDate BETWEEN :startDate AND :endDate', {
+        startDate: startOfDay(startDate).toISOString(),
+        endDate: endOfDay(endDate).toISOString(),
+      });
+    }
+
+    return await paymentsQB
+      .take(take)
+      .skip(skip)
+      .orderBy('header.transactionDate', 'DESC')
+      .getMany();
+    //
+  }
   async findInventories(inventoryArgs: InventoryArgs): Promise<Inventory[]> {
     const { warehouseId, skip, take } = inventoryArgs;
     let inventoriesQB = this.inventoryRepo
@@ -405,7 +440,9 @@ export class TransactionService {
     try {
       const header = await this.headerRepo.findOne(
         { id },
-        { relations: ['lines', 'lines.item', 'warehouse', 'toWarehouse', 'businessPartner'] },
+        {
+          relations: ['lines', 'lines.item', 'warehouse', 'toWarehouse', 'businessPartner'],
+        },
       );
       const invents: Inventory[] = [];
       if (header.type === TransactionType.Transfer) {

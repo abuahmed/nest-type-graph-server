@@ -11,7 +11,7 @@ import {
   SummaryInput,
   TransactionLineInput,
 } from '../dto/transaction.input';
-import { InventoryArgs, LineArgs, TransactionArgs } from './dto/transaction.args';
+import { InventoryArgs, LineArgs, PaymentArgs, TransactionArgs } from './dto/transaction.args';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { DelResult } from '../user/dto/user.dto';
@@ -47,6 +47,11 @@ export class TransactionResolver {
   @Query(() => [TransactionLine])
   lines(@Args() transactionArgs: LineArgs): Promise<Array<TransactionLine>> {
     return this.transactionService.findLines(transactionArgs);
+  }
+
+  @Query(() => [Payment])
+  payments(@Args() paymentArgs: PaymentArgs): Promise<Array<Payment>> {
+    return this.transactionService.findPayments(paymentArgs);
   }
 
   @Query(() => TransactionHeader)
