@@ -245,15 +245,33 @@ export class TransactionService {
       .createQueryBuilder('p')
       .innerJoinAndSelect('p.header', 'header')
       .innerJoinAndSelect('header.warehouse', 'warehouse');
-
+    //console.log(paymentArgs);
     if (headerId) {
       paymentsQB = paymentsQB.andWhere('p.headerId = :headerId', {
         headerId: headerId,
       });
+    } else {
+      if (type) {
+        paymentsQB = paymentsQB.andWhere('p.type = :type', {
+          type: type,
+        });
+      }
+
+      if (method) {
+        paymentsQB = paymentsQB.andWhere('p.method = :method', {
+          method: method,
+        });
+      }
+
+      if (status) {
+        paymentsQB = paymentsQB.andWhere('p.status = :status', {
+          status: status,
+        });
+      }
     }
 
     if (startDate && endDate) {
-      paymentsQB = paymentsQB.andWhere('header.transactionDate BETWEEN :startDate AND :endDate', {
+      paymentsQB = paymentsQB.andWhere('p.paymentDate BETWEEN :startDate AND :endDate', {
         startDate: startOfDay(startDate).toISOString(),
         endDate: endOfDay(endDate).toISOString(),
       });

@@ -56,11 +56,11 @@ export class PaymentArgs extends PartialType(PaginationArgs) {
   warehouseId?: number;
   durationBegin?: Date;
   durationEnd?: Date;
-  @Field(() => PaymentTypes, { defaultValue: PaymentTypes.Sale })
+  @Field(() => PaymentTypes)
   type?: PaymentTypes;
-  @Field(() => PaymentMethods, { defaultValue: PaymentMethods.Cash })
+  @Field(() => PaymentMethods)
   method?: PaymentMethods;
-  @Field(() => PaymentStatus, { defaultValue: PaymentStatus.Draft })
+  @Field(() => PaymentStatus)
   status?: PaymentStatus;
 }
 
