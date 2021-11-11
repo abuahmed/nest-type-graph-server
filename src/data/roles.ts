@@ -48,4 +48,18 @@ export default [
   'Post Transfer',
   'UnPost Transfer',
   'Delete Transfer',
+
+  'Reserve Items',
+  'Manage Financial Accounts',
+  'Sales Payments',
+  'Purchase Payments',
+  'Add Checks',
+  'Deposit Payments',
+  'Check Payments',
+  'Verify Payments',
+  'Clear Payments',
+  'View Expenses',
+  'Manage Expenses',
+  'View Loans',
+  'Manage Loans',
 ];
