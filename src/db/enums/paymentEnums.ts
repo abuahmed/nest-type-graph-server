@@ -9,13 +9,14 @@ export enum CreditLimitTypes {
   Both = 'Both',
 }
 export enum PaymentStatus {
-  Draft = 'Draft',
-  OnProcess = 'OnProcess',
-  NotDeposited = 'NotDeposited',
-
-  CreditNotCleared = 'CreditNotCleared',
-  NotCleared = 'NotCleared',
+  NotPaid = 'NotPaid', //will also contain NotPaidWithCheck = "NotPaidWithCheck",
+  Paid = 'Paid', //will also contain CheckPaid = "CheckPaid",
+  Deposited = 'Deposited',
+  Checked = 'Checked',
+  Verified = 'Verified',
   Cleared = 'Cleared',
+  NotDeposited = 'NotDeposited',
+  NotCleared = 'NotCleared',
   NoPayment = 'NoPayment',
   Refunded = 'Refunded',
 }
@@ -34,16 +35,20 @@ export enum TransactionPaymentStatus {
   NoPayment = 'NoPayment',
 }
 export enum PaymentListTypes {
-  All = 'DoNotInvoice',
+  All = 'All',
+  Paid = 'Paid',
+  NotPaid = 'NotPaid',
+  Checked = 'Checked',
+  Verified = 'Verified',
   Cleared = 'Cleared',
-  NotCleared = 'NotCleared',
-  NotClearedAndOverdue = 'NotClearedAndOverdue',
-  NotDeposited = 'NotDeposited',
-  DepositedNotCleared = 'DepositedNotCleared',
-  DepositedCleared = 'DepositedCleared',
-  CreditNotCleared = 'CreditNotCleared',
-  CheckNotCleared = 'CheckNotCleared',
-  CheckCleared = 'CheckCleared',
+  // NotCleared = 'NotCleared',
+  // NotClearedAndOverdue = 'NotClearedAndOverdue',
+  // NotDeposited = 'NotDeposited',
+  // DepositedNotCleared = 'DepositedNotCleared',
+  // DepositedCleared = 'DepositedCleared',
+  // CreditNotCleared = 'CreditNotCleared',
+  // CheckNotCleared = 'CheckNotCleared',
+  // CheckCleared = 'CheckCleared',
 }
 export enum InvoiceTerms {
   Immediate = 'Immediate',

@@ -275,12 +275,14 @@ enum PaymentTypes {
 }
 
 enum PaymentStatus {
-  Draft
-  OnProcess
-  NotDeposited
-  CreditNotCleared
-  NotCleared
+  NotPaid
+  Paid
+  Deposited
+  Checked
+  Verified
   Cleared
+  NotDeposited
+  NotCleared
   NoPayment
   Refunded
 }
@@ -536,7 +538,7 @@ type Query {
   transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, type: TransactionType!, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [TransactionHeader!]!
   inventories(skip: Int = 0, take: Int = 25, warehouseId: Int, lastUpdated: DateTime): [Inventory!]!
   lines(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, itemId: Int, status: TransactionStatus = Draft, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [TransactionLine!]!
-  payments(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, type: PaymentTypes = Sale, method: PaymentMethods = Cash, status: PaymentStatus = Draft, durationBegin: DateTime, durationEnd: DateTime): [Payment!]!
+  payments(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, type: PaymentTypes, method: PaymentMethods, status: PaymentStatus, durationBegin: DateTime, durationEnd: DateTime): [Payment!]!
   getHeaderById(id: Int!): TransactionHeader!
   getItemInventory(id: Int!): Inventory!
   inventorySummary(skip: Int = 0, take: Int = 25, warehouseId: Int, lastUpdated: DateTime): [SummaryInput!]!

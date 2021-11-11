@@ -39,7 +39,7 @@ export class Payment extends BasicFields {
   type: PaymentTypes;
 
   @Column({
-    default: PaymentStatus.Draft,
+    default: PaymentStatus.Paid,
     enum: PaymentStatus,
     type: 'enum',
   })
