@@ -64,6 +64,7 @@ export class TransactionService {
       );
     }
   }
+
   async createLine(tranLine: TransactionLineInput): Promise<TransactionLine> {
     const { header } = tranLine;
     try {
@@ -234,6 +235,7 @@ export class TransactionService {
 
     return await linesQB.take(take).skip(skip).orderBy('header.transactionDate', 'DESC').getMany();
   }
+
   async findPayments(paymentArgs: PaymentArgs): Promise<Payment[]> {
     const {
       headerId,
@@ -288,6 +290,7 @@ export class TransactionService {
       .getMany();
     //
   }
+
   async findInventories(inventoryArgs: InventoryArgs): Promise<Inventory[]> {
     const { warehouseId, skip, take } = inventoryArgs;
     let inventoriesQB = this.inventoryRepo
@@ -314,6 +317,7 @@ export class TransactionService {
             'warehouse',
             'toWarehouse',
             'businessPartner',
+            'payments',
             'lines',
             'lines.item',
             'lines.item.itemCategory',
@@ -332,6 +336,7 @@ export class TransactionService {
       );
     }
   }
+
   async getItemInventory(id: number): Promise<Inventory> {
     try {
       return await this.inventoryRepo.findOne(
@@ -350,7 +355,7 @@ export class TransactionService {
     }
   }
 
-  async postHeader(id: number): Promise<TransactionHeader> {
+  async getLineUpdates(id: number): Promise<Inventory[]> {
     try {
       const header = await this.headerRepo.findOne(
         { id },
@@ -384,7 +389,6 @@ export class TransactionService {
           }
           toItemInventory.qtyOnHand = Number(toItemInventory.qtyOnHand) + Number(line.qty);
           invents.push(toItemInventory);
-          console.log(invents);
         });
       } else {
         const inventories = await this.inventoryRepo.find({ warehouseId: header.warehouse.id });
@@ -407,14 +411,24 @@ export class TransactionService {
         });
       }
 
-      const result = await this.inventoryRepo.save(invents);
-      if (result) {
-        const response = await this.headerRepo.save({
-          ...header,
-          status: TransactionStatus.Posted,
-        });
-
-        return response;
+      return invents;
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+  async getPostedHeader(id: number): Promise<TransactionHeader> {
+    try {
+      const header: TransactionHeader = await this.findOne(id);
+      if (header) {
+        header.status = TransactionStatus.Posted;
+        return header;
       }
     } catch (err) {
       throw new HttpException(
@@ -427,7 +441,27 @@ export class TransactionService {
       );
     }
   }
-  async postHeaderWithPayment(paymentInput: PaymentInput): Promise<TransactionHeader> {
+  async postHeader(id: number): Promise<TransactionHeader> {
+    try {
+      const header = await this.getPostedHeader(id);
+      const invents = await this.getLineUpdates(id);
+      const result = await this.inventoryRepo.save(invents);
+      if (result) {
+        return header;
+      }
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  async getPayments(paymentInput: PaymentInput): Promise<Payment[]> {
     try {
       const { amount, amountRequired } = paymentInput;
       const payments: Payment[] = [];
@@ -442,11 +476,27 @@ export class TransactionService {
         });
         payments.push(creditPayment);
       }
+      return payments;
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
   async postHeaderWithPayment(paymentInput: PaymentInput): Promise<TransactionHeader> {
     const { headerId, amount, amountRequired } = paymentInput;
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+
+    try {
+      const header = await this.getPostedHeader(headerId);
 
       await queryRunner.manager.save(await this.getPayments(paymentInput));
       if (amount !== amountRequired) {
@@ -458,7 +508,10 @@ export class TransactionService {
       }
       await queryRunner.manager.save(await this.postHeader(headerId));
       await queryRunner.manager.save(header);
+
       await queryRunner.commitTransaction();
+
+      return header;
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw new HttpException(
@@ -473,6 +526,7 @@ export class TransactionService {
       await queryRunner.release();
     }
   }
+
   async unPostHeader(id: number): Promise<TransactionHeader> {
     try {
       const header = await this.headerRepo.findOne(
