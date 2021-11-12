@@ -7,8 +7,8 @@ import { Item } from 'src/db/models/item.entity';
 import { Category } from 'src/db/models/category.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Inventory } from 'src/db/models/inventory.entity';
-import { Setting } from 'src/db/models/setting.entity';
 import { Payment } from 'src/db/models/payment.entity';
+import { BusinessPartner } from 'src/db/models/businessPartner.entity';
 
 @Module({
   imports: [
@@ -19,6 +19,7 @@ import { Payment } from 'src/db/models/payment.entity';
       Item,
       Category,
       Inventory,
+      BusinessPartner,
     ]),
   ],
   providers: [TransactionResolver, TransactionService],

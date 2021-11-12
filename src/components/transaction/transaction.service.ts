@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import {
   DailyTransactionsSummary,
   InventorySummary,
@@ -24,6 +24,7 @@ import { PaymentMethods } from 'src/db/enums/paymentEnums';
 @Injectable()
 export class TransactionService {
   constructor(
+    private connection: Connection,
     @InjectRepository(TransactionHeader)
     private readonly headerRepo: Repository<TransactionHeader>,
     @InjectRepository(Payment)
@@ -438,12 +439,19 @@ export class TransactionService {
         });
         payments.push(creditPayment);
       }
+  async postHeaderWithPayment(paymentInput: PaymentInput): Promise<TransactionHeader> {
+    const { headerId, amount, amountRequired } = paymentInput;
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-      const result = await this.paymentRepo.save(payments);
-      if (result) {
-        return await this.postHeader(paymentInput.headerId);
+      await queryRunner.manager.save(await this.getPayments(paymentInput));
       }
+      await queryRunner.manager.save(await this.postHeader(headerId));
+      await queryRunner.manager.save(header);
+      await queryRunner.commitTransaction();
     } catch (err) {
+      await queryRunner.rollbackTransaction();
       throw new HttpException(
         {
           status: HttpStatus.FORBIDDEN,
@@ -452,6 +460,8 @@ export class TransactionService {
         },
         HttpStatus.FORBIDDEN,
       );
+    } finally {
+      await queryRunner.release();
     }
   }
   async unPostHeader(id: number): Promise<TransactionHeader> {
