@@ -20,6 +20,7 @@ import { Inventory } from 'src/db/models/inventory.entity';
 import { TransactionType } from 'src/db/enums/transactionType';
 import { Payment } from 'src/db/models/payment.entity';
 import { PaymentMethods } from 'src/db/enums/paymentEnums';
+import { BusinessPartner } from 'src/db/models/businessPartner.entity';
 
 @Injectable()
 export class TransactionService {
@@ -33,6 +34,8 @@ export class TransactionService {
     private readonly lineRepo: Repository<TransactionLine>,
     @InjectRepository(Inventory)
     private readonly inventoryRepo: Repository<Inventory>,
+    @InjectRepository(BusinessPartner)
+    private readonly businessPartnerRepo: Repository<BusinessPartner>,
   ) {}
 
   async create(header: CreateTransactionInput) {
@@ -446,6 +449,12 @@ export class TransactionService {
     await queryRunner.startTransaction();
 
       await queryRunner.manager.save(await this.getPayments(paymentInput));
+      if (amount !== amountRequired) {
+        //Add Outstanding credit to the Business Partner
+        const bp = await this.businessPartnerRepo.findOne({ id: header.businessPartner.id });
+        const creditAmount = amountRequired - amount;
+        bp.totalOutstandingCredit = bp.totalOutstandingCredit + creditAmount;
+        await queryRunner.manager.save(bp);
       }
       await queryRunner.manager.save(await this.postHeader(headerId));
       await queryRunner.manager.save(header);
