@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
-import { Connection, Repository } from 'typeorm';
+import { Connection, QueryRunner, Repository } from 'typeorm';
 import {
   DailyTransactionsSummary,
   InventorySummary,
@@ -38,8 +38,7 @@ export class TransactionService {
     private readonly businessPartnerRepo: Repository<BusinessPartner>,
   ) {}
 
-  async create(header: CreateTransactionInput) {
-    //const { lines } = transactionInput;
+  async create(header: CreateTransactionInput): Promise<TransactionHeader> {
     try {
       const transaction = header.id
         ? await this.headerRepo.preload(header)
@@ -47,12 +46,8 @@ export class TransactionService {
 
       const response = await this.headerRepo.save(transaction);
       if (response) {
-        return await this.headerRepo.findOne({
-          relations: ['warehouse', 'toWarehouse', 'businessPartner'],
-          where: { id: response.id },
-        });
+        return await this.findOne(response.id);
       }
-      //return response;
     } catch (err) {
       throw new HttpException(
         {
@@ -251,7 +246,6 @@ export class TransactionService {
       .createQueryBuilder('p')
       .innerJoinAndSelect('p.header', 'header')
       .innerJoinAndSelect('header.warehouse', 'warehouse');
-    //console.log(paymentArgs);
     if (headerId) {
       paymentsQB = paymentsQB.andWhere('p.headerId = :headerId', {
         headerId: headerId,
@@ -423,6 +417,7 @@ export class TransactionService {
       );
     }
   }
+
   async getPostedHeader(id: number): Promise<TransactionHeader> {
     try {
       const header: TransactionHeader = await this.findOne(id);
@@ -442,14 +437,20 @@ export class TransactionService {
     }
   }
   async postHeader(id: number): Promise<TransactionHeader> {
+    const queryRunner = await this.getQueryRunner();
+
     try {
       const header = await this.getPostedHeader(id);
+      await queryRunner.manager.save(header);
+
       const invents = await this.getLineUpdates(id);
-      const result = await this.inventoryRepo.save(invents);
-      if (result) {
-        return header;
-      }
+      await queryRunner.manager.save(invents);
+
+      await queryRunner.commitTransaction();
+      return header;
     } catch (err) {
+      await queryRunner.rollbackTransaction();
+
       throw new HttpException(
         {
           status: HttpStatus.FORBIDDEN,
@@ -458,6 +459,8 @@ export class TransactionService {
         },
         HttpStatus.FORBIDDEN,
       );
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -467,6 +470,7 @@ export class TransactionService {
       const payments: Payment[] = [];
       const cashPayment = this.paymentRepo.create(paymentInput);
       payments.push(cashPayment);
+
       if (amount !== amountRequired) {
         const creditAmount = amountRequired - amount;
         const creditPayment = this.paymentRepo.create({
@@ -488,17 +492,31 @@ export class TransactionService {
       );
     }
   }
-
+  async getQueryRunner(): Promise<QueryRunner> {
+    try {
+      const queryRunner = this.connection.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      return queryRunner;
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
   async postHeaderWithPayment(paymentInput: PaymentInput): Promise<TransactionHeader> {
     const { headerId, amount, amountRequired } = paymentInput;
-    const queryRunner = this.connection.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
+    const queryRunner = await this.getQueryRunner();
     try {
       const header = await this.getPostedHeader(headerId);
-
-      await queryRunner.manager.save(await this.getPayments(paymentInput));
+      await queryRunner.manager.save(header);
+      const payments = await this.getPayments(paymentInput);
+      await queryRunner.manager.save(payments);
       if (amount !== amountRequired) {
         //Add Outstanding credit to the Business Partner
         const bp = await this.businessPartnerRepo.findOne({ id: header.businessPartner.id });
@@ -506,8 +524,7 @@ export class TransactionService {
         bp.totalOutstandingCredit = bp.totalOutstandingCredit + creditAmount;
         await queryRunner.manager.save(bp);
       }
-      await queryRunner.manager.save(await this.postHeader(headerId));
-      await queryRunner.manager.save(header);
+      await queryRunner.manager.save(await this.getLineUpdates(headerId));
 
       await queryRunner.commitTransaction();
 
