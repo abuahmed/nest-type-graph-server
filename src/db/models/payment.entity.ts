@@ -39,7 +39,7 @@ export class Payment extends BasicFields {
   type: PaymentTypes;
 
   @Column({
-    default: PaymentStatus.Paid,
+    default: PaymentStatus.NotCleared,
     enum: PaymentStatus,
     type: 'enum',
   })
@@ -91,7 +91,7 @@ export class Payment extends BasicFields {
   @ManyToOne(() => TransactionHeader, (tran) => tran.payments, {
     cascade: true,
     onDelete: 'CASCADE',
-    nullable: false,
+    nullable: true,
   })
   header: TransactionHeader;
 

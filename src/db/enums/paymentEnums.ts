@@ -9,8 +9,8 @@ export enum CreditLimitTypes {
   Both = 'Both',
 }
 export enum PaymentStatus {
-  NotPaid = 'NotPaid', //will also contain NotPaidWithCheck = "NotPaidWithCheck",
-  Paid = 'Paid', //will also contain CheckPaid = "CheckPaid",
+  //NotPaid = 'NotPaid', //will also contain NotPaidWithCheck = "NotPaidWithCheck",
+  //Paid = 'Paid', //will also contain CheckPaid = "CheckPaid",
   Deposited = 'Deposited',
   Checked = 'Checked',
   Verified = 'Verified',
