@@ -129,6 +129,7 @@ export class TransactionService {
   async findAll(transactionArgs: TransactionArgs): Promise<TransactionHeader[]> {
     const {
       type,
+      searchText,
       warehouseId,
       businessPartnerId,
       durationBegin: startDate,
@@ -139,34 +140,40 @@ export class TransactionService {
     let transactionsQB = this.headerRepo
       .createQueryBuilder('t')
       .innerJoinAndSelect('t.warehouse', 'Warehouse');
-    if (type === TransactionType.Transfer) {
-      transactionsQB = transactionsQB.innerJoinAndSelect('t.toWarehouse', 'ToWarehouse');
-    } else if (type === TransactionType.Sale || type === TransactionType.Purchase) {
-      transactionsQB = transactionsQB.innerJoinAndSelect('t.businessPartner', 'BusinessPartner');
-    }
-    transactionsQB = transactionsQB.where('t.type = :type', {
-      type: type,
-    });
+    if (searchText) {
+      transactionsQB = transactionsQB.andWhere(`t.id Like("%${searchText}%")`);
+    } else {
+      if (type === TransactionType.Transfer) {
+        transactionsQB = transactionsQB.innerJoinAndSelect('t.toWarehouse', 'ToWarehouse');
+      } else if (type === TransactionType.Sale || type === TransactionType.Purchase) {
+        transactionsQB = transactionsQB.innerJoinAndSelect('t.businessPartner', 'BusinessPartner');
+      }
+      transactionsQB = transactionsQB.where('t.type = :type', {
+        type: type,
+      });
 
-    if (warehouseId) {
-      transactionsQB = transactionsQB.andWhere('t.warehouseId = :warehouseId', {
-        warehouseId,
-      });
+      if (warehouseId) {
+        transactionsQB = transactionsQB.andWhere('t.warehouseId = :warehouseId', {
+          warehouseId,
+        });
+      }
+      if (businessPartnerId) {
+        transactionsQB = transactionsQB.andWhere('t.businessPartnerId = :businessPartnerId', {
+          businessPartnerId,
+        });
+      }
+      if (startDate && endDate) {
+        transactionsQB = transactionsQB.andWhere(
+          't.transactionDate BETWEEN :startDate AND :endDate',
+          {
+            startDate: startOfDay(startDate).toISOString(),
+            endDate: endOfDay(endDate).toISOString(),
+          },
+        );
+      }
     }
-    if (businessPartnerId) {
-      transactionsQB = transactionsQB.andWhere('t.businessPartnerId = :businessPartnerId', {
-        businessPartnerId,
-      });
-    }
-    if (startDate && endDate) {
-      transactionsQB = transactionsQB.andWhere(
-        't.transactionDate BETWEEN :startDate AND :endDate',
-        {
-          startDate: startOfDay(startDate).toISOString(),
-          endDate: endOfDay(endDate).toISOString(),
-        },
-      );
-    }
+
+    //console.log(transactionsQB.getSql());
     return await transactionsQB
       .take(take)
       .skip(skip)
@@ -215,17 +222,17 @@ export class TransactionService {
       linesQB = linesQB.andWhere('header.type IN (:type)', {
         type: tranTypes,
       });
-    }
-    if (itemId) {
-      linesQB = linesQB.andWhere('item.id = :itemId', {
-        itemId: itemId,
-      });
-    }
-    if (startDate && endDate) {
-      linesQB = linesQB.andWhere('header.transactionDate BETWEEN :startDate AND :endDate', {
-        startDate: startOfDay(startDate).toISOString(),
-        endDate: endOfDay(endDate).toISOString(),
-      });
+      if (itemId) {
+        linesQB = linesQB.andWhere('item.id = :itemId', {
+          itemId: itemId,
+        });
+      }
+      if (startDate && endDate) {
+        linesQB = linesQB.andWhere('header.transactionDate BETWEEN :startDate AND :endDate', {
+          startDate: startOfDay(startDate).toISOString(),
+          endDate: endOfDay(endDate).toISOString(),
+        });
+      }
     }
 
     return await linesQB.take(take).skip(skip).orderBy('header.transactionDate', 'DESC').getMany();

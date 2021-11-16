@@ -18,6 +18,7 @@ registerEnumType(PaymentStatus, {
 @ArgsType()
 export class TransactionArgs extends PartialType(PaginationArgs) {
   type: TransactionType;
+  searchText?: string;
   durationBegin?: Date;
   durationEnd?: Date;
   lastUpdated?: Date;
