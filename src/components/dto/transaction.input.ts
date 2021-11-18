@@ -9,6 +9,7 @@ import {
 import { PaymentTypes } from 'src/db/enums/paymentEnums';
 import { TransactionType } from 'src/db/enums/transactionType';
 import { BusinessPartner } from 'src/db/models/businessPartner.entity';
+import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { Warehouse } from 'src/db/models/warehouse.entity';
 import { BasicInput } from './basic.input';
 import { DisplayInput } from './display.input';
@@ -85,4 +86,10 @@ export class DailyTransactionsSummary {
   totalTransactions?: number;
   transactionDate?: string;
   totalAmount?: number;
+}
+@ObjectType()
+export class TransactionsWithSummary {
+  totalTransactions?: number;
+  totalAmount?: number;
+  headers?: TransactionHeader[];
 }

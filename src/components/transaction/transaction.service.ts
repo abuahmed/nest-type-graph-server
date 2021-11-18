@@ -10,6 +10,7 @@ import {
   PaymentInput,
   SummaryInput,
   TransactionLineInput,
+  TransactionsWithSummary,
 } from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, PaymentArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
@@ -126,7 +127,7 @@ export class TransactionService {
     }
   }
 
-  async findAll(transactionArgs: TransactionArgs): Promise<TransactionHeader[]> {
+  async findAll(transactionArgs: TransactionArgs): Promise<TransactionsWithSummary> {
     const {
       type,
       searchText,
@@ -137,6 +138,11 @@ export class TransactionService {
       skip,
       take,
     } = transactionArgs;
+
+    const summary: DailyTransactionsSummary[] = await this.currentTransactions({
+      ...transactionArgs,
+      take: undefined,
+    });
     let transactionsQB = this.headerRepo
       .createQueryBuilder('t')
       .innerJoinAndSelect('t.warehouse', 'Warehouse');
@@ -174,11 +180,17 @@ export class TransactionService {
     }
 
     //console.log(transactionsQB.getSql());
-    return await transactionsQB
+    const rows = await transactionsQB
       .take(take)
       .skip(skip)
       .orderBy('t.transactionDate', 'DESC')
       .getMany();
+
+    return {
+      totalTransactions: summary[0].totalTransactions,
+      totalAmount: summary[0].totalAmount,
+      headers: rows,
+    };
   }
 
   async findLines(lineArgs: LineArgs): Promise<TransactionLine[]> {
@@ -746,19 +758,26 @@ export class TransactionService {
       businessPartnerId,
       durationBegin: startDate,
       durationEnd: endDate,
-      skip,
+      groupByDate,
       take,
     } = transactionArgs;
     let transactionsQB = this.headerRepo
       .createQueryBuilder('t')
       .innerJoin('t.warehouse', 'Warehouse')
-      .innerJoin('t.businessPartner', 'BusinessPartner')
       .select('COUNT(t.id)', 'totalTransactions')
-      .addSelect('DATE_FORMAT(t.transactionDate, "%m/%d/%Y")', 'transactionDate')
-      .addSelect('SUM(t.totalAmount)', 'totalAmount')
-      .where('t.type = :type', {
-        type: type,
-      });
+      .addSelect('SUM(t.totalAmount)', 'totalAmount');
+    // if (type === TransactionType.Sale || type === TransactionType.Purchase) {
+    //   transactionsQB = transactionsQB
+    // }
+    if (groupByDate) {
+      transactionsQB = transactionsQB.addSelect(
+        'DATE_FORMAT(t.transactionDate, "%m/%d/%Y")',
+        'transactionDate',
+      );
+    }
+    transactionsQB = transactionsQB.where('t.type = :type', {
+      type: type,
+    });
 
     if (warehouseId) {
       transactionsQB = transactionsQB.andWhere('t.warehouseId = :warehouseId', {
@@ -779,10 +798,17 @@ export class TransactionService {
         },
       );
     }
-
-    transactionsQB = transactionsQB.groupBy('DATE_FORMAT(t.transactionDate, "%m/%d/%Y")');
-    transactionsQB = transactionsQB.limit(7);
-
-    return await transactionsQB.orderBy('transactionDate', 'ASC').getRawMany();
+    if (groupByDate) {
+      transactionsQB = transactionsQB.groupBy('DATE_FORMAT(t.transactionDate, "%m/%d/%Y")');
+      if (take) transactionsQB = transactionsQB.limit(take);
+      return await transactionsQB.orderBy('transactionDate', 'ASC').getRawMany();
+    } else {
+      return await transactionsQB.getRawMany();
+      // if (type === TransactionType.Sale || type === TransactionType.Purchase) {
+      //   return result;
+      // } else {
+      //   return [{ ...result[0], totalAmount: 0 }];
+      // }
+    }
   }
 }

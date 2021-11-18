@@ -28,6 +28,8 @@ export class TransactionArgs extends PartialType(PaginationArgs) {
   businessPartnerId?: number;
   @Field(() => Boolean, { defaultValue: false })
   includeLines: boolean;
+  @Field(() => Boolean, { defaultValue: false })
+  groupByDate: boolean;
 }
 
 @ArgsType()

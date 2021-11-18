@@ -518,6 +518,12 @@ type DailyTransactionsSummary {
   totalAmount: Float
 }
 
+type TransactionsWithSummary {
+  totalTransactions: Float
+  totalAmount: Float
+  headers: [TransactionHeader!]
+}
+
 type Query {
   Users: [User!]!
   GetUser(input: ListUserInput!): User!
@@ -533,7 +539,7 @@ type Query {
   items(skip: Int = 0, take: Int = 25, itemCategoryId: Int, subCategoryId: Int, unitOfMeasureId: Int): [Item!]!
   getItem(id: Int!): Item!
   getCategories(skip: Int = 0, take: Int = 25, type: CategoryType!): [Category!]!
-  transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, type: TransactionType!, searchText: String, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [TransactionHeader!]!
+  transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, groupByDate: Boolean = false, type: TransactionType!, searchText: String, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): TransactionsWithSummary!
   inventories(skip: Int = 0, take: Int = 25, warehouseId: Int, lastUpdated: DateTime): [Inventory!]!
   lines(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, itemId: Int, status: TransactionStatus = Draft, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [TransactionLine!]!
   payments(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, type: PaymentTypes, method: PaymentMethods, status: PaymentStatus, durationBegin: DateTime, durationEnd: DateTime): [Payment!]!
@@ -542,7 +548,7 @@ type Query {
   inventorySummary(skip: Int = 0, take: Int = 25, warehouseId: Int, lastUpdated: DateTime): [SummaryInput!]!
   getInventorySummary(skip: Int = 0, take: Int = 25, warehouseId: Int, lastUpdated: DateTime): InventorySummary!
   topItems(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, itemId: Int, status: TransactionStatus = Draft, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [LineSummary!]!
-  dailyTransactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, type: TransactionType!, searchText: String, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [DailyTransactionsSummary!]!
+  dailyTransactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, groupByDate: Boolean = false, type: TransactionType!, searchText: String, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [DailyTransactionsSummary!]!
 }
 
 input ListUserInput {
