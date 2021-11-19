@@ -4,6 +4,7 @@ import { CategoryType } from 'src/db/enums/categoryType';
 
 @ArgsType()
 export class ItemArgs extends PartialType(PaginationArgs) {
+  searchText?: string;
   @Field(() => Int, { nullable: true })
   itemCategoryId?: number;
   @Field(() => Int, { nullable: true })

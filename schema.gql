@@ -536,7 +536,7 @@ type Query {
   getWarehouse(id: Int!): Warehouse!
   businessPartners(skip: Int = 0, take: Int = 25, minimumOutstandingCredits: Float, type: BusinessPartnerType!): [BusinessPartner!]!
   getBusinessPartner(id: Int!): BusinessPartner!
-  items(skip: Int = 0, take: Int = 25, itemCategoryId: Int, subCategoryId: Int, unitOfMeasureId: Int): [Item!]!
+  items(skip: Int = 0, take: Int = 25, itemCategoryId: Int, subCategoryId: Int, unitOfMeasureId: Int, searchText: String): [Item!]!
   getItem(id: Int!): Item!
   getCategories(skip: Int = 0, take: Int = 25, type: CategoryType!): [Category!]!
   transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, groupByDate: Boolean = false, type: TransactionType!, searchText: String, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): TransactionsWithSummary!
