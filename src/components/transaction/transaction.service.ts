@@ -246,6 +246,7 @@ export class TransactionService {
         });
       }
     }
+    if (take === -1) return await linesQB.orderBy('header.transactionDate', 'DESC').getMany();
 
     return await linesQB.take(take).skip(skip).orderBy('header.transactionDate', 'DESC').getMany();
   }
@@ -305,7 +306,7 @@ export class TransactionService {
   }
 
   async findInventories(inventoryArgs: InventoryArgs): Promise<Inventory[]> {
-    const { warehouseId, skip, take } = inventoryArgs;
+    const { warehouseId, itemId, categoryId, uomId, skip, take } = inventoryArgs;
     let inventoriesQB = this.inventoryRepo
       .createQueryBuilder('inv')
       .innerJoinAndSelect('inv.warehouse', 'warehouse')
@@ -313,11 +314,27 @@ export class TransactionService {
       .innerJoinAndSelect('item.itemCategory', 'cat')
       .innerJoinAndSelect('item.unitOfMeasure', 'uom');
     if (warehouseId) {
-      inventoriesQB = inventoriesQB.andWhere('inv.warehouseId = :warehouseId', {
+      inventoriesQB = inventoriesQB.andWhere('warehouse.id = :warehouseId', {
         warehouseId,
       });
     }
+    if (itemId) {
+      inventoriesQB = inventoriesQB.andWhere('item.id = :itemId', {
+        itemId,
+      });
+    }
+    if (categoryId) {
+      inventoriesQB = inventoriesQB.andWhere('cat.id = :categoryId', {
+        categoryId,
+      });
+    }
+    if (uomId) {
+      inventoriesQB = inventoriesQB.andWhere('uom.id = :uomId', {
+        uomId,
+      });
+    }
 
+    if (take === -1) return await inventoriesQB.orderBy('item.displayName').getMany();
     return await inventoriesQB.take(take).skip(skip).orderBy('item.displayName').getMany();
   }
 

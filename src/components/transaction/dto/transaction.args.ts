@@ -34,6 +34,7 @@ export class TransactionArgs extends PartialType(PaginationArgs) {
 
 @ArgsType()
 export class LineArgs extends PartialType(PaginationArgs) {
+  searchText?: string;
   @Field(() => Int, { nullable: true })
   headerId?: number;
   @Field(() => Int, { nullable: true })
@@ -71,6 +72,12 @@ export class PaymentArgs extends PartialType(PaginationArgs) {
 export class InventoryArgs extends PartialType(PaginationArgs) {
   @Field(() => Int, { nullable: true })
   warehouseId?: number;
-
+  @Field(() => Int, { nullable: true })
+  itemId?: number;
+  @Field(() => Int, { nullable: true })
+  categoryId?: number;
+  @Field(() => Int, { nullable: true })
+  uomId?: number;
+  searchText?: string;
   lastUpdated?: Date;
 }
