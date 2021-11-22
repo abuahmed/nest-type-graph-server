@@ -21,7 +21,7 @@ export class Item extends DisplayFields {
   // @Field()
   // code?: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: '' })
   @Field({ defaultValue: '' })
   pictureUrl?: string;
 

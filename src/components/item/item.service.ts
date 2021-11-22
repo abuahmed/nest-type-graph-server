@@ -20,20 +20,24 @@ export class ItemService {
   ) {}
 
   async findAll(itemArgs: ItemArgs): Promise<Item[]> {
-    const { skip, take, itemCategoryId, unitOfMeasureId } = itemArgs;
+    const { searchText, skip, take, categoryId, uomId } = itemArgs;
 
     let itemsQB = this.itemRepository
       .createQueryBuilder('i')
       .innerJoinAndSelect('i.itemCategory', 'ItemCategory')
       .innerJoinAndSelect('i.unitOfMeasure', 'UOM');
-    if (itemCategoryId) {
-      itemsQB = itemsQB.andWhere('i.itemCategoryID = :itemCategoryId', { itemCategoryId });
+    if (searchText && searchText.length > 0) {
+      itemsQB = itemsQB.andWhere(`i.displayName Like("%${searchText}%")`);
     }
-    if (unitOfMeasureId) {
-      itemsQB = itemsQB.andWhere('i.unitOfMeasureId = :unitOfMeasureId', { unitOfMeasureId });
+    if (categoryId) {
+      itemsQB = itemsQB.andWhere('ItemCategory.id = :categoryId', { categoryId });
+    }
+    if (uomId) {
+      itemsQB = itemsQB.andWhere('UOM.id = :uomId', { uomId });
     }
     return await itemsQB.take(take).skip(skip).getMany();
   }
+
   async findOne(id: number): Promise<Item> {
     return await this.itemRepository.findOne(
       { id },
@@ -95,7 +99,15 @@ export class ItemService {
   }
 
   async getCategories(categoryArgs: CategoryArgs): Promise<Array<Category>> {
-    return await this.categoryRepository.find({ type: categoryArgs.type });
+    const { searchText, skip, take, type } = categoryArgs;
+    let categoriesQB = this.categoryRepository
+      .createQueryBuilder('c')
+      .where('c.type = :type', { type });
+    if (searchText && searchText.length > 0) {
+      categoriesQB = categoriesQB.andWhere(`c.displayName Like("%${searchText}%")`);
+    }
+    if (take === -1) return await categoriesQB.getMany();
+    return await categoriesQB.take(take).skip(skip).getMany();
   }
 
   async createItemCategory(input: CategoryInput): Promise<Category> {
