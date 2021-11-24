@@ -25,14 +25,17 @@ export class BusinessPartnerService {
   ) {}
 
   async findAll(bpArgs: BusinessPartnerArgs): Promise<BusinessPartner[]> {
-    const { skip, take, type } = bpArgs;
-    const bpsQB = this.businessPartnerRepository
+    const { searchText, skip, take, type } = bpArgs;
+    let bpsQB = this.businessPartnerRepository
       .createQueryBuilder('bp')
       .innerJoinAndSelect('bp.address', 'address')
       .innerJoinAndSelect('bp.contact', 'contact')
       .innerJoinAndSelect('contact.address', 'contactAddress')
       .where('bp.type = :type', { type });
-
+    if (searchText && searchText.length > 0) {
+      bpsQB = bpsQB.andWhere(`bp.displayName Like("%${searchText}%")`);
+    }
+    if (take === -1) return await bpsQB.getMany();
     return await bpsQB.take(take).skip(skip).getMany();
   }
   async findOne(id: number): Promise<BusinessPartner> {
