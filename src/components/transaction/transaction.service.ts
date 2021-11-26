@@ -296,13 +296,12 @@ export class TransactionService {
         endDate: endOfDay(endDate).toISOString(),
       });
     }
-
+    if (take === -1) return await paymentsQB.orderBy('header.transactionDate', 'DESC').getMany();
     return await paymentsQB
       .take(take)
       .skip(skip)
       .orderBy('header.transactionDate', 'DESC')
       .getMany();
-    //
   }
 
   async findInventories(inventoryArgs: InventoryArgs): Promise<Inventory[]> {

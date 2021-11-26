@@ -54,6 +54,7 @@ export class LineArgs extends PartialType(PaginationArgs) {
 
 @ArgsType()
 export class PaymentArgs extends PartialType(PaginationArgs) {
+  searchText?: string;
   @Field(() => Int, { nullable: true })
   headerId?: number;
   @Field(() => Int, { nullable: true })
