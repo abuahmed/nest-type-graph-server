@@ -23,12 +23,16 @@ export class WarehouseService {
     private readonly warehouseRepository: Repository<Warehouse>,
   ) {}
 
-  // async findAll(): Promise<Warehouse[]> {
-  //   return this.warehouseRepository.find();
-  // }
-
   async findAllClients(clientArgs: ClientArgs): Promise<Client[]> {
-    return this.clientRepository.find({ relations: ['address'] });
+    const { searchText, take, skip } = clientArgs;
+    let clientsQB = this.clientRepository
+      .createQueryBuilder('c')
+      .innerJoinAndSelect('c.address', 'address');
+    if (searchText && searchText.length > 0) {
+      clientsQB = clientsQB.andWhere(`c.displayName Like("%${searchText}%")`);
+    }
+    if (take === -1) return await clientsQB.getMany();
+    return await clientsQB.take(take).skip(skip).getMany();
   }
   async findOneClient(id: number): Promise<Client> {
     return await this.clientRepository.findOne({ id }, { relations: ['address'] });
@@ -69,11 +73,20 @@ export class WarehouseService {
   }
 
   async findAllOrganizations(organizationArgs: OrganizationArgs): Promise<Organization[]> {
-    const { clientId } = organizationArgs;
-    return this.organizationRepository.find({
-      relations: ['address', 'client', 'client.address'],
-      where: { clientId },
-    });
+    const { clientId, searchText, take, skip } = organizationArgs;
+    let organizationsQB = this.organizationRepository
+      .createQueryBuilder('o')
+      .innerJoinAndSelect('o.client', 'client')
+      .innerJoinAndSelect('client.address', 'clientAddress')
+      .innerJoinAndSelect('o.address', 'address')
+      .where('o.clientId = :clientId', {
+        clientId: clientId,
+      });
+    if (searchText && searchText.length > 0) {
+      organizationsQB = organizationsQB.andWhere(`o.displayName Like("%${searchText}%")`);
+    }
+    if (take === -1) return await organizationsQB.getMany();
+    return await organizationsQB.take(take).skip(skip).getMany();
   }
   async findOneOrganization(id: number): Promise<Organization> {
     return await this.organizationRepository.findOne(
@@ -123,7 +136,7 @@ export class WarehouseService {
   }
 
   async findAllWarehouses(warehouseArgs: WarehouseArgs): Promise<Warehouse[]> {
-    const { parent, parentId, take, skip } = warehouseArgs;
+    const { parent, parentId, searchText, take, skip } = warehouseArgs;
     let warehousesQB = this.warehouseRepository
       .createQueryBuilder('w')
       .innerJoinAndSelect('w.address', 'address')
@@ -141,17 +154,11 @@ export class WarehouseService {
       });
     }
 
+    if (searchText && searchText.length > 0) {
+      warehousesQB = warehousesQB.andWhere(`w.displayName Like("%${searchText}%")`);
+    }
+    if (take === -1) return await warehousesQB.getMany();
     return await warehousesQB.take(take).skip(skip).getMany();
-    // return this.warehouseRepository.find({
-    //   relations: [
-    //     'address',
-    //     'organization',
-    //     'organization.address',
-    //     'organization.client',
-    //     'organization.client.address',
-    //   ],
-    //   where: { organizationId },
-    // });
   }
   async findOneWarehouse(id: number): Promise<Warehouse> {
     return await this.warehouseRepository.findOne(

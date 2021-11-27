@@ -525,14 +525,14 @@ type TransactionsWithSummary {
 }
 
 type Query {
-  Users: [User!]!
+  Users(skip: Int = 0, take: Int = 25, searchText: String): [User!]!
   GetUser(input: ListUserInput!): User!
   GetRoles: [Role!]!
-  clients(skip: Int = 0, take: Int = 25, clientId: Int): [Client!]!
+  clients(skip: Int = 0, take: Int = 25, clientId: Int, searchText: String): [Client!]!
   getClient(id: Int!): Client!
-  organizations(skip: Int = 0, take: Int = 25, clientId: Int, organizationId: Int): [Organization!]!
+  organizations(skip: Int = 0, take: Int = 25, clientId: Int, organizationId: Int, searchText: String): [Organization!]!
   getOrganization(id: Int!): Organization!
-  warehouses(skip: Int = 0, take: Int = 25, organizationId: Int, warehouseId: Int, parent: String, parentId: Int): [Warehouse!]!
+  warehouses(skip: Int = 0, take: Int = 25, organizationId: Int, warehouseId: Int, parent: String, parentId: Int, searchText: String): [Warehouse!]!
   getWarehouse(id: Int!): Warehouse!
   businessPartners(skip: Int = 0, take: Int = 25, minimumOutstandingCredits: Float, type: BusinessPartnerType!, searchText: String): [BusinessPartner!]!
   getBusinessPartner(id: Int!): BusinessPartner!
