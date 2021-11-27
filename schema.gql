@@ -538,6 +538,8 @@ type Query {
   getBusinessPartner(id: Int!): BusinessPartner!
   items(skip: Int = 0, take: Int = 25, itemId: Int, categoryId: Int, subCategoryId: Int, uomId: Int, searchText: String): [Item!]!
   getItem(id: Int!): Item!
+  financialAccounts(skip: Int = 0, take: Int = 25, bankId: Int, organizationId: Int, businessPartnerId: Int, searchText: String): [FinancialAccount!]!
+  getFinancialAccount(id: Int!): FinancialAccount!
   getCategories(skip: Int = 0, take: Int = 25, type: CategoryType!, searchText: String): [Category!]!
   transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, groupByDate: Boolean = false, type: TransactionType!, searchText: String, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): TransactionsWithSummary!
   inventories(skip: Int = 0, take: Int = 25, warehouseId: Int, itemId: Int, categoryId: Int, uomId: Int, searchText: String, lastUpdated: DateTime): [Inventory!]!
@@ -584,8 +586,10 @@ type Mutation {
   createBusinessPartner(input: CreateBusinessPartnerInput!): BusinessPartner!
   removeBusinessPartner(id: Int!): DelResult!
   createItem(input: CreateItemInput!): Item!
+  createFinancialAccount(input: FinancialAccountInput!): FinancialAccount!
   createItemCategory(input: CategoryInput!): Category!
   removeItem(id: Int!): DelResult!
+  removeFinancialAccount(id: Int!): DelResult!
   removeCategory(id: Int!): DelResult!
   createTransaction(input: CreateTransactionInput!): TransactionHeader!
   createUpdateLine(input: TransactionLineInput!): TransactionLine!
@@ -791,6 +795,28 @@ input CategoryInput {
   description: String
   type: CategoryType = ItemCategory
   parentCategory: CategoryInput
+}
+
+input FinancialAccountInput {
+  id: Int
+  createdByUserId: Int
+  modifiedByUserId: Int
+  version: Float
+  uuid: String
+  isEnabled: Boolean
+  dateRecordCreated: DateTime
+  dateLastModified: DateTime
+  displayName: String
+  description: String
+  branch: String
+  accountNumber: String!
+  accountFormat: String
+  iban: String
+  swiftCode: String
+  country: String
+  bank: CategoryInput
+  organizationId: Float
+  businessPartnerId: Float
 }
 
 input CreateTransactionInput {

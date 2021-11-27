@@ -2,13 +2,14 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryType } from 'src/db/enums/categoryType';
 import { Category } from 'src/db/models/category.entity';
+import { FinancialAccount } from 'src/db/models/financialAccount.entity';
 import { Item } from 'src/db/models/item.entity';
 import { displaySchema, validate } from 'src/validation';
 import { Repository } from 'typeorm';
 import { CategoryInput } from '../dto/category.input';
 import { DelResult } from '../user/dto/user.dto';
-import { CreateItemInput } from './dto/create-item.input';
-import { CategoryArgs, ItemArgs } from './dto/item.args';
+import { CreateItemInput, FinancialAccountInput } from './dto/create-item.input';
+import { CategoryArgs, FinancialAccountArgs, ItemArgs } from './dto/item.args';
 
 @Injectable()
 export class ItemService {
@@ -17,6 +18,8 @@ export class ItemService {
     private readonly itemRepository: Repository<Item>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(FinancialAccount)
+    private readonly financialAccountRepository: Repository<FinancialAccount>,
   ) {}
 
   async findAll(itemArgs: ItemArgs): Promise<Item[]> {
@@ -35,6 +38,7 @@ export class ItemService {
     if (uomId) {
       itemsQB = itemsQB.andWhere('UOM.id = :uomId', { uomId });
     }
+    if (take === -1) return await itemsQB.getMany();
     return await itemsQB.take(take).skip(skip).getMany();
   }
 
@@ -93,6 +97,72 @@ export class ItemService {
   }
   async remove(id: number): Promise<DelResult> {
     const del = await this.itemRepository.delete(id);
+    const res = new DelResult();
+    res.affectedRows = del.affected;
+    return res;
+  }
+
+  async findAllFinancialAccounts(itemArgs: FinancialAccountArgs): Promise<FinancialAccount[]> {
+    const { searchText, skip, take, bankId } = itemArgs;
+
+    let financialAccountsQB = this.financialAccountRepository
+      .createQueryBuilder('f')
+      .innerJoinAndSelect('f.bank', 'bank');
+    if (searchText && searchText.length > 0) {
+      financialAccountsQB = financialAccountsQB.andWhere(
+        `bank.displayName Like("%${searchText}%")`,
+      );
+    }
+
+    if (bankId) {
+      financialAccountsQB = financialAccountsQB.andWhere('bank.id = :bankId', { bankId });
+    }
+    if (take === -1) return await financialAccountsQB.getMany();
+
+    return await financialAccountsQB.take(take).skip(skip).getMany();
+  }
+
+  async findOneFinancialAccount(id: number): Promise<FinancialAccount> {
+    return await this.financialAccountRepository.findOne({ id }, { relations: ['bank'] });
+  }
+
+  async createUpdateFinancialAccount(faInput: FinancialAccountInput): Promise<FinancialAccount> {
+    let { bank } = faInput;
+    try {
+      await validate(displaySchema, { displayName: faInput.displayName });
+
+      const fa = faInput.id
+        ? await this.financialAccountRepository.preload(faInput)
+        : this.financialAccountRepository.create(faInput);
+
+      if (!bank.id)
+        bank = await this.categoryRepository.findOne({
+          displayName: 'Default',
+        });
+
+      bank.type = CategoryType.Bank;
+      const cat = bank.id
+        ? await this.categoryRepository.preload(bank)
+        : this.categoryRepository.create(bank);
+
+      fa.bank = cat;
+
+      const response = await this.financialAccountRepository.save(fa);
+
+      return response;
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: err,
+          message: err.message,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+  async removeFinancialAccount(id: number): Promise<DelResult> {
+    const del = await this.financialAccountRepository.delete(id);
     const res = new DelResult();
     res.affectedRows = del.affected;
     return res;

@@ -14,6 +14,16 @@ export class ItemArgs extends PartialType(PaginationArgs) {
   @Field(() => Int, { nullable: true })
   uomId?: number;
 }
+@ArgsType()
+export class FinancialAccountArgs extends PartialType(PaginationArgs) {
+  searchText?: string;
+  @Field(() => Int, { nullable: true })
+  bankId?: number;
+  @Field(() => Int, { nullable: true })
+  organizationId?: number;
+  @Field(() => Int, { nullable: true })
+  businessPartnerId?: number;
+}
 
 @ArgsType()
 export class CategoryArgs extends PartialType(PaginationArgs) {
