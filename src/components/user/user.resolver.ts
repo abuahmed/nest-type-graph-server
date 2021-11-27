@@ -18,6 +18,7 @@ import {
 import { User } from '../../db/models/user.entity';
 import { UserService } from './user.service';
 import { Role } from 'src/db/models/role.entity';
+import { UserArgs } from '../warehouse/dto/list.args';
 
 @Resolver()
 export class UserResolver {
@@ -26,8 +27,8 @@ export class UserResolver {
   //Query
   @Query(() => [User])
   @UseGuards(JwtAuthGuard)
-  async Users(): Promise<Array<User>> {
-    return await this._userService.findAll();
+  async Users(@Args() userArgs: UserArgs): Promise<Array<User>> {
+    return await this._userService.findAll(userArgs);
   }
 
   @Query(() => User)

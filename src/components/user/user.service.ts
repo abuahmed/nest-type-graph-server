@@ -42,6 +42,7 @@ import { Role } from 'src/db/models/role.entity';
 import { JwtDto } from '../auth/dto/jwt.dto';
 import roles from 'src/data/roles';
 import { Warehouse } from 'src/db/models/warehouse.entity';
+import { UserArgs } from '../warehouse/dto/list.args';
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 @Injectable()
@@ -56,8 +57,19 @@ export class UserService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async findAll(): Promise<User[]> {
-    return this.userRepository.find({ relations: ['roles', 'warehouses', 'client'] });
+  async findAll(userArgs: UserArgs): Promise<User[]> {
+    const { searchText, take, skip } = userArgs;
+    let usersQB = this.userRepository
+      .createQueryBuilder('u')
+      .leftJoinAndSelect('u.roles', 'roles')
+      .leftJoinAndSelect('u.warehouses', 'warehouses')
+      .leftJoinAndSelect('u.client', 'client');
+
+    if (searchText && searchText.length > 0) {
+      usersQB = usersQB.where(`u.name Like("%${searchText}%")`);
+    }
+    if (take === -1) return await usersQB.getMany();
+    return await usersQB.take(take).skip(skip).getMany();
   }
 
   async authUser(listUserInput: ListUserInput): Promise<User> {
