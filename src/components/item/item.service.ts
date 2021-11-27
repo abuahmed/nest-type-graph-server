@@ -129,8 +129,6 @@ export class ItemService {
   async createUpdateFinancialAccount(faInput: FinancialAccountInput): Promise<FinancialAccount> {
     let { bank } = faInput;
     try {
-      await validate(displaySchema, { displayName: faInput.displayName });
-
       const fa = faInput.id
         ? await this.financialAccountRepository.preload(faInput)
         : this.financialAccountRepository.create(faInput);

@@ -1,5 +1,6 @@
 import { Field, InputType, PartialType } from '@nestjs/graphql';
 import { CreateBusinessPartnerInput } from 'src/components/business-partner/dto/create-bp.input';
+import { BasicInput } from 'src/components/dto/basic.input';
 import { CategoryInput } from 'src/components/dto/category.input';
 import { DisplayInput } from 'src/components/dto/display.input';
 import { OrganizationInput } from 'src/components/warehouse/dto/create-update.input';
@@ -15,7 +16,7 @@ export class CreateItemInput extends PartialType(DisplayInput) {
 }
 
 @InputType()
-export class FinancialAccountInput extends PartialType(DisplayInput) {
+export class FinancialAccountInput extends PartialType(BasicInput) {
   bank?: CategoryInput;
   organizationId?: number;
   businessPartnerId?: number;

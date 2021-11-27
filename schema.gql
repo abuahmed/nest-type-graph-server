@@ -806,8 +806,6 @@ input FinancialAccountInput {
   isEnabled: Boolean
   dateRecordCreated: DateTime
   dateLastModified: DateTime
-  displayName: String
-  description: String
   branch: String
   accountNumber: String!
   accountFormat: String
