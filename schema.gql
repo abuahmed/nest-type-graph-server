@@ -806,6 +806,8 @@ input FinancialAccountInput {
   isEnabled: Boolean
   dateRecordCreated: DateTime
   dateLastModified: DateTime
+  organizationId: Int
+  businessPartnerId: Int
   branch: String
   accountNumber: String!
   accountFormat: String
@@ -813,8 +815,6 @@ input FinancialAccountInput {
   swiftCode: String
   country: String
   bank: CategoryInput
-  organizationId: Float
-  businessPartnerId: Float
 }
 
 input CreateTransactionInput {
