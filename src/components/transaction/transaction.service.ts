@@ -10,7 +10,7 @@ import {
   PaymentInput,
   SummaryInput,
   TransactionLineInput,
-  TransactionsWithSummary,
+  HeadersWithCount,
 } from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, PaymentArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
@@ -127,7 +127,7 @@ export class TransactionService {
     }
   }
 
-  async findAll(transactionArgs: TransactionArgs): Promise<TransactionsWithSummary> {
+  async findAll(transactionArgs: TransactionArgs): Promise<HeadersWithCount> {
     const {
       type,
       searchText,
@@ -139,10 +139,10 @@ export class TransactionService {
       take,
     } = transactionArgs;
 
-    const summary: DailyTransactionsSummary[] = await this.currentTransactions({
-      ...transactionArgs,
-      take: undefined,
-    });
+    // const summary: DailyTransactionsSummary[] = await this.currentTransactions({
+    //   ...transactionArgs,
+    //   take: undefined,
+    // });
     let transactionsQB = this.headerRepo
       .createQueryBuilder('t')
       .innerJoinAndSelect('t.warehouse', 'Warehouse');
@@ -184,12 +184,11 @@ export class TransactionService {
       .take(take)
       .skip(skip)
       .orderBy('t.transactionDate', 'DESC')
-      .getMany();
+      .getManyAndCount();
 
     return {
-      totalTransactions: summary[0].totalTransactions,
-      totalAmount: summary[0].totalAmount,
-      headers: rows,
+      headers: rows[0] as TransactionHeader[],
+      totalCount: rows[1],
     };
   }
 

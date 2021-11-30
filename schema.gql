@@ -518,10 +518,9 @@ type DailyTransactionsSummary {
   totalAmount: Float
 }
 
-type TransactionsWithSummary {
-  totalTransactions: Float
-  totalAmount: Float
-  headers: [TransactionHeader!]
+type HeadersWithCount {
+  totalCount: Float!
+  headers: [TransactionHeader!]!
 }
 
 type Query {
@@ -537,11 +536,12 @@ type Query {
   businessPartners(skip: Int = 0, take: Int = 25, minimumOutstandingCredits: Float, type: BusinessPartnerType!, searchText: String): [BusinessPartner!]!
   getBusinessPartner(id: Int!): BusinessPartner!
   items(skip: Int = 0, take: Int = 25, itemId: Int, categoryId: Int, subCategoryId: Int, uomId: Int, searchText: String): [Item!]!
+  getItems(skip: Int = 0, take: Int = 25, itemId: Int, categoryId: Int, subCategoryId: Int, uomId: Int, searchText: String): [Item!]!
   getItem(id: Int!): Item!
   financialAccounts(skip: Int = 0, take: Int = 25, bankId: Int, organizationId: Int, businessPartnerId: Int, searchText: String): [FinancialAccount!]!
   getFinancialAccount(id: Int!): FinancialAccount!
   getCategories(skip: Int = 0, take: Int = 25, type: CategoryType!, searchText: String): [Category!]!
-  transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, groupByDate: Boolean = false, type: TransactionType!, searchText: String, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): TransactionsWithSummary!
+  transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, groupByDate: Boolean = false, type: TransactionType!, searchText: String, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): HeadersWithCount!
   inventories(skip: Int = 0, take: Int = 25, warehouseId: Int, itemId: Int, categoryId: Int, uomId: Int, searchText: String, lastUpdated: DateTime): [Inventory!]!
   lines(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, itemId: Int, status: TransactionStatus = Draft, searchText: String, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [TransactionLine!]!
   payments(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, type: PaymentTypes, method: PaymentMethods, status: PaymentStatus, searchText: String, durationBegin: DateTime, durationEnd: DateTime): [Payment!]!

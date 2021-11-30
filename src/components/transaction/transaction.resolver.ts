@@ -10,7 +10,7 @@ import {
   PaymentInput,
   SummaryInput,
   TransactionLineInput,
-  TransactionsWithSummary,
+  HeadersWithCount,
 } from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, PaymentArgs, TransactionArgs } from './dto/transaction.args';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -34,8 +34,8 @@ export class TransactionResolver {
     return this.transactionService.createLine(input);
   }
 
-  @Query(() => TransactionsWithSummary)
-  transactions(@Args() transactionArgs: TransactionArgs): Promise<TransactionsWithSummary> {
+  @Query(() => HeadersWithCount)
+  transactions(@Args() transactionArgs: TransactionArgs): Promise<HeadersWithCount> {
     return this.transactionService.findAll(transactionArgs);
   }
 
