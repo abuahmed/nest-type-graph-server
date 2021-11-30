@@ -1,6 +1,6 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { ItemService } from './item.service';
-import { CreateItemInput, FinancialAccountInput } from './dto/create-item.input';
+import { CreateItemInput, FinancialAccountInput, ItemsWithCount } from './dto/create-item.input';
 import { Item } from 'src/db/models/item.entity';
 import { CategoryArgs, FinancialAccountArgs, ItemArgs } from './dto/item.args';
 import { DelResult } from '../user/dto/user.dto';
@@ -20,9 +20,14 @@ export class ItemResolver {
     return this.itemService.createUpdate(input);
   }
 
-  @Query(() => [Item])
-  items(@Args() itemArgs: ItemArgs): Promise<Array<Item>> {
+  @Query(() => ItemsWithCount)
+  items(@Args() itemArgs: ItemArgs): Promise<ItemsWithCount> {
     return this.itemService.findAll(itemArgs);
+  }
+
+  @Query(() => [Item])
+  getItems(@Args() itemArgs: ItemArgs): Promise<Array<Item>> {
+    return this.itemService.getAllItems(itemArgs);
   }
 
   @Query(() => Item)

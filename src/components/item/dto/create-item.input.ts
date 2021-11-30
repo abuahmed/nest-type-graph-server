@@ -1,8 +1,13 @@
-import { Field, InputType, Int, PartialType } from '@nestjs/graphql';
+import { Field, InputType, Int, ObjectType, PartialType } from '@nestjs/graphql';
 import { BasicInput } from 'src/components/dto/basic.input';
 import { CategoryInput } from 'src/components/dto/category.input';
 import { DisplayInput } from 'src/components/dto/display.input';
-
+import { Item } from 'src/db/models/item.entity';
+@ObjectType()
+export class ItemList {
+  items: Item[];
+  count: number;
+}
 @InputType()
 export class CreateItemInput extends PartialType(DisplayInput) {
   code?: string;
@@ -32,4 +37,10 @@ export class FinancialAccountInput extends PartialType(BasicInput) {
   swiftCode?: string;
   @Field(() => String, { nullable: true })
   country?: string;
+}
+
+@ObjectType()
+export class ItemsWithCount {
+  totalCount: number;
+  items: Item[];
 }

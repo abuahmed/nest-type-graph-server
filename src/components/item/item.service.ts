@@ -8,7 +8,12 @@ import { displaySchema, validate } from 'src/validation';
 import { Repository } from 'typeorm';
 import { CategoryInput } from '../dto/category.input';
 import { DelResult } from '../user/dto/user.dto';
-import { CreateItemInput, FinancialAccountInput } from './dto/create-item.input';
+import {
+  CreateItemInput,
+  FinancialAccountInput,
+  ItemList,
+  ItemsWithCount,
+} from './dto/create-item.input';
 import { CategoryArgs, FinancialAccountArgs, ItemArgs } from './dto/item.args';
 
 @Injectable()
@@ -22,7 +27,7 @@ export class ItemService {
     private readonly financialAccountRepository: Repository<FinancialAccount>,
   ) {}
 
-  async findAll(itemArgs: ItemArgs): Promise<Item[]> {
+  async findAll(itemArgs: ItemArgs): Promise<ItemsWithCount> {
     const { searchText, skip, take, categoryId, uomId } = itemArgs;
 
     let itemsQB = this.itemRepository
@@ -38,8 +43,31 @@ export class ItemService {
     if (uomId) {
       itemsQB = itemsQB.andWhere('UOM.id = :uomId', { uomId });
     }
-    if (take === -1) return await itemsQB.getMany();
-    return await itemsQB.take(take).skip(skip).getMany();
+    let rows: any[];
+
+    if (take === -1) rows = await itemsQB.getManyAndCount();
+    else rows = await itemsQB.take(take).skip(skip).getManyAndCount();
+
+    return {
+      items: rows[0],
+      totalCount: rows[1],
+    };
+  }
+
+  async getAllItems(itemArgs: ItemArgs): Promise<Item[]> {
+    // const itemsQB = await this.itemRepository.findAndCount({ select: ['id', 'displayName'] });
+    const itemsQB = this.itemRepository
+      .createQueryBuilder('item')
+      .select('id', 'id')
+      .addSelect('displayName', 'displayName');
+    console.log(itemsQB.getSql());
+    return await itemsQB.getRawMany();
+    // const response = await itemsQB.getMany();
+
+    // if (response) {
+    //   return response;
+    // }
+    //return itemsQB[0];
   }
 
   async findOne(id: number): Promise<Item> {
