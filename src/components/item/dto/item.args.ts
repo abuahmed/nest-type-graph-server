@@ -27,6 +27,6 @@ export class FinancialAccountArgs extends PartialType(PaginationArgs) {
 
 @ArgsType()
 export class CategoryArgs extends PartialType(PaginationArgs) {
-  type: CategoryType;
+  //type: CategoryType;
   searchText?: string;
 }

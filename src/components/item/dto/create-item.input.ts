@@ -2,6 +2,7 @@ import { Field, InputType, Int, ObjectType, PartialType } from '@nestjs/graphql'
 import { BasicInput } from 'src/components/dto/basic.input';
 import { CategoryInput } from 'src/components/dto/category.input';
 import { DisplayInput } from 'src/components/dto/display.input';
+import { FinancialAccount } from 'src/db/models/financialAccount.entity';
 import { Item } from 'src/db/models/item.entity';
 @ObjectType()
 export class ItemList {
@@ -43,4 +44,10 @@ export class FinancialAccountInput extends PartialType(BasicInput) {
 export class ItemsWithCount {
   totalCount: number;
   items: Item[];
+}
+
+@ObjectType()
+export class FinancialAccountsWithCount {
+  totalCount: number;
+  financialAccounts: FinancialAccount[];
 }

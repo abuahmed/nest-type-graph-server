@@ -11,6 +11,7 @@ import { DelResult } from '../user/dto/user.dto';
 import {
   CreateItemInput,
   FinancialAccountInput,
+  FinancialAccountsWithCount,
   ItemList,
   ItemsWithCount,
 } from './dto/create-item.input';
@@ -130,7 +131,9 @@ export class ItemService {
     return res;
   }
 
-  async findAllFinancialAccounts(itemArgs: FinancialAccountArgs): Promise<FinancialAccount[]> {
+  async findAllFinancialAccounts(
+    itemArgs: FinancialAccountArgs,
+  ): Promise<FinancialAccountsWithCount> {
     const { searchText, skip, take, bankId } = itemArgs;
 
     let financialAccountsQB = this.financialAccountRepository
@@ -145,9 +148,16 @@ export class ItemService {
     if (bankId) {
       financialAccountsQB = financialAccountsQB.andWhere('bank.id = :bankId', { bankId });
     }
-    if (take === -1) return await financialAccountsQB.getMany();
 
-    return await financialAccountsQB.take(take).skip(skip).getMany();
+    let rows: any[];
+
+    if (take === -1) rows = await financialAccountsQB.getManyAndCount();
+    else rows = await financialAccountsQB.take(take).skip(skip).getManyAndCount();
+
+    return {
+      financialAccounts: rows[0],
+      totalCount: rows[1],
+    };
   }
 
   async findOneFinancialAccount(id: number): Promise<FinancialAccount> {
@@ -195,10 +205,9 @@ export class ItemService {
   }
 
   async getCategories(categoryArgs: CategoryArgs): Promise<Array<Category>> {
-    const { searchText, skip, take, type } = categoryArgs;
-    let categoriesQB = this.categoryRepository
-      .createQueryBuilder('c')
-      .where('c.type = :type', { type });
+    const { searchText, skip, take } = categoryArgs;
+    let categoriesQB = this.categoryRepository.createQueryBuilder('c');
+    //.where('c.type = :type', { type });
     if (searchText && searchText.length > 0) {
       categoriesQB = categoriesQB.andWhere(`c.displayName Like("%${searchText}%")`);
     }

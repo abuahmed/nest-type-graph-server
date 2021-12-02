@@ -478,6 +478,11 @@ type ItemsWithCount {
   items: [Item!]!
 }
 
+type FinancialAccountsWithCount {
+  totalCount: Float!
+  financialAccounts: [FinancialAccount!]!
+}
+
 type Inventory {
   id: Int!
   uuid: String!
@@ -543,9 +548,9 @@ type Query {
   items(skip: Int = 0, take: Int = 25, itemId: Int, categoryId: Int, subCategoryId: Int, uomId: Int, searchText: String): ItemsWithCount!
   getItems(skip: Int = 0, take: Int = 25, itemId: Int, categoryId: Int, subCategoryId: Int, uomId: Int, searchText: String): [Item!]!
   getItem(id: Int!): Item!
-  financialAccounts(skip: Int = 0, take: Int = 25, bankId: Int, organizationId: Int, businessPartnerId: Int, searchText: String): [FinancialAccount!]!
+  financialAccounts(skip: Int = 0, take: Int = 25, bankId: Int, organizationId: Int, businessPartnerId: Int, searchText: String): FinancialAccountsWithCount!
   getFinancialAccount(id: Int!): FinancialAccount!
-  getCategories(skip: Int = 0, take: Int = 25, type: CategoryType!, searchText: String): [Category!]!
+  getCategories(skip: Int = 0, take: Int = 25, searchText: String): [Category!]!
   transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, groupByDate: Boolean = false, type: TransactionType!, searchText: String, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): HeadersWithCount!
   inventories(skip: Int = 0, take: Int = 25, warehouseId: Int, itemId: Int, categoryId: Int, uomId: Int, searchText: String, lastUpdated: DateTime): [Inventory!]!
   lines(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, itemId: Int, status: TransactionStatus = Draft, searchText: String, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): [TransactionLine!]!
