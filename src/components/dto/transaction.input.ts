@@ -9,6 +9,7 @@ import {
 import { PaymentTypes } from 'src/db/enums/paymentEnums';
 import { TransactionType } from 'src/db/enums/transactionType';
 import { BusinessPartner } from 'src/db/models/businessPartner.entity';
+import { Inventory } from 'src/db/models/inventory.entity';
 import { Item } from 'src/db/models/item.entity';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { Warehouse } from 'src/db/models/warehouse.entity';
@@ -92,4 +93,10 @@ export class DailyTransactionsSummary {
 export class HeadersWithCount {
   totalCount: number;
   headers: TransactionHeader[];
+}
+
+@ObjectType()
+export class InventoriesWithCount {
+  totalCount: number;
+  inventories: Inventory[];
 }

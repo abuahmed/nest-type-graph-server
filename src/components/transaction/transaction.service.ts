@@ -11,6 +11,7 @@ import {
   SummaryInput,
   TransactionLineInput,
   HeadersWithCount,
+  InventoriesWithCount,
 } from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, PaymentArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
@@ -303,7 +304,7 @@ export class TransactionService {
       .getMany();
   }
 
-  async findInventories(inventoryArgs: InventoryArgs): Promise<Inventory[]> {
+  async findInventories(inventoryArgs: InventoryArgs): Promise<InventoriesWithCount> {
     const { warehouseId, itemId, categoryId, uomId, skip, take } = inventoryArgs;
     let inventoriesQB = this.inventoryRepo
       .createQueryBuilder('inv')
@@ -331,9 +332,20 @@ export class TransactionService {
         uomId,
       });
     }
+    let rows: any[];
 
-    if (take === -1) return await inventoriesQB.orderBy('item.displayName').getMany();
-    return await inventoriesQB.take(take).skip(skip).orderBy('item.displayName').getMany();
+    if (take === -1) rows = await inventoriesQB.orderBy('item.displayName').getManyAndCount();
+    else
+      rows = await inventoriesQB
+        .take(take)
+        .skip(skip)
+        .orderBy('item.displayName')
+        .getManyAndCount();
+
+    return {
+      inventories: rows[0],
+      totalCount: rows[1],
+    };
   }
 
   async findOne(id: number) {
