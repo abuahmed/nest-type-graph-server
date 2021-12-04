@@ -1,8 +1,9 @@
-import { Field, InputType, Int, PartialType } from '@nestjs/graphql';
+import { Field, InputType, Int, ObjectType, PartialType } from '@nestjs/graphql';
 import { AddressInput } from 'src/components/dto/address.input';
 import { ContactInput } from 'src/components/dto/contact.input';
 import { DisplayInput } from 'src/components/dto/display.input';
 import { BusinessPartnerType } from 'src/db/enums/businessPartnerType';
+import { BusinessPartner } from 'src/db/models/businessPartner.entity';
 
 @InputType()
 export class CreateBusinessPartnerInput extends PartialType(DisplayInput) {
@@ -13,4 +14,10 @@ export class CreateBusinessPartnerInput extends PartialType(DisplayInput) {
   creditTransactionsLimit?: number;
   address: AddressInput;
   contact: ContactInput;
+}
+
+@ObjectType()
+export class BusinessPartnersWithCount {
+  totalCount: number;
+  businessPartners: BusinessPartner[];
 }

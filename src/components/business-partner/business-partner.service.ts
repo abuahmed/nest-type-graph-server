@@ -9,7 +9,7 @@ import { SalesPerson } from 'src/db/models/salesPerson.entity';
 import { DisplayInput } from '../dto/display.input';
 import { BusinessPartnerArgs } from './dto/business-partner.args';
 import { DelResult } from '../user/dto/user.dto';
-import { CreateBusinessPartnerInput } from './dto/create-bp.input';
+import { BusinessPartnersWithCount, CreateBusinessPartnerInput } from './dto/create-bp.input';
 
 @Injectable()
 export class BusinessPartnerService {
@@ -24,7 +24,7 @@ export class BusinessPartnerService {
     private readonly businessPartnerRepository: Repository<BusinessPartner>,
   ) {}
 
-  async findAll(bpArgs: BusinessPartnerArgs): Promise<BusinessPartner[]> {
+  async findAll(bpArgs: BusinessPartnerArgs): Promise<BusinessPartnersWithCount> {
     const { searchText, skip, take, type } = bpArgs;
     let bpsQB = this.businessPartnerRepository
       .createQueryBuilder('bp')
@@ -35,8 +35,13 @@ export class BusinessPartnerService {
     if (searchText && searchText.length > 0) {
       bpsQB = bpsQB.andWhere(`bp.displayName Like("%${searchText}%")`);
     }
-    if (take === -1) return await bpsQB.getMany();
-    return await bpsQB.take(take).skip(skip).getMany();
+    let rows: any[];
+    if (take === -1) rows = await bpsQB.getManyAndCount();
+    else rows = await bpsQB.take(take).skip(skip).getManyAndCount();
+    return {
+      businessPartners: rows[0],
+      totalCount: rows[1],
+    };
   }
   async findOne(id: number): Promise<BusinessPartner> {
     return await this.businessPartnerRepository.findOne(

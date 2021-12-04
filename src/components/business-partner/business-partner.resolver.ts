@@ -6,7 +6,7 @@ import { DisplayInput } from '../dto/display.input';
 import { DelResult } from '../user/dto/user.dto';
 import { BusinessPartnerService } from './business-partner.service';
 import { BusinessPartnerArgs } from './dto/business-partner.args';
-import { CreateBusinessPartnerInput } from './dto/create-bp.input';
+import { BusinessPartnersWithCount, CreateBusinessPartnerInput } from './dto/create-bp.input';
 
 @Resolver()
 @UseGuards(JwtAuthGuard)
@@ -14,8 +14,8 @@ export class BusinessPartnerResolver {
   constructor(private readonly _businessPartnerService: BusinessPartnerService) {}
 
   //Query
-  @Query(() => [BusinessPartner])
-  async businessPartners(@Args() bpArgs: BusinessPartnerArgs): Promise<Array<BusinessPartner>> {
+  @Query(() => BusinessPartnersWithCount)
+  async businessPartners(@Args() bpArgs: BusinessPartnerArgs): Promise<BusinessPartnersWithCount> {
     return this._businessPartnerService.findAll(bpArgs);
   }
   @Query(() => BusinessPartner)

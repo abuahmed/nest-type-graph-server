@@ -473,6 +473,11 @@ type DelResult {
   affectedRows: String!
 }
 
+type BusinessPartnersWithCount {
+  totalCount: Float!
+  businessPartners: [BusinessPartner!]!
+}
+
 type ItemsWithCount {
   totalCount: Float!
   items: [Item!]!
@@ -558,7 +563,7 @@ type Query {
   getOrganization(id: Int!): Organization!
   warehouses(skip: Int = 0, take: Int = 25, organizationId: Int, warehouseId: Int, parent: String, parentId: Int, searchText: String): [Warehouse!]!
   getWarehouse(id: Int!): Warehouse!
-  businessPartners(skip: Int = 0, take: Int = 25, minimumOutstandingCredits: Float, type: BusinessPartnerType!, searchText: String): [BusinessPartner!]!
+  businessPartners(skip: Int = 0, take: Int = 25, minimumOutstandingCredits: Float, type: BusinessPartnerType!, searchText: String): BusinessPartnersWithCount!
   getBusinessPartner(id: Int!): BusinessPartner!
   items(skip: Int = 0, take: Int = 25, itemId: Int, categoryId: Int, subCategoryId: Int, uomId: Int, searchText: String): ItemsWithCount!
   getItems(skip: Int = 0, take: Int = 25, itemId: Int, categoryId: Int, subCategoryId: Int, uomId: Int, searchText: String): [Item!]!
