@@ -12,6 +12,7 @@ import { BusinessPartner } from 'src/db/models/businessPartner.entity';
 import { Inventory } from 'src/db/models/inventory.entity';
 import { Item } from 'src/db/models/item.entity';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
+import { TransactionLine } from 'src/db/models/transactionLine.entity';
 import { Warehouse } from 'src/db/models/warehouse.entity';
 import { BasicInput } from './basic.input';
 import { DisplayInput } from './display.input';
@@ -94,7 +95,11 @@ export class HeadersWithCount {
   totalCount: number;
   headers: TransactionHeader[];
 }
-
+@ObjectType()
+export class LinesWithCount {
+  totalCount: number;
+  lines: TransactionLine[];
+}
 @ObjectType()
 export class InventoriesWithCount {
   totalCount: number;

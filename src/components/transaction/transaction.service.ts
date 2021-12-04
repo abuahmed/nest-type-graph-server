@@ -12,6 +12,7 @@ import {
   TransactionLineInput,
   HeadersWithCount,
   InventoriesWithCount,
+  LinesWithCount,
 } from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, PaymentArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
@@ -193,7 +194,7 @@ export class TransactionService {
     };
   }
 
-  async findLines(lineArgs: LineArgs): Promise<TransactionLine[]> {
+  async findLines(lineArgs: LineArgs): Promise<LinesWithCount> {
     const {
       headerId,
       itemId,
@@ -214,7 +215,7 @@ export class TransactionService {
     if (includePIs) tranTypes.push(TransactionType.PI);
     if (includeTransfers) tranTypes.push(TransactionType.Transfer);
 
-    if (!headerId && tranTypes.length === 0) return [];
+    if (!headerId && tranTypes.length === 0) return { totalCount: 0, lines: [] };
     let linesQB = this.lineRepo
       .createQueryBuilder('l')
       .innerJoinAndSelect('l.header', 'header')
@@ -246,9 +247,21 @@ export class TransactionService {
         });
       }
     }
-    if (take === -1) return await linesQB.orderBy('header.transactionDate', 'DESC').getMany();
+    let rows: any[];
 
-    return await linesQB.take(take).skip(skip).orderBy('header.transactionDate', 'DESC').getMany();
+    if (take === -1)
+      rows = await linesQB.orderBy('header.transactionDate', 'DESC').getManyAndCount();
+    else
+      rows = await linesQB
+        .take(take)
+        .skip(skip)
+        .orderBy('header.transactionDate', 'DESC')
+        .getManyAndCount();
+
+    return {
+      lines: rows[0],
+      totalCount: rows[1],
+    };
   }
 
   async findPayments(paymentArgs: PaymentArgs): Promise<Payment[]> {

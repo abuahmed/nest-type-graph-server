@@ -12,6 +12,7 @@ import {
   TransactionLineInput,
   HeadersWithCount,
   InventoriesWithCount,
+  LinesWithCount,
 } from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, PaymentArgs, TransactionArgs } from './dto/transaction.args';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -45,8 +46,8 @@ export class TransactionResolver {
     return this.transactionService.findInventories(transactionArgs);
   }
 
-  @Query(() => [TransactionLine])
-  lines(@Args() transactionArgs: LineArgs): Promise<Array<TransactionLine>> {
+  @Query(() => LinesWithCount)
+  lines(@Args() transactionArgs: LineArgs): Promise<LinesWithCount> {
     return this.transactionService.findLines(transactionArgs);
   }
 
