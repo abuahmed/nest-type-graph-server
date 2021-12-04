@@ -543,6 +543,11 @@ type InventoriesWithCount {
   inventories: [Inventory!]!
 }
 
+type PaymentsWithCount {
+  totalCount: Float!
+  payments: [Payment!]!
+}
+
 type Query {
   Users(skip: Int = 0, take: Int = 25, searchText: String): [User!]!
   GetUser(input: ListUserInput!): User!
@@ -564,7 +569,7 @@ type Query {
   transactions(skip: Int = 0, take: Int = 25, warehouseId: Int, businessPartnerId: Int, includeLines: Boolean = false, groupByDate: Boolean = false, type: TransactionType!, searchText: String, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): HeadersWithCount!
   inventories(skip: Int = 0, take: Int = 25, warehouseId: Int, itemId: Int, categoryId: Int, uomId: Int, searchText: String, lastUpdated: DateTime): InventoriesWithCount!
   lines(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, itemId: Int, status: TransactionStatus = Draft, searchText: String, includeSales: Boolean, includePurchases: Boolean, includePIs: Boolean, includeTransfers: Boolean, durationBegin: DateTime, durationEnd: DateTime, lastUpdated: DateTime): LinesWithCount!
-  payments(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, type: PaymentTypes, method: PaymentMethods, status: PaymentStatus, searchText: String, durationBegin: DateTime, durationEnd: DateTime): [Payment!]!
+  payments(skip: Int = 0, take: Int = 25, headerId: Int, warehouseId: Int, type: PaymentTypes, method: PaymentMethods, status: PaymentStatus, searchText: String, durationBegin: DateTime, durationEnd: DateTime): PaymentsWithCount!
   getHeaderById(id: Int!): TransactionHeader!
   getItemInventory(id: Int!): Inventory!
   inventorySummary(skip: Int = 0, take: Int = 25, warehouseId: Int, itemId: Int, categoryId: Int, uomId: Int, searchText: String, lastUpdated: DateTime): [SummaryInput!]!

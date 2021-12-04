@@ -13,6 +13,7 @@ import {
   HeadersWithCount,
   InventoriesWithCount,
   LinesWithCount,
+  PaymentsWithCount,
 } from '../dto/transaction.input';
 import { InventoryArgs, LineArgs, PaymentArgs, TransactionArgs } from './dto/transaction.args';
 import { CreateTransactionInput } from './dto/create-transaction.input';
@@ -264,7 +265,7 @@ export class TransactionService {
     };
   }
 
-  async findPayments(paymentArgs: PaymentArgs): Promise<Payment[]> {
+  async findPayments(paymentArgs: PaymentArgs): Promise<PaymentsWithCount> {
     const {
       headerId,
       durationBegin: startDate,
@@ -309,12 +310,21 @@ export class TransactionService {
         endDate: endOfDay(endDate).toISOString(),
       });
     }
-    if (take === -1) return await paymentsQB.orderBy('header.transactionDate', 'DESC').getMany();
-    return await paymentsQB
-      .take(take)
-      .skip(skip)
-      .orderBy('header.transactionDate', 'DESC')
-      .getMany();
+    let rows: any[];
+
+    if (take === -1)
+      rows = await paymentsQB.orderBy('header.transactionDate', 'DESC').getManyAndCount();
+    else
+      rows = await paymentsQB
+        .take(take)
+        .skip(skip)
+        .orderBy('header.transactionDate', 'DESC')
+        .getManyAndCount();
+
+    return {
+      payments: rows[0],
+      totalCount: rows[1],
+    };
   }
 
   async findInventories(inventoryArgs: InventoryArgs): Promise<InventoriesWithCount> {

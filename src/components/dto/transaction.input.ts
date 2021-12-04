@@ -11,6 +11,7 @@ import { TransactionType } from 'src/db/enums/transactionType';
 import { BusinessPartner } from 'src/db/models/businessPartner.entity';
 import { Inventory } from 'src/db/models/inventory.entity';
 import { Item } from 'src/db/models/item.entity';
+import { Payment } from 'src/db/models/payment.entity';
 import { TransactionHeader } from 'src/db/models/transactionHeader.entity';
 import { TransactionLine } from 'src/db/models/transactionLine.entity';
 import { Warehouse } from 'src/db/models/warehouse.entity';
@@ -104,4 +105,10 @@ export class LinesWithCount {
 export class InventoriesWithCount {
   totalCount: number;
   inventories: Inventory[];
+}
+
+@ObjectType()
+export class PaymentsWithCount {
+  totalCount: number;
+  payments: Payment[];
 }
