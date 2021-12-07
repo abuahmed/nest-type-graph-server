@@ -198,6 +198,7 @@ export class TransactionService {
   async findLines(lineArgs: LineArgs): Promise<LinesWithCount> {
     const {
       headerId,
+      warehouseId,
       itemId,
       includeSales,
       includePurchases,
@@ -206,10 +207,10 @@ export class TransactionService {
       durationBegin: startDate,
       durationEnd: endDate,
       status,
+      searchText,
       skip,
       take,
     } = lineArgs;
-
     const tranTypes: TransactionType[] = [];
     if (includeSales) tranTypes.push(TransactionType.Sale);
     if (includePurchases) tranTypes.push(TransactionType.Purchase);
@@ -236,11 +237,17 @@ export class TransactionService {
       linesQB = linesQB.andWhere('header.type IN (:type)', {
         type: tranTypes,
       });
+      if (warehouseId) {
+        linesQB = linesQB.andWhere('warehouse.id = :warehouseId', {
+          warehouseId: warehouseId,
+        });
+      }
       if (itemId) {
         linesQB = linesQB.andWhere('item.id = :itemId', {
           itemId: itemId,
         });
       }
+
       if (startDate && endDate) {
         linesQB = linesQB.andWhere('header.transactionDate BETWEEN :startDate AND :endDate', {
           startDate: startOfDay(startDate).toISOString(),
@@ -248,6 +255,11 @@ export class TransactionService {
         });
       }
     }
+
+    if (searchText) {
+      linesQB = linesQB.andWhere(`item.displayName Like("%${searchText}%")`);
+    }
+
     let rows: any[];
 
     if (take === -1)

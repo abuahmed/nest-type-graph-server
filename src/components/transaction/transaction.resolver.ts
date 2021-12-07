@@ -20,7 +20,6 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { DelResult } from '../user/dto/user.dto';
 import { Inventory } from 'src/db/models/inventory.entity';
-import { Payment } from 'src/db/models/payment.entity';
 
 @Resolver(() => TransactionHeader)
 @UseGuards(JwtAuthGuard)
