@@ -340,7 +340,7 @@ export class TransactionService {
   }
 
   async findInventories(inventoryArgs: InventoryArgs): Promise<InventoriesWithCount> {
-    const { warehouseId, itemId, categoryId, uomId, skip, take } = inventoryArgs;
+    const { warehouseId, itemId, searchText, categoryId, uomId, skip, take } = inventoryArgs;
     let inventoriesQB = this.inventoryRepo
       .createQueryBuilder('inv')
       .innerJoinAndSelect('inv.warehouse', 'warehouse')
@@ -356,6 +356,9 @@ export class TransactionService {
       inventoriesQB = inventoriesQB.andWhere('item.id = :itemId', {
         itemId,
       });
+    }
+    if (searchText) {
+      inventoriesQB = inventoriesQB.andWhere(`item.displayName Like("%${searchText}%")`);
     }
     if (categoryId) {
       inventoriesQB = inventoriesQB.andWhere('cat.id = :categoryId', {
