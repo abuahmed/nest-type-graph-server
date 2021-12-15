@@ -14,7 +14,7 @@ const options: TypeOrmModuleOptions = {
   logging: false,
   entities: [path.resolve(__dirname, '..', 'db', 'models', '*')],
   synchronize: true,
-  migrationsRun: true,
+  migrationsRun: false,
   migrations: [path.resolve(__dirname, '..', 'db', 'migrations', '*')],
   cli: {
     // Location of migration should be inside src folder
