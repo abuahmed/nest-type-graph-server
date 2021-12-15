@@ -92,9 +92,9 @@ export class UserService {
   }
 
   async signUpUser(createUserDto: CreateUserInput): Promise<User> {
-    const { email, name, password } = createUserDto;
+    const { email, name, password, confirmPassword } = createUserDto;
     try {
-      await validate(registerSchema, createUserDto);
+      await validate(registerSchema, { email, name, password, confirmPassword });
       const found = await this.userRepository.findOne({ email });
 
       if (found) {
@@ -147,7 +147,7 @@ export class UserService {
   async createUser(createUserDto: CreateUserInput): Promise<User> {
     const { email, accountVerified, clientId } = createUserDto;
     try {
-      await validate(registerFederatedUserSchema, createUserDto);
+      await validate(registerFederatedUserSchema, { email, clientId });
       const found = await this.userRepository.findOne({ email });
 
       if (found) {
