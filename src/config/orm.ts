@@ -5,7 +5,7 @@ const MYSQL_USERNAME = process.env.MYSQL_USERNAME;
 const MYSQL_PASSWORD = process.env.MYSQL_PASSWORD;
 
 const options: TypeOrmModuleOptions = {
-  type: 'mysql',
+  type: 'mariadb',
   host: 'localhost',
   port: 3306,
   username: MYSQL_USERNAME,

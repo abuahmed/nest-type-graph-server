@@ -92,7 +92,7 @@ export class UserService {
   }
 
   async signUpUser(createUserDto: CreateUserInput): Promise<User> {
-    const { email, name, password, confirmPassword } = createUserDto;
+    const { email, clientId, name, password, confirmPassword } = createUserDto;
     try {
       await validate(registerSchema, { email, name, password, confirmPassword });
       const found = await this.userRepository.findOne({ email });
@@ -107,7 +107,7 @@ export class UserService {
         );
       }
 
-      let user = this.userRepository.create({ email, name, password });
+      let user = this.userRepository.create({ email, name, password, clientId });
       user = await this.preSave(user);
 
       const response = await this.userRepository.save(user);

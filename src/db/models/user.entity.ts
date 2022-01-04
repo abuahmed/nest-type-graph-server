@@ -24,16 +24,16 @@ export class User extends BasicFields {
   @Field()
   password: string;
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
+  @Column({ nullable: true, default: '' })
+  @Field({ nullable: true, defaultValue: '' })
   salt: string;
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
+  @Column({ nullable: true, default: '' })
+  @Field({ nullable: true, defaultValue: '' })
   avatar: string;
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
+  @Column({ nullable: true, default: '' })
+  @Field({ nullable: true, defaultValue: '' })
   bio: string;
 
   @Column({ default: false })
@@ -70,8 +70,8 @@ export class User extends BasicFields {
   @Field(() => [Warehouse])
   warehouses: Warehouse[];
 
-  @Column({ nullable: false })
-  @Field(() => Int, { nullable: false })
+  @Column({ nullable: true })
+  @Field(() => Int, { nullable: true })
   clientId: number;
 
   @ManyToOne(() => Client)

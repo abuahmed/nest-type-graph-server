@@ -458,7 +458,7 @@ type User {
   expiredAt: DateTime!
   roles: [Role!]!
   warehouses: [Warehouse!]!
-  clientId: Int!
+  clientId: Int
   client: Client!
 }
 

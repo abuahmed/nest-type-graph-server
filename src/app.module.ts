@@ -14,7 +14,7 @@ import * as ormOptions from './config/orm';
     TypeOrmModule.forRoot(ormOptions),
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',
-      playground: true,
+      introspection: true,
       debug: true,
     }),
 
